@@ -3,6 +3,8 @@ import { pricingCatalog, defaultResources } from '@/lib/pricing-catalog'
 import { calculateInsurancePlan, calculateStandardPlan, calculateCumulativeCosts, mergeDetails } from '@/lib/simulator'
 import { SimulationParams, SimulationResult, ResourceConfig } from '@/lib/types'
 
+export const runtime = 'edge'
+
 export async function POST(request: NextRequest) {
   try {
     const body: SimulationParams = await request.json()
