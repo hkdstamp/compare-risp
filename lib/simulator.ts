@@ -15,6 +15,8 @@ export function calculateInsurancePlan(
   let totalPremium = 0
   const details: DetailItem[] = []
 
+  let totalExpectedRefund = 0
+
   for (const res of resources) {
     const onDemandRate = catalog.resources[res.service][res.instance].on_demand_hourly_usd
     const coverageQty = res.quantity * coverage
@@ -27,12 +29,18 @@ export function calculateInsurancePlan(
     const remainingCost = onDemandRate * hours * remainingQty * usage
     const monthlyCost = discountedUsageCost + premium + remainingCost
 
+    // Calculate expected refund
+    // Refund = Premium at 100% coverage - Premium at actual coverage
+    const premiumAt100Coverage = onDemandRate * hours * res.quantity * plan.discount_rate * plan.premium_rate
+    const expectedRefund = premiumAt100Coverage - premium
+
     details.push({
       resource: `${res.service}:${res.instance}`,
       baseline_cost: baseline,
       insurance_cost: monthlyCost,
       insurance_premium: premium,
       insurance_savings: baseline - monthlyCost,
+      insurance_expected_refund: expectedRefund,
       standard_cost: 0,
       standard_upfront: 0,
       standard_savings: 0
@@ -41,9 +49,13 @@ export function calculateInsurancePlan(
     totalBaseline += baseline
     totalMonthlyCost += monthlyCost
     totalPremium += premium
+    totalExpectedRefund += expectedRefund
   }
 
   const monthlySavings = totalBaseline - totalMonthlyCost
+  
+  // Effective savings including expected refund
+  const effectiveMonthlySavings = monthlySavings + totalExpectedRefund
 
   // Insurance RI/SP break-even calculation
   // IMPORTANT: Use the STANDARD RI/SP contract term (not insurance plan's term)
@@ -67,9 +79,10 @@ export function calculateInsurancePlan(
     result: {
       name: `Insurance RI/SP ${plan.name}`,
       monthly_cost: totalMonthlyCost,
-      monthly_savings: monthlySavings,
+      monthly_savings: effectiveMonthlySavings,
       initial_cost: 0,
       premium: totalPremium,
+      expected_refund: totalExpectedRefund,
       break_even_months: breakEven
     },
     details
@@ -138,6 +151,7 @@ export function calculateStandardPlan(
       insurance_cost: 0,
       insurance_premium: 0,
       insurance_savings: 0,
+      insurance_expected_refund: 0,
       standard_cost: monthlyEffective,
       standard_upfront: upfront * coverageQty,
       standard_savings: baseline - monthlyEffective

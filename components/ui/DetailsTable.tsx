@@ -18,6 +18,7 @@ export default function DetailsTable({ details }: DetailsTableProps) {
               <th className="px-4 py-3 text-right font-semibold text-gray-700">通常価格</th>
               <th className="px-4 py-3 text-right font-semibold text-gray-700">保険RI/SP</th>
               <th className="px-4 py-3 text-right font-semibold text-gray-700">保険料</th>
+              <th className="px-4 py-3 text-right font-semibold text-gray-700">返金見込</th>
               <th className="px-4 py-3 text-right font-semibold text-gray-700">保険削減額</th>
               <th className="px-4 py-3 text-right font-semibold text-gray-700">標準RI/SP</th>
               <th className="px-4 py-3 text-right font-semibold text-gray-700">標準初期コスト</th>
@@ -31,8 +32,16 @@ export default function DetailsTable({ details }: DetailsTableProps) {
                 <td className="px-4 py-3 text-right text-gray-700">{formatCurrency(detail.baseline_cost)}</td>
                 <td className="px-4 py-3 text-right text-gray-700">{formatCurrency(detail.insurance_cost)}</td>
                 <td className="px-4 py-3 text-right text-gray-700">{formatCurrency(detail.insurance_premium)}</td>
+                <td className="px-4 py-3 text-right font-medium text-emerald-600">
+                  {formatCurrency(detail.insurance_expected_refund)}
+                </td>
                 <td className="px-4 py-3 text-right font-semibold text-green-600">
                   {formatCurrency(detail.insurance_savings)}
+                  {detail.insurance_expected_refund > 0 && (
+                    <div className="text-xs text-gray-500 mt-1">
+                      ({formatCurrency(detail.insurance_savings - detail.insurance_expected_refund)} + {formatCurrency(detail.insurance_expected_refund)})
+                    </div>
+                  )}
                 </td>
                 <td className="px-4 py-3 text-right text-gray-700">{formatCurrency(detail.standard_cost)}</td>
                 <td className="px-4 py-3 text-right text-gray-700">{formatCurrency(detail.standard_upfront)}</td>

@@ -34,9 +34,19 @@ export default function CostCards({ baselineCost, insurance, standard }: CostCar
             <div className="text-sm text-gray-600">月額コスト</div>
           </div>
           <div className="bg-green-50 px-3 py-2 rounded-lg">
-            <div className="text-sm font-semibold text-green-700">削減額: {formatCurrency(insurance.monthly_savings)}</div>
+            <div className="text-sm font-semibold text-green-700">
+              月間削減額: {formatCurrency(insurance.monthly_savings)}
+            </div>
+            {insurance.expected_refund && insurance.expected_refund > 0 && (
+              <div className="text-xs text-green-600 mt-1">
+                (基本削減: {formatCurrency(insurance.monthly_savings - insurance.expected_refund)} + 返金見込: {formatCurrency(insurance.expected_refund)})
+              </div>
+            )}
           </div>
           <div className="text-sm text-gray-600">保険料: {formatCurrency(insurance.premium)}</div>
+          {insurance.expected_refund && insurance.expected_refund > 0 && (
+            <div className="text-sm text-emerald-600 font-medium">💰 返金見込: {formatCurrency(insurance.expected_refund)}</div>
+          )}
           <div className="text-sm text-gray-600">
             損益分岐: {insurance.break_even_months ? `${insurance.break_even_months}ヶ月` : '-'}
           </div>

@@ -14,6 +14,7 @@ export interface PlanResult {
   monthly_cash_savings?: number
   initial_cost: number
   premium: number
+  expected_refund?: number
   break_even_months: number | null
 }
 
@@ -50,6 +51,7 @@ export interface DetailItem {
   insurance_cost: number
   insurance_premium: number
   insurance_savings: number
+  insurance_expected_refund: number
   standard_cost: number
   standard_upfront: number
   standard_savings: number
