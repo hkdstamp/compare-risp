@@ -44,11 +44,14 @@ export function calculateInsurancePlan(
 
   const monthlySavings = totalBaseline - totalMonthlyCost
 
-  // Insurance RI/SP has no initial cost, so there is NO break-even point
-  // You're already saving from month 1 (if monthly_savings > 0)
-  // The concept of "breaking even" doesn't apply when there's no upfront investment
+  // Insurance RI/SP has no initial cost
+  // Break-even condition: on-demand cumulative >= insurance total expenditure
+  // At month 1: baseline_cost × 1 >= 0 + monthly_cost × 1
+  // Since monthly_cost < baseline_cost (we have savings), condition is met at month 1
   let breakEven = null
-  // breakEven remains null for insurance plans (no initial cost to recover)
+  if (monthlySavings > 0) {
+    breakEven = 1  // Condition satisfied from month 1 (no initial cost)
+  }
 
   return {
     result: {
@@ -155,15 +158,23 @@ export function calculateStandardPlan(
   //
   // Therefore: N = ceil(initial_cost / monthly_savings)
   //
+  // Special case: When initial_cost = 0 (Savings Plans, NoUpfront)
+  //   0 + (monthly_cost × 1) vs baseline_cost × 1
+  //   Since monthly_cost < baseline_cost (we have savings),
+  //   the condition is ALREADY satisfied at month 1
+  //   Therefore: N = 1
+  //
   // This is the month when you START saving money (on-demand becomes more expensive)
   let breakEven = null
-  if (monthlySavings > 0 && totalInitialCost > 0) {
-    // With initial cost: calculate the month when on-demand cumulative exceeds total expenditure
-    breakEven = Math.ceil(totalInitialCost / monthlySavings)
+  if (monthlySavings > 0) {
+    if (totalInitialCost > 0) {
+      // With initial cost: calculate the month when on-demand cumulative exceeds total expenditure
+      breakEven = Math.ceil(totalInitialCost / monthlySavings)
+    } else {
+      // No initial cost: condition is met from month 1
+      breakEven = 1
+    }
   }
-  // Note: When initial_cost = 0 (Savings Plans, NoUpfront), there is NO break-even point
-  // because you're already saving from month 1. The concept of "breaking even" doesn't apply
-  // when you start with immediate savings. breakEven remains null in this case.
 
   // Create plan name
   let planName: string

@@ -180,36 +180,22 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
           💹 累積コスト推移（契約期間: {termDisplay}）
         </h3>
         <div className="flex gap-4 text-sm">
-          {standardPlan.break_even_months !== null ? (
+          {standardPlan.break_even_months !== null && (
             <div className="flex items-center gap-2">
               <span className="inline-block w-3 h-3 rounded-full bg-blue-500"></span>
               <span className="text-gray-600">
                 標準RI/SP 損益分岐: <span className="font-semibold text-blue-600">{standardPlan.break_even_months}ヶ月</span>
               </span>
             </div>
-          ) : standardPlan.monthly_savings > 0 ? (
-            <div className="flex items-center gap-2">
-              <span className="inline-block w-3 h-3 rounded-full bg-blue-500"></span>
-              <span className="text-gray-600">
-                標準RI/SP: <span className="font-semibold text-blue-600">即座に節約</span>
-              </span>
-            </div>
-          ) : null}
-          {insurancePlan.break_even_months !== null ? (
+          )}
+          {insurancePlan.break_even_months !== null && (
             <div className="flex items-center gap-2">
               <span className="inline-block w-3 h-3 rounded-full bg-green-500"></span>
               <span className="text-gray-600">
                 保険RI/SP 損益分岐: <span className="font-semibold text-green-600">{insurancePlan.break_even_months}ヶ月</span>
               </span>
             </div>
-          ) : insurancePlan.monthly_savings > 0 ? (
-            <div className="flex items-center gap-2">
-              <span className="inline-block w-3 h-3 rounded-full bg-green-500"></span>
-              <span className="text-gray-600">
-                保険RI/SP: <span className="font-semibold text-green-600">即座に節約</span>
-              </span>
-            </div>
-          ) : null}
+          )}
         </div>
       </div>
       <div className="mb-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
