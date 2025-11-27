@@ -74,18 +74,39 @@ export function calculateStandardPlan(
 
   const termMonths = term === '1yr' ? 12 : 36
 
-  for (const res of resources) {
-    const onDemandRate = catalog.resources[res.service][res.instance].on_demand_hourly_usd
-    const plan = catalog.resources[res.service][res.instance].standard_ri[term][option]
+  // Check if this is a Savings Plan
+  const isSavingsPlan = option === 'SavingsPlan'
 
-    const reservedRate = plan.hourly_usd
-    const upfront = plan.upfront_usd
+  for (const res of resources) {
+    const resourcePricing = catalog.resources[res.service][res.instance]
+    const onDemandRate = resourcePricing.on_demand_hourly_usd
+
+    let reservedRate: number
+    let upfront: number
+
+    if (isSavingsPlan) {
+      // Use Savings Plans pricing
+      if (!resourcePricing.savings_plans || !resourcePricing.savings_plans[term]) {
+        // Fallback to RI NoUpfront if SP not available
+        const plan = resourcePricing.standard_ri[term]['NoUpfront']
+        reservedRate = plan.hourly_usd
+        upfront = 0
+      } else {
+        reservedRate = resourcePricing.savings_plans[term].hourly_usd
+        upfront = 0  // Savings Plans have no upfront payment
+      }
+    } else {
+      // Use Reserved Instance pricing
+      const plan = resourcePricing.standard_ri[term][option]
+      reservedRate = plan.hourly_usd
+      upfront = plan.upfront_usd
+    }
 
     const coverageQty = res.quantity * coverage
     const remainingQty = Math.max(res.quantity - coverageQty, 0)
 
     const baseline = onDemandRate * hours * res.quantity * usage
-    const reservedMonthlyRecurring = reservedRate * hours * coverageQty
+    const reservedMonthlyRecurring = reservedRate * hours * coverageQty * usage
     const reservedMonthlyAmortized = (upfront * coverageQty) / termMonths
     const reservedMonthlyEffective = reservedMonthlyRecurring + reservedMonthlyAmortized
     const remainingMonthlyCost = onDemandRate * hours * remainingQty * usage
@@ -113,11 +134,22 @@ export function calculateStandardPlan(
   let breakEven = null
   if (totalInitialCost > 0 && totalMonthlyCashSavings > 0) {
     breakEven = Math.ceil(totalInitialCost / totalMonthlyCashSavings)
+  } else if (totalInitialCost === 0 && monthlySavings > 0) {
+    // For Savings Plans (no upfront), break-even is immediate
+    breakEven = 1
+  }
+
+  // Create plan name
+  let planName: string
+  if (isSavingsPlan) {
+    planName = `Compute Savings Plan ${term === '1yr' ? '1年' : '3年'}`
+  } else {
+    planName = `Standard RI ${term} ${option}`
   }
 
   return {
     result: {
-      name: `Standard RI/SP ${term} ${option}`,
+      name: planName,
       monthly_cost: totalMonthlyEffective,
       monthly_savings: monthlySavings,
       initial_cost: totalInitialCost,

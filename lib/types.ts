@@ -73,6 +73,11 @@ export interface PricingCatalog {
             }
           }
         }
+        savings_plans?: {
+          [term: string]: {
+            hourly_usd: number
+          }
+        }
       }
     }
   }

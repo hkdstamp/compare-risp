@@ -77,16 +77,21 @@ export default function SimulationConfig({ onSimulate, isLoading }: SimulationCo
         <div className="flex flex-col">
           <label className="flex items-center gap-2 font-semibold text-gray-700 mb-2">
             <span className="text-xl">💰</span>
-            標準RI/SP 支払い方法
+            標準RI/SP タイプ
           </label>
           <select
             value={standardOption}
             onChange={(e) => setStandardOption(e.target.value)}
             className="px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition"
           >
-            <option value="NoUpfront">NoUpfront (全額後払い)</option>
-            <option value="PartialUpfront">PartialUpfront (50%前払い)</option>
-            <option value="AllUpfront">AllUpfront (100%前払い)</option>
+            <optgroup label="Reserved Instance (RI)">
+              <option value="NoUpfront">RI - NoUpfront (全額後払い)</option>
+              <option value="PartialUpfront">RI - PartialUpfront (50%前払い)</option>
+              <option value="AllUpfront">RI - AllUpfront (100%前払い)</option>
+            </optgroup>
+            <optgroup label="Savings Plans (SP)">
+              <option value="SavingsPlan">SP - Compute Savings Plan</option>
+            </optgroup>
           </select>
         </div>
 

@@ -65,6 +65,10 @@ export const pricingCatalog: PricingCatalog = {
             PartialUpfront: { hourly_usd: 0.0218, upfront_usd: 572 },
             AllUpfront: { hourly_usd: 0.0, upfront_usd: 1075 }
           }
+        },
+        savings_plans: {
+          "1yr": { hourly_usd: 0.0653 },  // ~40% discount from on-demand
+          "3yr": { hourly_usd: 0.0435 }   // ~60% discount from on-demand
         }
       },
       "t3.xlarge": {
@@ -80,6 +84,10 @@ export const pricingCatalog: PricingCatalog = {
             PartialUpfront: { hourly_usd: 0.0435, upfront_usd: 1144 },
             AllUpfront: { hourly_usd: 0.0, upfront_usd: 2150 }
           }
+        },
+        savings_plans: {
+          "1yr": { hourly_usd: 0.1306 },  // ~40% discount from on-demand
+          "3yr": { hourly_usd: 0.0870 }   // ~60% discount from on-demand
         }
       },
       "t3.2xlarge": {
@@ -202,6 +210,10 @@ export const pricingCatalog: PricingCatalog = {
             PartialUpfront: { hourly_usd: 0.0504, upfront_usd: 1325 },
             AllUpfront: { hourly_usd: 0.0, upfront_usd: 2596 }
           }
+        },
+        savings_plans: {
+          "1yr": { hourly_usd: 0.1212 },  // ~40% discount from on-demand
+          "3yr": { hourly_usd: 0.0808 }   // ~60% discount from on-demand
         }
       },
       "db.m5.large": {
