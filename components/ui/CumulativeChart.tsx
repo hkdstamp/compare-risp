@@ -164,10 +164,16 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
     },
   }
 
+  // Determine term duration from the number of months
+  const termMonths = cumulative.months.length
+  const termDisplay = termMonths === 12 ? '1年' : termMonths === 36 ? '3年' : `${termMonths}ヶ月`
+
   return (
     <div className="bg-white rounded-xl shadow-lg p-6">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-xl font-bold text-gray-900">💹 12ヶ月累積コスト推移</h3>
+        <h3 className="text-xl font-bold text-gray-900">
+          💹 累積コスト推移（契約期間: {termDisplay}）
+        </h3>
         <div className="flex gap-4 text-sm">
           {standardPlan.break_even_months !== null && (
             <div className="flex items-center gap-2">
@@ -194,8 +200,9 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
             <p className="font-semibold mb-1">グラフの見方：</p>
             <ul className="list-disc list-inside space-y-1">
               <li><strong>実線</strong>: 累積ランニングコスト（月々の利用料金の合計）</li>
-              <li><strong>破線（総支出）</strong>: 初期費用 + 累積コスト（実際の総支出額）</li>
+              <li><strong>破線（総支出）</strong>: 初期費用（一括払い）+ 累積ランニングコスト = 実際の総支出額</li>
               <li>標準RI/SPの破線が通常価格の実線と交差する点が<strong>損益分岐点</strong>です</li>
+              <li>横軸は標準RI/SPの契約期間（{termDisplay}）に合わせて表示されます</li>
             </ul>
           </div>
         </div>

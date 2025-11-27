@@ -95,8 +95,9 @@ export async function POST(request: NextRequest) {
       hours
     )
 
-    // Calculate cumulative costs
-    const cumulativeData = calculateCumulativeCosts(baselineCost, insuranceResult, standardResult)
+    // Calculate cumulative costs with term duration
+    const termMonths = standard_term === '1yr' ? 12 : 36
+    const cumulativeData = calculateCumulativeCosts(baselineCost, insuranceResult, standardResult, termMonths)
 
     // Merge details
     const details = mergeDetails(insuranceDetails, standardDetails)

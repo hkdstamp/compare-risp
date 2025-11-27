@@ -132,7 +132,7 @@ export function calculateCumulativeCosts(
   baselineCost: number,
   insuranceResult: PlanResult,
   standardResult: PlanResult,
-  months: number = 12
+  termMonths: number = 12
 ): CumulativeData {
   const cumulative: CumulativeData = {
     months: [],
@@ -141,11 +141,11 @@ export function calculateCumulativeCosts(
     standard: []
   }
 
-  for (let month = 1; month <= months; month++) {
+  for (let month = 1; month <= termMonths; month++) {
     cumulative.months.push(month)
     cumulative.on_demand.push(baselineCost * month)
-    cumulative.insurance.push(insuranceResult.monthly_cost * month + insuranceResult.initial_cost)
-    cumulative.standard.push(standardResult.monthly_cost * month + standardResult.initial_cost)
+    cumulative.insurance.push(insuranceResult.monthly_cost * month)
+    cumulative.standard.push(standardResult.monthly_cost * month)
   }
 
   return cumulative
