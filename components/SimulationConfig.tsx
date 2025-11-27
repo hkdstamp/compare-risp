@@ -51,8 +51,8 @@ export default function SimulationConfig({ onSimulate, isLoading }: SimulationCo
             onChange={(e) => setInsurance(e.target.value)}
             className="px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition"
           >
-            <option value="30d">30日保証 (30%割引 / 50%保険料)</option>
-            <option value="1y">1年保証 (45%割引 / 33%保険料)</option>
+            <option value="30d">30日保証 (60%割引 / 50%保険料)</option>
+            <option value="1y">1年保証 (60%割引 / 33%保険料)</option>
           </select>
           <small className="text-gray-500 mt-1">保証期間終了後、未使用分は返金</small>
         </div>
