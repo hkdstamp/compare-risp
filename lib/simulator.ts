@@ -44,6 +44,12 @@ export function calculateInsurancePlan(
 
   const monthlySavings = totalBaseline - totalMonthlyCost
 
+  // Insurance RI/SP has no initial cost, so break-even is immediate if there are savings
+  let breakEven = null
+  if (monthlySavings > 0) {
+    breakEven = 1  // Immediate break-even (no upfront cost)
+  }
+
   return {
     result: {
       name: `Insurance RI/SP ${plan.name}`,
@@ -51,7 +57,7 @@ export function calculateInsurancePlan(
       monthly_savings: monthlySavings,
       initial_cost: 0,
       premium: totalPremium,
-      break_even_months: monthlySavings > 0 ? 1 : null
+      break_even_months: breakEven
     },
     details
   }
@@ -131,12 +137,32 @@ export function calculateStandardPlan(
   }
 
   const monthlySavings = totalBaseline - totalMonthlyEffective
+  
+  // Calculate break-even point (month where total expenditure crosses on-demand cumulative cost)
+  // 
+  // In the graph:
+  // - Dashed line (total expenditure) = initial_cost + (monthly_cost × N)
+  // - Solid grey line (on-demand cumulative) = baseline_cost × N
+  // 
+  // Break-even occurs when:
+  //   initial_cost + (monthly_cost × N) = baseline_cost × N
+  // 
+  // Solving for N:
+  //   initial_cost = (baseline_cost - monthly_cost) × N
+  //   N = initial_cost / (baseline_cost - monthly_cost)
+  //   N = initial_cost / monthly_savings
+  //
+  // Where monthly_savings = baseline_cost - monthly_cost
   let breakEven = null
-  if (totalInitialCost > 0 && totalMonthlyCashSavings > 0) {
-    breakEven = Math.ceil(totalInitialCost / totalMonthlyCashSavings)
-  } else if (totalInitialCost === 0 && monthlySavings > 0) {
-    // For Savings Plans (no upfront), break-even is immediate
-    breakEven = 1
+  if (monthlySavings > 0) {
+    if (totalInitialCost > 0) {
+      // With initial cost: calculate intersection point between dashed line and on-demand line
+      breakEven = Math.ceil(totalInitialCost / monthlySavings)
+    } else {
+      // No initial cost (e.g., Savings Plans, NoUpfront): 
+      // Dashed line starts at 0, always below on-demand, immediate break-even
+      breakEven = 1
+    }
   }
 
   // Create plan name
