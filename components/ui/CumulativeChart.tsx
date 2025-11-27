@@ -15,11 +15,17 @@ interface CumulativeChartProps {
 }
 
 export default function CumulativeChart({ cumulative, standardPlan, insurancePlan }: CumulativeChartProps) {
-  // Calculate standard RI/SP total expenditure (initial cost + cumulative running cost)
-  const standardTotalExpenditure = cumulative.standard.map(cost => cost + standardPlan.initial_cost)
+  // Calculate total contract expenditure (constant for all months)
+  // Total = Initial cost + (Monthly cost × Contract term)
+  const termMonths = cumulative.months.length
   
-  // Calculate insurance RI/SP total expenditure (initial cost + cumulative running cost + premium)
-  const insuranceTotalExpenditure = cumulative.insurance.map(cost => cost + insurancePlan.initial_cost)
+  // Standard RI/SP total expenditure: initial cost + total monthly cost over contract term
+  const standardTotalCost = standardPlan.initial_cost + (standardPlan.monthly_cost * termMonths)
+  const standardTotalExpenditure = cumulative.months.map(() => standardTotalCost)
+  
+  // Insurance RI/SP total expenditure: initial cost + total monthly cost over contract term
+  const insuranceTotalCost = insurancePlan.initial_cost + (insurancePlan.monthly_cost * termMonths)
+  const insuranceTotalExpenditure = cumulative.months.map(() => insuranceTotalCost)
 
   const data = {
     labels: cumulative.months.map(m => `${m}ヶ月`),
@@ -165,7 +171,6 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
   }
 
   // Determine term duration from the number of months
-  const termMonths = cumulative.months.length
   const termDisplay = termMonths === 12 ? '1年' : termMonths === 36 ? '3年' : `${termMonths}ヶ月`
 
   return (
@@ -200,7 +205,7 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
             <p className="font-semibold mb-1">グラフの見方：</p>
             <ul className="list-disc list-inside space-y-1">
               <li><strong>実線</strong>: 累積ランニングコスト（月々の利用料金の合計）</li>
-              <li><strong>破線（総支出）</strong>: 初期費用（一括払い）+ 累積ランニングコスト = 実際の総支出額</li>
+              <li><strong>破線（総支出）</strong>: 契約期間全体の総支出額（初期費用 + 全期間の月額料金合計）を各月で表示</li>
               <li>標準RI/SPの破線が通常価格の実線と交差する点が<strong>損益分岐点</strong>です</li>
               <li>横軸は標準RI/SPの契約期間（{termDisplay}）に合わせて表示されます</li>
             </ul>
