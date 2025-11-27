@@ -30,7 +30,11 @@ export default function SimulationResults({ result }: SimulationResultsProps) {
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <CumulativeChart cumulative={result.cumulative} />
+        <CumulativeChart 
+          cumulative={result.cumulative}
+          standardPlan={result.standard}
+          insurancePlan={result.insurance}
+        />
         <MonthlyChart
           baselineCost={result.baseline_cost}
           insurance={result.insurance}

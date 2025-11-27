@@ -3,16 +3,24 @@
 import { useEffect, useRef } from 'react'
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js'
 import { Line } from 'react-chartjs-2'
-import { CumulativeData } from '@/lib/types'
+import { CumulativeData, PlanResult } from '@/lib/types'
 import { formatCurrency } from '@/lib/utils'
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler)
 
 interface CumulativeChartProps {
   cumulative: CumulativeData
+  standardPlan: PlanResult
+  insurancePlan: PlanResult
 }
 
-export default function CumulativeChart({ cumulative }: CumulativeChartProps) {
+export default function CumulativeChart({ cumulative, standardPlan, insurancePlan }: CumulativeChartProps) {
+  // Calculate standard RI/SP total expenditure (initial cost + cumulative running cost)
+  const standardTotalExpenditure = cumulative.standard.map(cost => cost + standardPlan.initial_cost)
+  
+  // Calculate insurance RI/SP total expenditure (initial cost + cumulative running cost + premium)
+  const insuranceTotalExpenditure = cumulative.insurance.map(cost => cost + insurancePlan.initial_cost)
+
   const data = {
     labels: cumulative.months.map(m => `${m}ヶ月`),
     datasets: [
@@ -26,7 +34,7 @@ export default function CumulativeChart({ cumulative }: CumulativeChartProps) {
         fill: true,
       },
       {
-        label: '保険RI/SP',
+        label: '保険RI/SP（累積）',
         data: cumulative.insurance,
         borderColor: 'rgba(16, 185, 129, 1)',
         backgroundColor: 'rgba(16, 185, 129, 0.1)',
@@ -35,13 +43,35 @@ export default function CumulativeChart({ cumulative }: CumulativeChartProps) {
         fill: true,
       },
       {
-        label: '標準RI/SP',
+        label: '保険RI/SP（総支出）',
+        data: insuranceTotalExpenditure,
+        borderColor: 'rgba(16, 185, 129, 0.6)',
+        backgroundColor: 'rgba(16, 185, 129, 0.05)',
+        borderWidth: 2,
+        borderDash: [5, 5],
+        tension: 0.4,
+        fill: false,
+        pointRadius: 0,
+      },
+      {
+        label: '標準RI/SP（累積）',
         data: cumulative.standard,
         borderColor: 'rgba(37, 99, 235, 1)',
         backgroundColor: 'rgba(37, 99, 235, 0.1)',
         borderWidth: 2,
         tension: 0.4,
         fill: true,
+      },
+      {
+        label: '標準RI/SP（総支出）',
+        data: standardTotalExpenditure,
+        borderColor: 'rgba(37, 99, 235, 0.6)',
+        backgroundColor: 'rgba(37, 99, 235, 0.05)',
+        borderWidth: 3,
+        borderDash: [5, 5],
+        tension: 0.4,
+        fill: false,
+        pointRadius: 0,
       },
     ],
   }
@@ -60,8 +90,18 @@ export default function CumulativeChart({ cumulative }: CumulativeChartProps) {
           usePointStyle: true,
           padding: 15,
           font: {
-            size: 12,
+            size: 11,
             weight: '600' as const,
+          },
+          generateLabels: (chart: any) => {
+            const original = ChartJS.defaults.plugins.legend.labels.generateLabels(chart)
+            return original.map((label: any) => {
+              // Add dash pattern visual to legend for dashed lines
+              if (label.text.includes('総支出')) {
+                label.lineDash = [5, 5]
+              }
+              return label
+            })
           },
         },
       },
@@ -74,6 +114,24 @@ export default function CumulativeChart({ cumulative }: CumulativeChartProps) {
             }
             label += formatCurrency(context.parsed.y)
             return label
+          },
+          footer: function(tooltipItems: any[]) {
+            const monthIndex = tooltipItems[0].dataIndex
+            const month = monthIndex + 1
+            
+            let footer = []
+            
+            // Check if insurance break-even month
+            if (insurancePlan.break_even_months !== null && month === insurancePlan.break_even_months) {
+              footer.push('🎯 保険RI/SP 損益分岐点')
+            }
+            
+            // Check if standard break-even month
+            if (standardPlan.break_even_months !== null && month === standardPlan.break_even_months) {
+              footer.push('🎯 標準RI/SP 損益分岐点')
+            }
+            
+            return footer
           },
         },
       },
@@ -108,7 +166,40 @@ export default function CumulativeChart({ cumulative }: CumulativeChartProps) {
 
   return (
     <div className="bg-white rounded-xl shadow-lg p-6">
-      <h3 className="text-xl font-bold text-gray-900 mb-4">💹 12ヶ月累積コスト推移</h3>
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-xl font-bold text-gray-900">💹 12ヶ月累積コスト推移</h3>
+        <div className="flex gap-4 text-sm">
+          {standardPlan.break_even_months !== null && (
+            <div className="flex items-center gap-2">
+              <span className="inline-block w-3 h-3 rounded-full bg-blue-500"></span>
+              <span className="text-gray-600">
+                標準RI/SP 損益分岐: <span className="font-semibold text-blue-600">{standardPlan.break_even_months}ヶ月</span>
+              </span>
+            </div>
+          )}
+          {insurancePlan.break_even_months !== null && (
+            <div className="flex items-center gap-2">
+              <span className="inline-block w-3 h-3 rounded-full bg-green-500"></span>
+              <span className="text-gray-600">
+                保険RI/SP 損益分岐: <span className="font-semibold text-green-600">{insurancePlan.break_even_months}ヶ月</span>
+              </span>
+            </div>
+          )}
+        </div>
+      </div>
+      <div className="mb-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+        <div className="flex items-start gap-2">
+          <span className="text-blue-600 text-lg">ℹ️</span>
+          <div className="text-sm text-blue-900">
+            <p className="font-semibold mb-1">グラフの見方：</p>
+            <ul className="list-disc list-inside space-y-1">
+              <li><strong>実線</strong>: 累積ランニングコスト（月々の利用料金の合計）</li>
+              <li><strong>破線（総支出）</strong>: 初期費用 + 累積コスト（実際の総支出額）</li>
+              <li>標準RI/SPの破線が通常価格の実線と交差する点が<strong>損益分岐点</strong>です</li>
+            </ul>
+          </div>
+        </div>
+      </div>
       <Line data={data} options={options} />
     </div>
   )
