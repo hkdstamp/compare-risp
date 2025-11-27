@@ -44,11 +44,11 @@ export function calculateInsurancePlan(
 
   const monthlySavings = totalBaseline - totalMonthlyCost
 
-  // Insurance RI/SP has no initial cost, so break-even is immediate if there are savings
+  // Insurance RI/SP has no initial cost, so there is NO break-even point
+  // You're already saving from month 1 (if monthly_savings > 0)
+  // The concept of "breaking even" doesn't apply when there's no upfront investment
   let breakEven = null
-  if (monthlySavings > 0) {
-    breakEven = 1  // Immediate break-even (no upfront cost)
-  }
+  // breakEven remains null for insurance plans (no initial cost to recover)
 
   return {
     result: {
@@ -157,16 +157,13 @@ export function calculateStandardPlan(
   //
   // This is the month when you START saving money (on-demand becomes more expensive)
   let breakEven = null
-  if (monthlySavings > 0) {
-    if (totalInitialCost > 0) {
-      // With initial cost: calculate the month when on-demand cumulative exceeds total expenditure
-      breakEven = Math.ceil(totalInitialCost / monthlySavings)
-    } else {
-      // No initial cost (e.g., Savings Plans, NoUpfront): 
-      // Total expenditure is always lower than on-demand from month 1
-      breakEven = 1
-    }
+  if (monthlySavings > 0 && totalInitialCost > 0) {
+    // With initial cost: calculate the month when on-demand cumulative exceeds total expenditure
+    breakEven = Math.ceil(totalInitialCost / monthlySavings)
   }
+  // Note: When initial_cost = 0 (Savings Plans, NoUpfront), there is NO break-even point
+  // because you're already saving from month 1. The concept of "breaking even" doesn't apply
+  // when you start with immediate savings. breakEven remains null in this case.
 
   // Create plan name
   let planName: string
