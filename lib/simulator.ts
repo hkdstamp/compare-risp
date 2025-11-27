@@ -44,13 +44,21 @@ export function calculateInsurancePlan(
 
   const monthlySavings = totalBaseline - totalMonthlyCost
 
-  // Insurance RI/SP has no initial cost
-  // Break-even condition: on-demand cumulative >= insurance total expenditure
-  // At month 1: baseline_cost × 1 >= 0 + monthly_cost × 1
-  // Since monthly_cost < baseline_cost (we have savings), condition is met at month 1
+  // Insurance RI/SP break-even calculation
+  // Total Expenditure = 0 (no initial) + (monthly_cost × term_months)
+  // Break-even: when on-demand cumulative >= total expenditure
   let breakEven = null
   if (monthlySavings > 0) {
-    breakEven = 1  // Condition satisfied from month 1 (no initial cost)
+    const termMonths = plan.term_months
+    const totalExpenditure = 0 + (totalMonthlyCost * termMonths)
+    
+    // Break-even = when on-demand cumulative exceeds this fixed total
+    breakEven = Math.ceil(totalExpenditure / totalBaseline)
+    
+    // If break-even is beyond contract term, no break-even
+    if (breakEven > termMonths) {
+      breakEven = null
+    }
   }
 
   return {
@@ -141,38 +149,36 @@ export function calculateStandardPlan(
 
   const monthlySavings = totalBaseline - totalMonthlyEffective
   
-  // Calculate break-even point: the month when on-demand cumulative cost exceeds total expenditure
+  // Calculate break-even point: the month when on-demand cumulative exceeds TOTAL expenditure
+  // 
+  // IMPORTANT: Total Expenditure is a FIXED value (the horizontal dashed line in graph)
+  // Total Expenditure = initial_cost + (monthly_cost × term_months)
   // 
   // In the graph:
-  // - Dashed line (RI/SP total expenditure) = initial_cost + (monthly_cost × N)
-  // - Solid grey line (on-demand cumulative) = baseline_cost × N
+  // - Dashed line (RI/SP total expenditure) = initial_cost + (monthly_cost × termMonths) [FIXED]
+  // - Solid grey line (on-demand cumulative) = baseline_cost × N [INCREASES each month]
   // 
-  // Break-even: The first month when on-demand cumulative ≥ RI/SP total expenditure
-  // This is when: baseline_cost × N ≥ initial_cost + (monthly_cost × N)
+  // Break-even: The first month when on-demand cumulative ≥ TOTAL expenditure
+  // This is when: baseline_cost × N ≥ initial_cost + (monthly_cost × termMonths)
   // 
-  // Rearranging:
-  //   baseline_cost × N - monthly_cost × N ≥ initial_cost
-  //   (baseline_cost - monthly_cost) × N ≥ initial_cost
-  //   monthly_savings × N ≥ initial_cost
-  //   N ≥ initial_cost / monthly_savings
+  // Solving for N:
+  //   N ≥ (initial_cost + monthly_cost × termMonths) / baseline_cost
+  //   N ≥ total_expenditure / baseline_cost
   //
-  // Therefore: N = ceil(initial_cost / monthly_savings)
+  // Therefore: N = ceil(total_expenditure / baseline_cost)
   //
-  // Special case: When initial_cost = 0 (Savings Plans, NoUpfront)
-  //   0 + (monthly_cost × 1) vs baseline_cost × 1
-  //   Since monthly_cost < baseline_cost (we have savings),
-  //   the condition is ALREADY satisfied at month 1
-  //   Therefore: N = 1
-  //
-  // This is the month when you START saving money (on-demand becomes more expensive)
+  // This is the month when you START saving money (on-demand becomes more expensive than total)
   let breakEven = null
   if (monthlySavings > 0) {
-    if (totalInitialCost > 0) {
-      // With initial cost: calculate the month when on-demand cumulative exceeds total expenditure
-      breakEven = Math.ceil(totalInitialCost / monthlySavings)
-    } else {
-      // No initial cost: condition is met from month 1
-      breakEven = 1
+    // Calculate total expenditure for the entire contract term
+    const totalExpenditure = totalInitialCost + (totalMonthlyEffective * termMonths)
+    
+    // Break-even = when on-demand cumulative exceeds this fixed total
+    breakEven = Math.ceil(totalExpenditure / totalBaseline)
+    
+    // If break-even is beyond contract term, it means you never break even
+    if (breakEven > termMonths) {
+      breakEven = null
     }
   }
 
