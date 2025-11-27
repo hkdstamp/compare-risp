@@ -13,6 +13,7 @@ Ripple連携と保険RI/SPを活用したMSP収益モデルのシミュレーシ
 - **標準RI/SP**: 1年・3年予約 × NoUpfront/PartialUpfront/AllUpfront
 - **リアルタイム計算**: 月次コスト、削減額、損益分岐点
 - **累積コスト推移**: 12ヶ月のグラフ可視化
+- **🆕 動的リソース選択**: 複数のAWSサービスとインスタンスタイプを自由に組み合わせ
 
 ### 🎨 モダンUI/UX
 - **Next.js 15** App Router (最新版)
@@ -21,6 +22,7 @@ Ripple連携と保険RI/SPを活用したMSP収益モデルのシミュレーシ
 - React Chart.js 2 可視化
 - レスポンシブデザイン
 - スムーズアニメーション
+- **🆕 インタラクティブなリソースセレクター**: ドラッグ&ドロップ不要の直感的な選択UI
 
 ### ⚡ 高パフォーマンス
 - サーバーサイドレンダリング (SSR)
@@ -167,15 +169,38 @@ npm run start
 ### `GET /api/resources`
 デフォルトリソース設定を取得
 
-## 📦 対象リソース
+## 📦 対応リソース（動的選択可能）
 
-- **EC2 t3.large** × 3台
-- **EC2 t3.xlarge** × 2台
-- **RDS db.t4g.large** × 2台
+### 🆕 選択可能なAWSサービス
+
+#### Amazon EC2（Elastic Compute Cloud）
+- **t3ファミリー**: t3.micro, t3.small, t3.medium, t3.large, t3.xlarge, t3.2xlarge
+- **m5ファミリー**: m5.large, m5.xlarge
+- **c5ファミリー**: c5.large
+
+#### Amazon RDS（Relational Database Service）
+- **t4gファミリー**: db.t4g.micro, db.t4g.small, db.t4g.medium, db.t4g.large
+- **m5ファミリー**: db.m5.large
+- **r5ファミリー**: db.r5.large
+
+#### Amazon ElastiCache（In-Memory Data Store）
+- **t4gファミリー**: cache.t4g.micro, cache.t4g.small
+- **m5ファミリー**: cache.m5.large
+
+### 🎛️ 柔軟な構成
+- **複数サービス**: EC2、RDS、ElastiCacheを自由に組み合わせ
+- **台数指定**: 各リソース1〜100台まで指定可能
+- **リアルタイム追加/削除**: UIから簡単にリソースを追加・削除
+
+### 📊 デフォルト構成（例）
+- EC2 t3.large × 3台
+- EC2 t3.xlarge × 2台
+- RDS db.t4g.large × 2台
 
 ## 💰 価格データ
 
-AWS 東京リージョン (ap-northeast-1) の公式価格を使用
+AWS 東京リージョン (ap-northeast-1) の公式価格を使用  
+全20種類以上のインスタンスタイプをサポート
 
 ## 🆕 Next.js 15 & React 19 新機能
 

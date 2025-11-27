@@ -14,7 +14,8 @@ export async function POST(request: NextRequest) {
       coverage = 1.0,
       usage = 1.0,
       user_id,
-      save_history = false
+      save_history = false,
+      resources: customResources
     } = body
 
     // Validate parameters
@@ -34,8 +35,33 @@ export async function POST(request: NextRequest) {
 
     const hours = pricingCatalog.metadata.hours_per_month
     
+    // Use custom resources if provided, otherwise use default
+    const baseResources = customResources && customResources.length > 0 ? customResources : defaultResources
+    
+    // Validate resources exist in pricing catalog
+    for (const res of baseResources) {
+      if (!pricingCatalog.resources[res.service]) {
+        return NextResponse.json(
+          { error: `Unknown service: ${res.service}` },
+          { status: 400 }
+        )
+      }
+      if (!pricingCatalog.resources[res.service][res.instance]) {
+        return NextResponse.json(
+          { error: `Unknown instance type: ${res.instance} for service ${res.service}` },
+          { status: 400 }
+        )
+      }
+      if (res.quantity < 1 || res.quantity > 100) {
+        return NextResponse.json(
+          { error: 'Quantity must be between 1 and 100' },
+          { status: 400 }
+        )
+      }
+    }
+    
     // Create resources with usage and coverage
-    const resources: ResourceConfig[] = defaultResources.map(res => ({
+    const resources: ResourceConfig[] = baseResources.map(res => ({
       ...res,
       usage,
       coverage

@@ -25,6 +25,7 @@ export interface SimulationParams {
   usage: number
   user_id?: string
   save_history?: boolean
+  resources?: ResourceConfig[]
 }
 
 export interface SimulationResult {

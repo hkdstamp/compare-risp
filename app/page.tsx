@@ -5,12 +5,14 @@ import SimulationConfig from '@/components/SimulationConfig'
 import SimulationResults from '@/components/SimulationResults'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
-import ResourceInfo from '@/components/ResourceInfo'
-import { SimulationResult } from '@/lib/types'
+import ResourceSelector from '@/components/ResourceSelector'
+import { SimulationResult, ResourceConfig } from '@/lib/types'
+import { defaultResources } from '@/lib/pricing-catalog'
 
 export default function Home() {
   const [simulationResult, setSimulationResult] = useState<SimulationResult | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [resources, setResources] = useState<ResourceConfig[]>(defaultResources)
 
   const handleSimulate = async (params: any) => {
     setIsLoading(true)
@@ -20,7 +22,10 @@ export default function Home() {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(params)
+        body: JSON.stringify({
+          ...params,
+          resources // Include selected resources in simulation
+        })
       })
 
       if (!response.ok) {
@@ -43,6 +48,8 @@ export default function Home() {
         <Header />
         
         <main className="space-y-6">
+          <ResourceSelector resources={resources} onChange={setResources} />
+          
           <SimulationConfig onSimulate={handleSimulate} isLoading={isLoading} />
           
           {isLoading && (
@@ -57,8 +64,6 @@ export default function Home() {
           {simulationResult && !isLoading && (
             <SimulationResults result={simulationResult} />
           )}
-          
-          <ResourceInfo />
         </main>
         
         <Footer />
