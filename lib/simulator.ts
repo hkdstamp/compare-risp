@@ -6,7 +6,8 @@ export function calculateInsurancePlan(
   insuranceKey: string,
   coverage: number,
   usage: number,
-  hours: number
+  hours: number,
+  standardTermMonths: number
 ): { result: PlanResult; details: DetailItem[] } {
   const plan = catalog.insurance_plans[insuranceKey]
   let totalBaseline = 0
@@ -45,18 +46,19 @@ export function calculateInsurancePlan(
   const monthlySavings = totalBaseline - totalMonthlyCost
 
   // Insurance RI/SP break-even calculation
-  // Total Expenditure = 0 (no initial) + (monthly_cost × term_months)
+  // IMPORTANT: Use the STANDARD RI/SP contract term (not insurance plan's term)
+  // because we compare insurance costs over the same period as standard RI/SP
+  // Total Expenditure = 0 (no initial) + (monthly_cost × standard_term_months)
   // Break-even: when on-demand cumulative >= total expenditure
   let breakEven = null
   if (monthlySavings > 0) {
-    const termMonths = plan.term_months
-    const totalExpenditure = 0 + (totalMonthlyCost * termMonths)
+    const totalExpenditure = 0 + (totalMonthlyCost * standardTermMonths)
     
     // Break-even = when on-demand cumulative exceeds this fixed total
     breakEven = Math.ceil(totalExpenditure / totalBaseline)
     
     // If break-even is beyond contract term, no break-even
-    if (breakEven > termMonths) {
+    if (breakEven > standardTermMonths) {
       breakEven = null
     }
   }

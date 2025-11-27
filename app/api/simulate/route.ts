@@ -74,16 +74,9 @@ export async function POST(request: NextRequest) {
       baselineCost += onDemandRate * hours * res.quantity * usage
     }
 
-    // Calculate insurance plan
-    const { result: insuranceResult, details: insuranceDetails } = calculateInsurancePlan(
-      pricingCatalog,
-      resources,
-      insurance,
-      coverage,
-      usage,
-      hours
-    )
-
+    // Calculate standard plan first to get term duration
+    const termMonths = standard_term === '1yr' ? 12 : 36
+    
     // Calculate standard plan
     const { result: standardResult, details: standardDetails } = calculateStandardPlan(
       pricingCatalog,
@@ -95,8 +88,18 @@ export async function POST(request: NextRequest) {
       hours
     )
 
+    // Calculate insurance plan (using standard term for break-even calculation)
+    const { result: insuranceResult, details: insuranceDetails } = calculateInsurancePlan(
+      pricingCatalog,
+      resources,
+      insurance,
+      coverage,
+      usage,
+      hours,
+      termMonths
+    )
+
     // Calculate cumulative costs with term duration
-    const termMonths = standard_term === '1yr' ? 12 : 36
     const cumulativeData = calculateCumulativeCosts(baselineCost, insuranceResult, standardResult, termMonths)
 
     // Merge details
