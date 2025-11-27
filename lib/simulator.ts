@@ -138,29 +138,32 @@ export function calculateStandardPlan(
 
   const monthlySavings = totalBaseline - totalMonthlyEffective
   
-  // Calculate break-even point (month where total expenditure crosses on-demand cumulative cost)
+  // Calculate break-even point: the month when on-demand cumulative cost exceeds total expenditure
   // 
   // In the graph:
-  // - Dashed line (total expenditure) = initial_cost + (monthly_cost × N)
+  // - Dashed line (RI/SP total expenditure) = initial_cost + (monthly_cost × N)
   // - Solid grey line (on-demand cumulative) = baseline_cost × N
   // 
-  // Break-even occurs when:
-  //   initial_cost + (monthly_cost × N) = baseline_cost × N
+  // Break-even: The first month when on-demand cumulative ≥ RI/SP total expenditure
+  // This is when: baseline_cost × N ≥ initial_cost + (monthly_cost × N)
   // 
-  // Solving for N:
-  //   initial_cost = (baseline_cost - monthly_cost) × N
-  //   N = initial_cost / (baseline_cost - monthly_cost)
-  //   N = initial_cost / monthly_savings
+  // Rearranging:
+  //   baseline_cost × N - monthly_cost × N ≥ initial_cost
+  //   (baseline_cost - monthly_cost) × N ≥ initial_cost
+  //   monthly_savings × N ≥ initial_cost
+  //   N ≥ initial_cost / monthly_savings
   //
-  // Where monthly_savings = baseline_cost - monthly_cost
+  // Therefore: N = ceil(initial_cost / monthly_savings)
+  //
+  // This is the month when you START saving money (on-demand becomes more expensive)
   let breakEven = null
   if (monthlySavings > 0) {
     if (totalInitialCost > 0) {
-      // With initial cost: calculate intersection point between dashed line and on-demand line
+      // With initial cost: calculate the month when on-demand cumulative exceeds total expenditure
       breakEven = Math.ceil(totalInitialCost / monthlySavings)
     } else {
       // No initial cost (e.g., Savings Plans, NoUpfront): 
-      // Dashed line starts at 0, always below on-demand, immediate break-even
+      // Total expenditure is always lower than on-demand from month 1
       breakEven = 1
     }
   }
