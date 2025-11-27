@@ -4,7 +4,7 @@
 
 ## 🚀 概要
 
-Ripple連携と保険RI/SPを活用したMSP収益モデルのシミュレーションツールです。**Next.js 15 (App Router) + React 19 + TailwindCSS + Cloudflare Pages** の最新モダンスタック構成で、高速・スケーラブルなアプリケーションを実現しています。
+Ripple連携と保険RI/SPを活用したMSP収益モデルのシミュレーションツールです。**Next.js 15 (App Router) + React 19 + TailwindCSS + AWS Amplify** の最新モダンスタック構成で、高速・スケーラブルなアプリケーションを実現しています。
 
 ## ✨ 主要機能
 
@@ -25,7 +25,7 @@ Ripple連携と保険RI/SPを活用したMSP収益モデルのシミュレーシ
 ### ⚡ 高パフォーマンス
 - サーバーサイドレンダリング (SSR)
 - 静的サイト生成 (SSG)
-- Cloudflare Pages グローバル配信
+- AWS Amplify グローバルCDN配信
 - 最適化されたバンドルサイズ
 
 ## 🏗️ 技術スタック
@@ -42,14 +42,13 @@ Ripple連携と保険RI/SPを活用したMSP収益モデルのシミュレーシ
 - **TypeScript 5.6**: 型安全なロジック
 
 ### デプロイメント
-- **Cloudflare Pages**: エッジ配信
-- **@cloudflare/next-on-pages 1.13+**: Next.js 15 → Cloudflare 変換
+- **AWS Amplify Hosting**: マネージドホスティング & CI/CD
+- **CloudFront CDN**: グローバル配信
+- **Lambda@Edge**: サーバーレスAPI実行
 
 ## 📦 インストール
 
 ```bash
-cd nextjs
-
 # 依存関係のインストール
 npm install
 ```
@@ -75,28 +74,33 @@ npm run build
 npm run start
 ```
 
-## 🌐 Cloudflare Pages デプロイ
+## 🌐 AWS Amplify デプロイ
 
-### ビルド & デプロイ
+### 自動デプロイ（推奨）
+
+1. [AWS Amplify Console](https://console.aws.amazon.com/amplify/) にアクセス
+2. **New app** → **Host web app** をクリック
+3. GitHubリポジトリを接続: `compare-risp`
+4. ブランチを選択: `main` または `genspark_ai_developer`
+5. ビルド設定を確認（`amplify.yml`が自動検出されます）
+6. **Save and deploy** をクリック
+
+詳細は [AMPLIFY_DEPLOYMENT.md](./AMPLIFY_DEPLOYMENT.md) を参照してください。
+
+### 手動ビルド（ローカル確認）
 
 ```bash
-# Cloudflare Pages 用にビルド
-npm run cf:build
+# プロダクションビルド
+npm run build
 
-# デプロイ
-npm run cf:deploy
-```
-
-### ローカルでCloudflare環境をプレビュー
-
-```bash
-npm run cf:preview
+# ビルドを確認
+npm run start
 ```
 
 ## 📁 プロジェクト構造
 
 ```
-nextjs/
+/
 ├── app/                      # Next.js App Router
 │   ├── api/                  # API Routes
 │   │   ├── simulate/         # シミュレーションAPI
@@ -123,6 +127,7 @@ nextjs/
 │   ├── pricing-catalog.ts    # 価格カタログ
 │   └── utils.ts              # ユーティリティ関数
 ├── public/                   # 静的ファイル
+├── amplify.yml               # AWS Amplify ビルド設定
 ├── next.config.js            # Next.js設定
 ├── tailwind.config.js        # TailwindCSS設定
 ├── tsconfig.json             # TypeScript設定
@@ -234,12 +239,13 @@ npm install
 npx tsc --noEmit
 ```
 
-### Cloudflareデプロイエラー
+### AWS Amplifyデプロイエラー
 
-```bash
-# Wranglerを再インストール
-npm install -g wrangler@latest
-```
+Amplify Consoleのビルドログを確認してください。一般的な問題：
+
+- **Node.js バージョン**: Amplifyは Node.js 18.x を使用
+- **環境変数**: 必要な環境変数が設定されているか確認
+- **ビルドメモリ**: 大規模プロジェクトの場合、サポートに連絡してメモリを増やす
 
 ## 📝 ライセンス
 
@@ -255,7 +261,7 @@ MIT License - © 2025 Alphaus Cloud Group
 
 ---
 
-**⚡ Built with Next.js 15 + React 19 + TailwindCSS + Cloudflare Pages**
+**⚡ Built with Next.js 15 + React 19 + TailwindCSS + AWS Amplify**
 
 ### 📋 バージョン情報
 - Next.js: 15.0.3

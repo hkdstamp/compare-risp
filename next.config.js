@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Removed 'output: export' to support API Routes on Cloudflare Pages
+  // AWS Amplify supports full Next.js features including API Routes
   images: {
     unoptimized: true,
   },
@@ -22,6 +22,8 @@ const nextConfig = {
     // Remove console logs in production
     removeConsole: process.env.NODE_ENV === 'production',
   },
+  // AWS Amplify configuration
+  trailingSlash: true,
 }
 
 module.exports = nextConfig
