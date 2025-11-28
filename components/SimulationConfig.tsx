@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { formatPercentage } from '@/lib/utils'
 import DiscountRateInfo from '@/components/ui/DiscountRateInfo'
+import { ShieldIcon, CalendarIcon, DollarIcon, ChartBarIcon, ActivityIcon, RocketIcon, RefreshIcon } from '@/components/icons'
 
 interface SimulationConfigProps {
   onSimulate: (params: any) => void
@@ -35,13 +36,13 @@ export default function SimulationConfig({ onSimulate, isLoading }: SimulationCo
   }
 
   return (
-    <section className="bg-white rounded-xl shadow-lg p-6">
-      <div className="flex items-center justify-between mb-6 pb-3 border-b-4 border-primary-600">
-        <h2 className="text-2xl font-bold text-gray-900">
+    <section className="bg-white rounded-xl shadow-lg p-6 border border-secondary-200">
+      <div className="flex items-center justify-between mb-6 pb-3 border-b-2 border-primary-500">
+        <h2 className="text-2xl font-bold text-secondary-900">
           シミュレーション設定
         </h2>
         <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-600">割引率の詳細</span>
+          <span className="text-sm text-secondary-600">割引率の詳細</span>
           <DiscountRateInfo />
         </div>
       </div>
@@ -49,31 +50,31 @@ export default function SimulationConfig({ onSimulate, isLoading }: SimulationCo
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
         {/* Insurance Plan */}
         <div className="flex flex-col">
-          <label className="flex items-center gap-2 font-semibold text-gray-700 mb-2">
-            <span className="text-xl">🛡️</span>
+          <label className="flex items-center gap-2 font-semibold text-secondary-700 mb-2">
+            <ShieldIcon size={20} className="text-accent-600" />
             保険RI/SPプラン
           </label>
           <select
             value={insurance}
             onChange={(e) => setInsurance(e.target.value)}
-            className="px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition"
+            className="px-4 py-2 border border-secondary-300 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition bg-white text-secondary-900"
           >
             <option value="30d">30日保証 (60%割引 / 50%保険料)</option>
             <option value="1y">1年保証 (60%割引 / 33%保険料)</option>
           </select>
-          <small className="text-gray-500 mt-1">保証期間終了後、未使用分は返金</small>
+          <small className="text-secondary-500 mt-1">保証期間終了後、未使用分は返金</small>
         </div>
 
         {/* Standard Term */}
         <div className="flex flex-col">
-          <label className="flex items-center gap-2 font-semibold text-gray-700 mb-2">
-            <span className="text-xl">📅</span>
+          <label className="flex items-center gap-2 font-semibold text-secondary-700 mb-2">
+            <CalendarIcon size={20} className="text-primary-600" />
             標準RI/SP 契約期間
           </label>
           <select
             value={standardTerm}
             onChange={(e) => setStandardTerm(e.target.value)}
-            className="px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition"
+            className="px-4 py-2 border border-secondary-300 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition bg-white text-secondary-900"
           >
             <option value="1yr">1年予約</option>
             <option value="3yr">3年予約</option>
@@ -82,14 +83,14 @@ export default function SimulationConfig({ onSimulate, isLoading }: SimulationCo
 
         {/* Standard Option */}
         <div className="flex flex-col">
-          <label className="flex items-center gap-2 font-semibold text-gray-700 mb-2">
-            <span className="text-xl">💰</span>
+          <label className="flex items-center gap-2 font-semibold text-secondary-700 mb-2">
+            <DollarIcon size={20} className="text-success-600" />
             標準RI/SP タイプ
           </label>
           <select
             value={standardOption}
             onChange={(e) => setStandardOption(e.target.value)}
-            className="px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition"
+            className="px-4 py-2 border border-secondary-300 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition bg-white text-secondary-900"
           >
             <optgroup label="Reserved Instance (RI)">
               <option value="NoUpfront">RI - NoUpfront (全額後払い)</option>
@@ -104,8 +105,8 @@ export default function SimulationConfig({ onSimulate, isLoading }: SimulationCo
 
         {/* Coverage */}
         <div className="flex flex-col">
-          <label className="flex items-center gap-2 font-semibold text-gray-700 mb-2">
-            <span className="text-xl">📊</span>
+          <label className="flex items-center gap-2 font-semibold text-secondary-700 mb-2">
+            <ChartBarIcon size={20} className="text-primary-600" />
             想定カバレッジ: <span className="text-primary-600">{formatPercentage(coverage / 100)}</span>
           </label>
           <input
@@ -115,15 +116,15 @@ export default function SimulationConfig({ onSimulate, isLoading }: SimulationCo
             step="5"
             value={coverage}
             onChange={(e) => setCoverage(Number(e.target.value))}
-            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary-600"
+            className="w-full h-2 bg-secondary-200 rounded-lg appearance-none cursor-pointer accent-primary-600"
           />
-          <small className="text-gray-500 mt-1">リソース全体の何%をRI/SPでカバーするか</small>
+          <small className="text-secondary-500 mt-1">リソース全体の何%をRI/SPでカバーするか</small>
         </div>
 
         {/* Usage */}
         <div className="flex flex-col">
-          <label className="flex items-center gap-2 font-semibold text-gray-700 mb-2">
-            <span className="text-xl">⚡</span>
+          <label className="flex items-center gap-2 font-semibold text-secondary-700 mb-2">
+            <ActivityIcon size={20} className="text-accent-600" />
             想定利用率: <span className="text-primary-600">{formatPercentage(usage / 100)}</span>
           </label>
           <input
@@ -133,9 +134,9 @@ export default function SimulationConfig({ onSimulate, isLoading }: SimulationCo
             step="5"
             value={usage}
             onChange={(e) => setUsage(Number(e.target.value))}
-            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary-600"
+            className="w-full h-2 bg-secondary-200 rounded-lg appearance-none cursor-pointer accent-primary-600"
           />
-          <small className="text-gray-500 mt-1">リソースの実稼働率</small>
+          <small className="text-secondary-500 mt-1">リソースの実稼働率</small>
         </div>
       </div>
 
@@ -144,17 +145,17 @@ export default function SimulationConfig({ onSimulate, isLoading }: SimulationCo
         <button
           onClick={handleSimulate}
           disabled={isLoading}
-          className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary-600 to-accent-600 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <span className="text-xl">🚀</span>
+          <RocketIcon size={20} />
           シミュレーション実行
         </button>
         <button
           onClick={handleReset}
           disabled={isLoading}
-          className="flex items-center gap-2 px-6 py-3 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center gap-2 px-6 py-3 bg-secondary-200 text-secondary-700 font-semibold rounded-lg hover:bg-secondary-300 transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <span className="text-xl">🔄</span>
+          <RefreshIcon size={20} />
           リセット
         </button>
       </div>
