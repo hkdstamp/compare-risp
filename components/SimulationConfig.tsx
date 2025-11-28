@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { formatPercentage } from '@/lib/utils'
+import DiscountRateInfo from '@/components/ui/DiscountRateInfo'
 
 interface SimulationConfigProps {
   onSimulate: (params: any) => void
@@ -35,9 +36,15 @@ export default function SimulationConfig({ onSimulate, isLoading }: SimulationCo
 
   return (
     <section className="bg-white rounded-xl shadow-lg p-6">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6 pb-3 border-b-4 border-primary-600">
-        シミュレーション設定
-      </h2>
+      <div className="flex items-center justify-between mb-6 pb-3 border-b-4 border-primary-600">
+        <h2 className="text-2xl font-bold text-gray-900">
+          シミュレーション設定
+        </h2>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-gray-600">割引率の詳細</span>
+          <DiscountRateInfo />
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
         {/* Insurance Plan */}
