@@ -11,8 +11,11 @@ AWS Managed Service Provider (MSP) 向けのコスト最適化シミュレーシ
 ### 核となるビジネスロジック
 
 1. **保険RI/SP**: 短期保証（30日/1年）で柔軟性が高く、一定の割引率とプレミアム料金が発生
+   - **返金見込み機能**: 想定カバレッジが100%未満の場合、未使用分の保険料を返金見込みとして計算
+   - カバレッジを下げることで、未使用分の保険料が返金として還元される
 2. **標準RI/SP**: AWS標準の1年/3年予約で、NoUpfront/PartialUpfront/AllUpfrontの支払いオプション
 3. **累積コスト比較**: 通常価格と各プランの累積コストを可視化し、損益分岐点を表示
+4. **割引率情報モーダル**: 各プランの割引率、保険料率、実効割引率を確認できる情報モーダル
 
 ## 🛠️ 技術スタック
 
@@ -42,33 +45,244 @@ AWS Managed Service Provider (MSP) 向けのコスト最適化シミュレーシ
 │   └── globals.css               # TailwindCSS + グローバルスタイル
 ├── components/                   # Reactコンポーネント
 │   ├── ui/                       # 再利用可能UIコンポーネント
-│   │   ├── CostCards.tsx         # コストカード表示
+│   │   ├── CostCards.tsx         # コストカード表示（返金見込み表示機能付き）★
 │   │   ├── RevenueHighlight.tsx  # 収益ハイライト
 │   │   ├── CumulativeChart.tsx   # 累積コストグラフ（メインチャート）★
 │   │   ├── MonthlyChart.tsx      # 月次コストグラフ
-│   │   └── DetailsTable.tsx      # リソース詳細テーブル
+│   │   ├── DetailsTable.tsx      # リソース詳細テーブル（返金見込み列付き）★
+│   │   └── DiscountRateInfo.tsx  # 割引率情報モーダル ★
+│   ├── icons/                    # SVGアイコンコンポーネント ★
+│   │   └── index.tsx             # 全アイコン定義（24種類）
 │   ├── Header.tsx                # ヘッダー
 │   ├── Footer.tsx                # フッター
 │   ├── ResourceInfo.tsx          # リソース情報表示
-│   ├── ResourceSelector.tsx      # 動的リソース選択UI ★
-│   ├── SimulationConfig.tsx      # シミュレーション設定パネル
+│   ├── ResourceSelector.tsx      # 動的リソース選択UI（SVGアイコン対応）★
+│   ├── SimulationConfig.tsx      # シミュレーション設定パネル（情報アイコン付き）★
 │   └── SimulationResults.tsx     # シミュレーション結果表示
 ├── lib/                          # ビジネスロジック & ユーティリティ
-│   ├── types.ts                  # TypeScript型定義（全データ構造）★
-│   ├── simulator.ts              # コア計算ロジック ★
+│   ├── types.ts                  # TypeScript型定義（全データ構造、返金見込みフィールド含む）★
+│   ├── simulator.ts              # コア計算ロジック（返金見込み計算機能付き）★
 │   ├── pricing-catalog.ts        # AWS価格カタログ（18種類以上）★
 │   └── utils.ts                  # ユーティリティ関数
 ├── public/                       # 静的ファイル
+├── CALCULATION_SPECIFICATION.md  # 計算仕様詳細ドキュメント ★
 ├── amplify.yml                   # AWS Amplify ビルド設定
 ├── next.config.js                # Next.js設定（API Routes対応）
-├── tailwind.config.js            # TailwindCSS設定
+├── tailwind.config.js            # TailwindCSS設定（Alphuas配色）★
 ├── tsconfig.json                 # TypeScript設定
 └── package.json                  # 依存関係
 ```
 
 ## 🎨 主要コンポーネント詳細
 
-### 1. CumulativeChart.tsx（累積コストグラフ）★★★
+### 0. アイコンコンポーネント（components/icons/index.tsx）★★
+
+**重要な設計変更**: 絵文字からSVGアイコンへの完全移行
+
+#### 実装されているアイコン（24種類）
+
+```typescript
+// components/icons/index.tsx
+
+interface IconProps {
+  className?: string
+  size?: number  // デフォルト: 24
+}
+
+// 主要アイコン
+export function ShieldIcon        // 保険RI/SP
+export function CalendarIcon      // 契約期間
+export function DollarIcon        // 支払方法
+export function ChartBarIcon      // 統計
+export function CoinsIcon         // 返金見込み ★
+export function BalanceIcon       // 料金
+export function InfoIcon          // 情報
+export function XIcon             // 閉じる
+export function RocketIcon        // シミュレーション実行
+export function RefreshIcon       // リセット
+
+// リソース用アイコン
+export function ServerIcon        // EC2
+export function DatabaseIcon      // RDS
+export function ZapIcon           // ElastiCache
+export function PackageIcon       // パッケージ
+export function PlusIcon          // 追加
+export function TrashIcon         // 削除
+
+// チャート用アイコン
+export function LineChartIcon     // 累積コストグラフ
+export function BarChartIcon      // 月次コストグラフ
+export function TargetIcon        // 損益分岐点
+export function TrendingUpIcon    // 収益トレンド
+export function ActivityIcon      // アクティビティ
+export function SearchIcon        // 検索
+export function FileTextIcon      // ドキュメント
+```
+
+#### 使用例
+
+```typescript
+import { ShieldIcon, CoinsIcon, CalendarIcon } from '@/components/icons'
+
+// 基本使用
+<ShieldIcon className="text-accent-600" size={20} />
+
+// アイコン付きテキスト
+<div className="flex items-center gap-2">
+  <CoinsIcon className="text-accent-600" size={18} />
+  <span>返金見込み</span>
+</div>
+
+// アイコン付きボタン
+<button className="flex items-center gap-2">
+  <RocketIcon size={20} />
+  <span>シミュレーション実行</span>
+</button>
+```
+
+#### アイコンの利点
+
+- ✅ **スケーラブル**: サイズを自由に調整可能
+- ✅ **カスタマイズ可能**: 色をTailwindクラスで指定
+- ✅ **アクセシビリティ**: スクリーンリーダー対応
+- ✅ **パフォーマンス**: SVGは軽量
+- ✅ **一貫性**: デザインシステム全体で統一
+
+---
+
+### 1. DiscountRateInfo.tsx（割引率情報モーダル）★★
+
+**新規追加コンポーネント** - シミュレーション設定の情報アイコンから開くモーダル
+
+#### 機能
+
+- **保険RI/SP情報表示**:
+  - 30日保証プラン（割引率60%、保険料率50%、実効割引率30.0%）
+  - 1年保証プラン（割引率60%、保険料率33%、実効割引率40.2%）
+  - 特徴: 短期契約、未使用分返金、初期費用ゼロ
+  - 注記: ComputeSP 3年相当で算定
+
+- **標準RI/SP情報表示**:
+  - Reserved Instance（RI）詳細テーブル
+    - 1年契約: NoUpfront (37.0%), PartialUpfront (40.0%), AllUpfront (41.2%)
+    - 3年契約: NoUpfront (56.8%), PartialUpfront (60.0%), AllUpfront (62.4%)
+  - Compute Savings Plans（SP）詳細テーブル
+    - 1年契約: 40.0%割引
+    - 3年契約: 60.0%割引
+  - 注記: ComputeSavingsPlansから簡易的に算定
+
+- **使い分けガイドライン**:
+  - 最大割引を求める → RI 3年 AllUpfront (62.4%)
+  - 初期費用を避けたい → SP 1年 (40.0%) または 保険RI/SP 1年 (40.2%)
+  - 柔軟性を重視 → 保険RI/SP 1年 (40.2%)
+  - 超短期利用 → 保険RI/SP 30日 (30.0%)
+
+#### 実装ポイント
+
+```typescript
+// components/ui/DiscountRateInfo.tsx
+'use client'
+
+import { useState } from 'react'
+import { InfoIcon, XIcon } from '@/components/icons'
+
+export default function DiscountRateInfo() {
+  const [isOpen, setIsOpen] = useState(false)
+
+  return (
+    <>
+      {/* 情報アイコンボタン */}
+      <button
+        onClick={() => setIsOpen(true)}
+        className="p-2 hover:bg-secondary-100 rounded-lg transition-colors"
+        aria-label="割引率情報を表示"
+      >
+        <InfoIcon className="text-secondary-600" size={20} />
+      </button>
+
+      {/* モーダル */}
+      {isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+          <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            {/* ヘッダー */}
+            <div className="sticky top-0 bg-gradient-to-r from-primary-600 to-accent-600 text-white p-6">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold">割引率情報</h2>
+                <button onClick={() => setIsOpen(false)}>
+                  <XIcon size={24} />
+                </button>
+              </div>
+            </div>
+
+            {/* コンテンツ */}
+            <div className="p-6 space-y-6">
+              {/* 保険RI/SPセクション */}
+              <section>
+                <h3 className="text-xl font-bold text-accent-700 mb-2">
+                  保険RI/SP
+                </h3>
+                <p className="text-sm text-secondary-600 mb-4">
+                  ※ ComputeSP 3年相当で算定
+                </p>
+                {/* 保険プランテーブル */}
+                <table className="w-full">
+                  <thead className="bg-accent-50">
+                    <tr>
+                      <th>プラン</th>
+                      <th>割引率</th>
+                      <th>保険料率</th>
+                      <th>実効割引率</th>
+                      <th>月額料金</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>30日保証</td>
+                      <td>60%</td>
+                      <td>50%</td>
+                      <td className="font-bold text-accent-600">30.0%</td>
+                      <td>$55.60</td>
+                    </tr>
+                    <tr>
+                      <td>1年保証</td>
+                      <td>60%</td>
+                      <td>33%</td>
+                      <td className="font-bold text-accent-600">40.2%</td>
+                      <td>$47.50</td>
+                    </tr>
+                  </tbody>
+                </table>
+                {/* 特徴リスト */}
+                <ul className="mt-3 space-y-1 text-sm">
+                  <li>✓ 短期契約（30日または1年）</li>
+                  <li>✓ 未使用分は返金される</li>
+                  <li>✓ 初期費用ゼロ</li>
+                  <li>✓ 1年保証は標準RI/SPと同等の割引率</li>
+                </ul>
+              </section>
+
+              {/* 標準RI/SPセクション */}
+              <section>
+                <h3 className="text-xl font-bold text-primary-700 mb-2">
+                  標準RI/SP
+                </h3>
+                <p className="text-sm text-secondary-600 mb-4">
+                  ※ SPは、ComputeSavingsPlansから簡易的に算定
+                </p>
+                {/* RIテーブル、SPテーブル、使い分けガイドライン */}
+              </section>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  )
+}
+```
+
+---
+
+### 2. CumulativeChart.tsx（累積コストグラフ）★★★
 
 **最重要コンポーネント** - 損益分岐点を可視化するメインチャート
 
@@ -235,10 +449,11 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
   const termDisplay = termMonths === 12 ? '1年' : termMonths === 36 ? '3年' : `${termMonths}ヶ月`
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6">
+    <div className="bg-white rounded-xl shadow-lg p-6 border border-primary-200">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-xl font-bold text-gray-900">
-          💹 累積コスト推移（契約期間: {termDisplay}）
+        <h3 className="text-xl font-bold text-secondary-900 flex items-center gap-2">
+          <LineChartIcon className="text-primary-600" size={24} />
+          累積コスト推移（契約期間: {termDisplay}）
         </h3>
         <div className="flex gap-4 text-sm">
           {standardPlan.break_even_months !== null && (
@@ -259,10 +474,10 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
           )}
         </div>
       </div>
-      <div className="mb-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+      <div className="mb-3 p-3 bg-primary-50 border border-primary-200 rounded-lg">
         <div className="flex items-start gap-2">
-          <span className="text-blue-600 text-lg">ℹ️</span>
-          <div className="text-sm text-blue-900">
+          <InfoIcon className="text-primary-600" size={20} />
+          <div className="text-sm text-primary-900">
             <p className="font-semibold mb-1">グラフの見方：</p>
             <ul className="list-disc list-inside space-y-1">
               <li><strong>実線</strong>: 累積ランニングコスト（月々の利用料金の合計）</li>
@@ -279,7 +494,141 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
 }
 ```
 
-### 2. ResourceSelector.tsx（動的リソース選択）★★
+### 3. CostCards.tsx（コストカード表示）★★
+
+**返金見込み表示機能を含む**
+
+#### 機能
+
+- **通常価格カード**: オンデマンド価格表示
+- **保険RI/SPカード**: 
+  - 月額コスト
+  - 月間削減額（基本削減 + 返金見込みの内訳表示）★
+  - 💰 返金見込み（単独表示）★
+  - 保険料
+  - 損益分岐月
+- **標準RI/SPカード**:
+  - 月額コスト
+  - 月間削減額
+  - 初期費用
+  - 損益分岐月
+
+#### 実装ポイント
+
+```typescript
+// components/ui/CostCards.tsx
+'use client'
+
+import { formatCurrency } from '@/lib/utils'
+import { ShieldIcon, CalendarIcon, CoinsIcon, BalanceIcon } from '@/components/icons'
+
+// 保険RI/SPカード内の返金見込み表示
+{insurance.expected_refund && insurance.expected_refund > 0 && (
+  <>
+    {/* 月間削減額の内訳 */}
+    <div className="flex items-center justify-between p-3 bg-success-50 rounded-lg">
+      <div className="flex items-center gap-2">
+        <BalanceIcon className="text-success-600" size={20} />
+        <span className="text-sm font-medium text-secondary-700">月間削減額</span>
+      </div>
+      <div className="text-right">
+        <div className="text-lg font-bold text-success-600">
+          {formatCurrency(insurance.monthly_savings)}
+        </div>
+        <div className="text-xs text-secondary-600">
+          (基本削減: {formatCurrency(insurance.monthly_savings - insurance.expected_refund)} + 
+          返金見込: {formatCurrency(insurance.expected_refund)})
+        </div>
+      </div>
+    </div>
+
+    {/* 返金見込み（単独表示） */}
+    <div className="flex items-center justify-between p-3 bg-accent-50 rounded-lg">
+      <div className="flex items-center gap-2">
+        <CoinsIcon className="text-accent-600" size={20} />
+        <span className="text-sm font-medium text-secondary-700">💰 返金見込</span>
+      </div>
+      <div className="text-lg font-bold text-accent-600">
+        {formatCurrency(insurance.expected_refund)}
+      </div>
+    </div>
+  </>
+)}
+```
+
+---
+
+### 4. DetailsTable.tsx（リソース詳細テーブル）★★
+
+**返金見込み列を含む**
+
+#### 機能
+
+- リソース別のコスト詳細表示
+- **返金見込み列**の追加 ★
+- 保険削減額の内訳表示（削減額 + 返金見込み）★
+
+#### テーブル列構成
+
+| 列名 | 説明 |
+|------|------|
+| リソース | サービス:インスタンスタイプ |
+| 通常価格 | オンデマンド月額コスト |
+| 保険RI/SP | 保険プラン月額コスト |
+| 保険料 | プレミアム料金 |
+| **返金見込** | 未使用分の返金額 ★ |
+| 保険削減額 | 月間削減額（内訳付き）★ |
+| 標準RI/SP | 標準プラン月額コスト |
+| 標準初期コスト | 前払い費用 |
+| 標準削減額 | 月間削減額 |
+
+#### 実装ポイント
+
+```typescript
+// components/ui/DetailsTable.tsx
+'use client'
+
+import { SearchIcon } from '@/components/icons'
+
+// テーブルヘッダー
+<thead className="bg-secondary-50">
+  <tr>
+    <th>リソース</th>
+    <th>通常価格</th>
+    <th>保険RI/SP</th>
+    <th>保険料</th>
+    <th className="text-accent-600">返金見込</th> {/* 新規追加 */}
+    <th>保険削減額</th>
+    <th>標準RI/SP</th>
+    <th>標準初期コスト</th>
+    <th>標準削減額</th>
+  </tr>
+</thead>
+
+// テーブルボディ（返金見込み列）
+<td className="text-right">
+  <span className="text-accent-600 font-medium">
+    {formatCurrency(detail.insurance_expected_refund)}
+  </span>
+</td>
+
+// 保険削減額（内訳表示）
+<td className="text-right">
+  <span className="text-success-600 font-semibold">
+    {formatCurrency(detail.insurance_savings)}
+  </span>
+  {detail.insurance_expected_refund > 0 && (
+    <div className="text-xs text-secondary-600 mt-1">
+      ({formatCurrency(detail.insurance_savings - detail.insurance_expected_refund)} + 
+      {formatCurrency(detail.insurance_expected_refund)})
+    </div>
+  )}
+</td>
+```
+
+---
+
+### 5. ResourceSelector.tsx（動的リソース選択）★★
 
 AWS複数サービスのリソースを動的に追加・削除・編集できるUI
 
@@ -303,10 +652,19 @@ interface ResourceSelectorProps {
   onChange: (resources: ResourceConfig[]) => void
 }
 
-const serviceIcons: Record<string, string> = {
-  ec2: '🖥️',
-  rds: '🗄️',
-  elasticache: '⚡'
+import { ServerIcon, DatabaseIcon, ZapIcon, PackageIcon, PlusIcon, TrashIcon, InfoIcon } from '@/components/icons'
+
+const ServiceIcon = ({ service, className = '', size = 20 }: { service: string; className?: string; size?: number }) => {
+  switch (service) {
+    case 'ec2':
+      return <ServerIcon className={className} size={size} />
+    case 'rds':
+      return <DatabaseIcon className={className} size={size} />
+    case 'elasticache':
+      return <ZapIcon className={className} size={size} />
+    default:
+      return <PackageIcon className={className} size={size} />
+  }
 }
 
 export default function ResourceSelector({ resources, onChange }: ResourceSelectorProps) {
@@ -338,14 +696,17 @@ export default function ResourceSelector({ resources, onChange }: ResourceSelect
   return (
     <section className="bg-white rounded-xl shadow-lg p-6">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-xl font-bold text-gray-900">
-          📦 シミュレーション対象リソース (東京リージョン)
-        </h3>
+        <div className="flex items-center gap-2">
+          <PackageIcon className="text-primary-600" size={24} />
+          <h3 className="text-xl font-bold text-secondary-900">
+            シミュレーション対象リソース (東京リージョン)
+          </h3>
+        </div>
         <button
           onClick={addResource}
           className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2"
         >
-          <span>+</span>
+          <PlusIcon size={18} />
           <span>リソース追加</span>
         </button>
       </div>
@@ -373,7 +734,7 @@ export default function ResourceSelector({ resources, onChange }: ResourceSelect
                 >
                   {Object.entries(serviceMetadata).map(([key, meta]) => (
                     <option key={key} value={key}>
-                      {serviceIcons[key]} {meta.name}
+                      {meta.name}
                     </option>
                   ))}
                 </select>
@@ -416,9 +777,10 @@ export default function ResourceSelector({ resources, onChange }: ResourceSelect
               <div className="md:col-span-3">
                 <button
                   onClick={() => removeResource(index)}
-                  className="w-full px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-colors"
+                  className="w-full px-4 py-2 bg-danger-500 hover:bg-danger-600 text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
                 >
-                  🗑️ 削除
+                  <TrashIcon size={18} />
+                  <span>削除</span>
                 </button>
               </div>
             </div>
@@ -437,7 +799,7 @@ export default function ResourceSelector({ resources, onChange }: ResourceSelect
 }
 ```
 
-### 3. lib/simulator.ts（コア計算ロジック）★★★
+### 6. lib/simulator.ts（コア計算ロジック）★★★
 
 保険RI/SPと標準RI/SPのコスト計算エンジン
 
@@ -456,10 +818,13 @@ export function calculateInsurancePlan(
   const plan = catalog.insurance_plans[insuranceKey]
   let totalMonthlyCost = 0
   let totalPremium = 0
+  let totalExpectedRefund = 0  // 返金見込み合計 ★
+  const details: DetailItem[] = []
   
   for (const res of resources) {
     const onDemandRate = catalog.resources[res.service][res.instance].on_demand_hourly_usd
     const coverageQty = res.quantity * coverage
+    const remainingQty = res.quantity - coverageQty
     
     // 割引適用後のコスト
     const discountedCost = onDemandRate * hours * coverageQty * usage * (1.0 - plan.discount_rate)
@@ -468,23 +833,67 @@ export function calculateInsurancePlan(
     const premiumBase = onDemandRate * hours * coverageQty * plan.discount_rate
     const premium = premiumBase * plan.premium_rate
     
-    totalMonthlyCost += discountedCost + premium
+    // 返金見込み計算 ★
+    const premiumAt100Coverage = onDemandRate * hours * res.quantity * plan.discount_rate * plan.premium_rate
+    const expectedRefund = premiumAt100Coverage - premium
+    
+    // 残りリソースのコスト
+    const remainingCost = onDemandRate * hours * remainingQty * usage
+    
+    const monthlyCost = discountedCost + premium + remainingCost
+    
+    totalMonthlyCost += monthlyCost
     totalPremium += premium
+    totalExpectedRefund += expectedRefund  // 返金見込み集計 ★
+    
+    // 詳細データに返金見込みを追加 ★
+    details.push({
+      resource: `${res.service}:${res.instance}`,
+      baseline_cost: onDemandRate * hours * res.quantity * usage,
+      insurance_cost: monthlyCost,
+      insurance_premium: premium,
+      insurance_expected_refund: expectedRefund,  // 返金見込み ★
+      insurance_savings: baselineCost - monthlyCost,
+      // ...
+    })
   }
   
-  // 損益分岐点の計算（初期費用がないので常にnull）
+  // 実効削減額 = 基本削減額 + 返金見込み ★
+  const baseSavings = baselineCost - totalMonthlyCost
+  const effectiveMonthlySavings = baseSavings + totalExpectedRefund
+  
   return {
     result: {
       name: `Insurance RI/SP ${plan.name}`,
       monthly_cost: totalMonthlyCost,
-      monthly_savings: baselineCost - totalMonthlyCost,
+      monthly_savings: effectiveMonthlySavings,  // 実効削減額 ★
       initial_cost: 0,
       premium: totalPremium,
-      break_even_months: null,
+      expected_refund: totalExpectedRefund,  // 返金見込み ★
+      break_even_months: calculateBreakEvenMonths(baselineCost, totalMonthlyCost, 0),
     },
-    details: [...]
+    details
   }
 }
+
+/**
+ * 返金見込みの計算ロジック
+ * 
+ * 想定カバレッジが100%未満の場合、未使用分の保険料が返金される。
+ * 
+ * 計算式:
+ *   返金見込み = 100%カバレッジ時の保険料 - 実際のカバレッジでの保険料
+ * 
+ * 例: カバレッジ70%の場合
+ *   - 100%カバレッジ時: $71.48
+ *   - 70%カバレッジ時: $50.04
+ *   - 返金見込み: $71.48 - $50.04 = $21.44
+ * 
+ * 効果:
+ *   - カバレッジを下げることで返金見込みが増加
+ *   - 実効削減額 = 基本削減額 + 返金見込み
+ *   - 柔軟なリソース計画が可能
+ */
 ```
 
 **calculateStandardPlan**: 標準RI/SPの月次コスト計算
@@ -574,7 +983,12 @@ export function calculateCumulativeCosts(
 - **初期費用は含まない**（グラフコンポーネント側で追加）
 - これにより、累積コストと総支出を分けて可視化できる
 
-### 4. lib/types.ts（型定義）★
+**返金見込みの計算**:
+- 保険RI/SPの特徴的な機能
+- カバレッジを下げることで未使用分の保険料が返金として還元
+- 実効削減額 = 基本削減額 + 返金見込み
+
+### 7. lib/types.ts（型定義）★
 
 全データ構造を定義
 
@@ -594,10 +1008,11 @@ export interface ResourceConfig {
 export interface PlanResult {
   name: string                    // プラン名
   monthly_cost: number            // 月次コスト（実効コスト）
-  monthly_savings: number         // 月次削減額
+  monthly_savings: number         // 月次削減額（実効削減額）★
   monthly_cash_savings?: number   // キャッシュ削減額
   initial_cost: number            // 初期費用（一括払い）
   premium: number                 // プレミアム料金（保険のみ）
+  expected_refund?: number        // 返金見込み（保険のみ）★
   break_even_months: number | null // 損益分岐点（月数）
 }
 
@@ -637,6 +1052,7 @@ export interface DetailItem {
   baseline_cost: number
   insurance_cost: number
   insurance_premium: number
+  insurance_expected_refund: number  // 返金見込み ★
   insurance_savings: number
   standard_cost: number
   standard_upfront: number
@@ -678,7 +1094,7 @@ export interface InsurancePlan {
 }
 ```
 
-### 5. lib/pricing-catalog.ts（価格カタログ）★
+### 8. lib/pricing-catalog.ts（価格カタログ）★
 
 AWS東京リージョンの実際の価格データ（18種類以上のインスタンスタイプ）
 
@@ -765,17 +1181,37 @@ export const pricingCatalog: PricingCatalog = {
   insurance_plans: {
     '30d': {
       name: '30-day guarantee',
-      discount_rate: 0.30,   // 30% discount
+      discount_rate: 0.60,   // 60% discount
       premium_rate: 0.50,    // 50% premium on saved amount
-      term_months: 1
+      term_months: 1,
+      effective_discount_rate: 0.30  // 実効割引率: 30.0%
     },
     '1y': {
       name: '1-year guarantee',
-      discount_rate: 0.45,   // 45% discount
+      discount_rate: 0.60,   // 60% discount
       premium_rate: 0.33,    // 33% premium on saved amount
-      term_months: 12
+      term_months: 12,
+      effective_discount_rate: 0.402  // 実効割引率: 40.2%
     }
   }
+}
+
+/**
+ * 保険RI/SPの実効割引率の計算
+ * 
+ * 実効割引率 = (オンデマンド月額 - 月額合計) / オンデマンド月額
+ * 
+ * 例: 1年保証プラン
+ *   オンデマンド月額: $79.42
+ *   割引後コスト: $79.42 × (1 - 0.60) = $31.77
+ *   保険料: $79.42 × 0.60 × 0.33 = $15.73
+ *   月額合計: $31.77 + $15.73 = $47.50
+ *   実効割引率: ($79.42 - $47.50) / $79.42 = 40.2%
+ * 
+ * 結論:
+ *   1年保証（40.2%）≈ RI AllUpfront（41.2%）≈ SP 1年（40.0%）
+ *   保険RI/SPは標準RI/SPと同等の割引率を実現
+ */
 }
 
 // サービスメタデータ（UI表示用）
@@ -828,35 +1264,108 @@ export const defaultResources: ResourceConfig[] = [
 
 ## 🎨 UI/UXデザインパターン
 
-### カラーパレット
+### カラーパレット（Alphuas Cloud配色）
 ```typescript
-// TailwindCSS設定
+// TailwindCSS設定 - 全スケール定義
 const colors = {
+  // Primary: Sky Blue（メインカラー）
   primary: {
     50: '#f0f9ff',
     100: '#e0f2fe',
-    500: '#0ea5e9',
+    200: '#b9e6fe',
+    300: '#7dd3fc',
+    400: '#38bdf8',
+    500: '#0ea5e9',  // メイン
     600: '#0284c7',
     700: '#0369a1',
+    800: '#075985',
+    900: '#0c4a6e',
+    950: '#082f49',
   },
-  // グレースケール
-  gray: {
-    50: '#f9fafb',
-    100: '#f3f4f6',
-    200: '#e5e7eb',
-    700: '#374151',
-    900: '#111827',
+  // Secondary: Slate Gray（サブカラー）
+  secondary: {
+    50: '#f8fafc',
+    100: '#f1f5f9',
+    200: '#e2e8f0',
+    300: '#cbd5e1',
+    400: '#94a3b8',
+    500: '#64748b',  // メイン
+    600: '#475569',
+    700: '#334155',
+    800: '#1e293b',
+    900: '#0f172a',
   },
-  // チャート色
+  // Accent: Cyan（アクセント - 保険RI/SP用）
+  accent: {
+    50: '#ecfeff',
+    100: '#cffafe',
+    200: '#a5f3fc',
+    300: '#67e8f9',
+    400: '#22d3ee',
+    500: '#06b6d4',  // メイン
+    600: '#0891b2',
+    700: '#0e7490',
+    800: '#155e75',
+    900: '#164e63',
+  },
+  // Success: Green（削減額表示用）
+  success: {
+    50: '#f0fdf4',
+    100: '#dcfce7',
+    200: '#bbf7d0',
+    300: '#86efac',
+    400: '#4ade80',
+    500: '#22c55e',  // メイン
+    600: '#16a34a',
+    700: '#15803d',
+    800: '#166534',
+    900: '#14532d',
+  },
+  // Warning: Amber（警告用）
+  warning: {
+    50: '#fffbeb',
+    100: '#fef3c7',
+    200: '#fde68a',
+    300: '#fcd34d',
+    400: '#fbbf24',
+    500: '#f59e0b',  // メイン
+    600: '#d97706',
+    700: '#b45309',
+    800: '#92400e',
+    900: '#78350f',
+  },
+  // Danger: Red（エラー・削除用）
+  danger: {
+    50: '#fef2f2',
+    100: '#fee2e2',
+    200: '#fecaca',
+    300: '#fca5a5',
+    400: '#f87171',
+    500: '#ef4444',  // メイン
+    600: '#dc2626',
+    700: '#b91c1c',
+    800: '#991b1b',
+    900: '#7f1d1d',
+  },
+  // チャート色（RGBA形式）
   chart: {
-    onDemand: 'rgba(148, 163, 184, 1)',      // グレー
-    insurance: 'rgba(16, 185, 129, 1)',      // 緑
-    insuranceDashed: 'rgba(16, 185, 129, 0.6)',
-    standard: 'rgba(37, 99, 235, 1)',        // 青
-    standardDashed: 'rgba(37, 99, 235, 0.6)',
+    onDemand: 'rgba(100, 116, 139, 1)',      // Secondary-500
+    insurance: 'rgba(6, 182, 212, 1)',       // Accent-500
+    insuranceDashed: 'rgba(6, 182, 212, 0.6)',
+    standard: 'rgba(14, 165, 233, 1)',       // Primary-500
+    standardDashed: 'rgba(14, 165, 233, 0.6)',
   }
 }
 ```
+
+### カラー使用ガイドライン
+
+- **Primary (Sky Blue)**: ボタン、標準RI/SP関連、主要アクション
+- **Secondary (Slate Gray)**: 通常価格、テキスト、境界線
+- **Accent (Cyan)**: 保険RI/SP関連、強調表示
+- **Success (Green)**: 削減額、ポジティブ指標
+- **Warning (Amber)**: 収益差額、注意喚起
+- **Danger (Red)**: エラー、削除アクション
 
 ### レイアウトパターン
 - **最大幅**: `max-w-7xl mx-auto` (1280px中央揃え)
@@ -903,6 +1412,77 @@ xl: '1280px'  // 大画面
 ```
 
 ## 🔑 重要な実装ポイント
+
+### 0. 返金見込みの実装
+
+**重要**: 保険RI/SPの特徴的な機能
+
+#### 計算ロジック
+
+```typescript
+// 100%カバレッジ時の保険料
+const premiumAt100Coverage = オンデマンド時間単価 × 稼働時間 × リソース数量 × 割引率 × 保険料率
+
+// 実際のカバレッジでの保険料
+const premiumBase = オンデマンド時間単価 × 稼働時間 × (リソース数量 × カバレッジ率) × 割引率
+const premiumActual = premiumBase × 保険料率
+
+// 返金見込み
+const expectedRefund = premiumAt100Coverage - premiumActual
+```
+
+#### 実効削減額の計算
+
+```typescript
+// 基本削減額
+const baseSavings = 通常価格月額 - 月額コスト
+
+// 実効削減額（返金見込みを含む）
+const effectiveMonthlySavings = baseSavings + expectedRefund
+```
+
+#### 効果
+
+- カバレッジ50%の場合: 返金見込み $35.74（保険料の50%）
+- カバレッジ70%の場合: 返金見込み $21.44（保険料の30%）
+- カバレッジ100%の場合: 返金見込み $0（全額使用）
+- **実効削減額は常に一定**（30.0%の削減率を維持）
+
+#### UI表示
+
+**CostCards.tsx**:
+```typescript
+// 月間削減額の内訳表示
+<div className="text-xs text-secondary-600">
+  (基本削減: {formatCurrency(savings - refund)} + 
+  返金見込: {formatCurrency(refund)})
+</div>
+
+// 返金見込み単独表示
+<div className="flex items-center gap-2">
+  <CoinsIcon className="text-accent-600" size={18} />
+  <span>💰 返金見込</span>
+  <span className="font-bold text-accent-600">
+    {formatCurrency(expectedRefund)}
+  </span>
+</div>
+```
+
+**DetailsTable.tsx**:
+```typescript
+// 返金見込み列
+<th className="text-accent-600">返金見込</th>
+
+// 保険削減額の内訳
+{detail.insurance_expected_refund > 0 && (
+  <div className="text-xs text-secondary-600 mt-1">
+    ({formatCurrency(detail.insurance_savings - detail.insurance_expected_refund)} + 
+    {formatCurrency(detail.insurance_expected_refund)})
+  </div>
+)}
+```
+
+---
 
 ### 1. 総支出グラフの正しい実装
 
@@ -1070,15 +1650,12 @@ module.exports = nextConfig
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-chartjs-2": "^5.2.0",
-    "chart.js": "^4.4.1",
-    "clsx": "^2.1.0",
-    "uuid": "^9.0.1"
+    "chart.js": "^4.4.1"
   },
   "devDependencies": {
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@types/uuid": "^9",
     "typescript": "^5.6",
     "tailwindcss": "^3.4.14",
     "postcss": "^8",
@@ -1086,6 +1663,56 @@ module.exports = nextConfig
     "eslint": "^9",
     "eslint-config-next": "^15"
   }
+}
+```
+
+**注意**: `clsx`, `uuid` の依存関係は現在の実装では使用されていません。
+
+---
+
+## 📝 関連ドキュメント
+
+### 計算仕様書 (CALCULATION_SPECIFICATION.md)
+
+詳細な計算ロジック、割引率の詳細、返金見込みの計算方法などが記載されています。
+
+**主要セクション**:
+1. 割引率の詳細 (RI/SP/保険RI/SP)
+2. 基本用語定義
+3. 保険RI/SP計算 (返金見込み含む)
+4. 標準RI/SP計算
+5. 累積コスト計算
+6. UI設計
+7. データ構造
+8. グラフ仕様
+9. 計算例
+
+### GitHubリポジトリ
+
+プロジェクトは `genspark_ai_developer` ブランチで開発されています。
+
+**リポジトリ**: https://github.com/hkdstamp/compare-risp  
+**Pull Request**: [#1 - Complete MSP Revenue Simulator](https://github.com/hkdstamp/compare-risp/pull/1)
+
+---
+
+## 🔧 トラブルシューティング (追加項目)
+
+### 返金見込みが0になる
+**原因**: カバレッジが100%に設定されている  
+**解決**: カバレッジを100%未満に設定すると返金見込みが発生します
+
+### SVGアイコンが表示されない
+**原因**: `components/icons/index.tsx`がインポートされていない  
+**解決**: `import { ShieldIcon, ... } from '@/components/icons'`を確認
+
+### 割引率モーダルが開かない
+**原因**: `DiscountRateInfo`コンポーネントが`SimulationConfig`に追加されていない  
+**解決**: `SimulationConfig.tsx`に`<DiscountRateInfo />`を追加
+
+### 色が正しく表示されない
+**原因**: `tailwind.config.js`のカラーパレットが古い  
+**解決**: Alphuas Cloud配色（Primary, Secondary, Accent, Successなど）を確認
 }
 ```
 
@@ -1301,40 +1928,68 @@ insurance_plans: {
 - [ ] `app/api/pricing/route.ts` - 価格取得API
 - [ ] `app/api/resources/route.ts` - リソース取得API
 
-### Phase 5: UIコンポーネント（基本）
+### Phase 5: アイコンコンポーネント ★
+- [ ] `components/icons/index.tsx` - 24種類のSVGアイコン定義
+  - [ ] ShieldIcon, CalendarIcon, DollarIcon
+  - [ ] CoinsIcon, BalanceIcon, InfoIcon, XIcon
+  - [ ] ServerIcon, DatabaseIcon, ZapIcon, PackageIcon
+  - [ ] PlusIcon, TrashIcon, SearchIcon
+  - [ ] LineChartIcon, BarChartIcon, TargetIcon
+  - [ ] 他のアイコン
+
+### Phase 6: UIコンポーネント（基本）
 - [ ] `components/Header.tsx`
 - [ ] `components/Footer.tsx`
 - [ ] `components/ResourceInfo.tsx`
 
-### Phase 6: UIコンポーネント（入力）
-- [ ] `components/ResourceSelector.tsx` - 動的リソース選択 ★
-- [ ] `components/SimulationConfig.tsx` - 設定パネル
+### Phase 7: UIコンポーネント（入力）
+- [ ] `components/ResourceSelector.tsx` - 動的リソース選択（SVGアイコン対応）★
+- [ ] `components/SimulationConfig.tsx` - 設定パネル（情報アイコン付き）★
 
-### Phase 7: UIコンポーネント（結果表示）
-- [ ] `components/ui/CostCards.tsx`
+### Phase 8: UIコンポーネント（結果表示）
+- [ ] `components/ui/DiscountRateInfo.tsx` - 割引率情報モーダル ★★
+- [ ] `components/ui/CostCards.tsx` - 返金見込み表示機能付き ★★
 - [ ] `components/ui/RevenueHighlight.tsx`
-- [ ] `components/ui/CumulativeChart.tsx` - メインチャート ★★★
-- [ ] `components/ui/MonthlyChart.tsx`
-- [ ] `components/ui/DetailsTable.tsx`
+- [ ] `components/ui/CumulativeChart.tsx` - メインチャート（SVGアイコン対応）★★★
+- [ ] `components/ui/MonthlyChart.tsx` - SVGアイコン対応 ★
+- [ ] `components/ui/DetailsTable.tsx` - 返金見込み列付き ★★
 - [ ] `components/SimulationResults.tsx`
 
-### Phase 8: メインページ
+### Phase 9: メインページ
 - [ ] `app/page.tsx` - シミュレーション画面
 
-### Phase 9: スタイリング
-- [ ] `app/globals.css` - グローバルスタイル
-- [ ] TailwindCSS カスタマイズ
+### Phase 10: スタイリング（Alphuas配色）★
+- [ ] `app/globals.css` - グローバルスタイル（スクロールバーカスタマイズ）
+- [ ] `tailwind.config.js` - Alphuas Cloud風カラーパレット
+  - [ ] Primary (Sky Blue)
+  - [ ] Secondary (Slate Gray)
+  - [ ] Accent (Cyan - 保険RI/SP用)
+  - [ ] Success, Warning, Danger
+  - [ ] 全スケール（50-950）定義
 
-### Phase 10: デプロイ設定
+### Phase 11: ドキュメント作成 ★
+- [ ] `CALCULATION_SPECIFICATION.md` - 計算仕様詳細
+  - [ ] 割引率の詳細（RI/SP/保険RI/SP）
+  - [ ] 返金見込み計算ロジック
+  - [ ] 実効削減額の計算方法
+  - [ ] 計算例とグラフ仕様
+
+### Phase 12: デプロイ設定
 - [ ] `amplify.yml` - AWS Amplify設定
 - [ ] `next.config.js` - Next.js設定確認
 
-### Phase 11: テスト
+### Phase 13: テスト
 - [ ] ローカル開発サーバーで動作確認
+- [ ] 返金見込み計算の検証
+  - [ ] カバレッジ50%で返金見込み$35.74
+  - [ ] カバレッジ70%で返金見込ま$21.44
+  - [ ] カバレッジ100%で返金見込み$0
+- [ ] 割引率情報モーダルの表示確認
+- [ ] SVGアイコンの表示確認
 - [ ] プロダクションビルドテスト
 - [ ] 各テストシナリオ実行
 
-### Phase 12: デプロイ
+### Phase 14: デプロイ
 - [ ] AWS Amplifyにデプロイ
 - [ ] 本番環境で動作確認
 
@@ -1343,10 +1998,13 @@ insurance_plans: {
 すべてのチェックリストが完了したら、以下を確認してください：
 
 ✅ ローカルで`npm run dev`が正常に起動  
-✅ リソース選択UIが動作  
+✅ リソース選択UIが動作（SVGアイコン表示）★  
 ✅ シミュレーション実行が成功  
-✅ グラフが正しく表示（5本のライン）  
+✅ 返金見込みが正しく計算・表示される★  
+✅ 割引率情報モーダルが正しく表示される★  
+✅ グラフが正しく表示（5本のライン、SVGアイコン）  
 ✅ 損益分岐点が表示される  
+✅ Alphuas Cloud配色が正しく適用されている★  
 ✅ レスポンシブデザインが機能  
 ✅ プロダクションビルドが成功  
 ✅ AWS Amplifyデプロイが成功  
@@ -1355,6 +2013,80 @@ insurance_plans: {
 
 **🌊 このプロンプトで、完全なMSP収益シミュレーションツールを再現できます！**
 
-Generated: 2025-11-27  
-Version: 2.0.0  
-Framework: Next.js 15 + React 19 + TypeScript 5.6 + TailwindCSS 3.4
+---
+
+## 🆕 最新の機能追加（2025-11-28更新）
+
+### 1. 返金見込み機能 ★★★
+
+**追加日**: 2025-11-28  
+**目的**: 保険RI/SPでカバレッジを100%未満に設定した際の未使用分保険料を返金見込みとして計算・表示
+
+**計算ロジック**:
+- 返金見込み = 100%カバレッジ時の保険料 - 実際のカバレッジでの保険料
+- 実効削減額 = 基本削減額 + 返金見込み
+
+**影響するファイル**:
+- `lib/simulator.ts`: 返金見込み計算ロジック追加
+- `lib/types.ts`: `expected_refund`, `insurance_expected_refund` フィールド追加
+- `components/ui/CostCards.tsx`: 返金見込み表示機能
+- `components/ui/DetailsTable.tsx`: 返金見込み列追加
+- `CALCULATION_SPECIFICATION.md`: 詳細仕様ドキュメント
+
+### 2. 割引率情報モーダル ★★
+
+**追加日**: 2025-11-28  
+**目的**: 各プランの割引率、保険料率、実効割引率を詳細に確認できるモーダル
+
+**表示内容**:
+- 保険RI/SP: 30日保証 (30.0%), 1年保証 (40.2%)
+- 標準RI/SP: RI 1年/3年, SP 1年/3年
+- 使い分けガイドライン
+
+**影響するファイル**:
+- `components/ui/DiscountRateInfo.tsx`: 新規モーダルコンポーネント
+- `components/SimulationConfig.tsx`: 情報アイコン追加
+
+### 3. SVGアイコンシステム ★★
+
+**追加日**: 2025-11-28  
+**目的**: 絵文字からプロフェッショナルSVGアイコンへの完全移行
+
+**アイコン数**: 24種類  
+**利点**: スケーラブル、カスタマイズ可能、アクセシビリティ向上
+
+**影響するファイル**:
+- `components/icons/index.tsx`: 全アイコン定義
+- 全UIコンポーネント: 絵文字からSVGアイコンへ置き換え
+
+### 4. Alphuas Cloud配色 ★★
+
+**追加日**: 2025-11-28  
+**目的**: Alphuas Cloudのブランドカラーに合わせたプロフェッショナルな配色
+
+**カラーパレット**:
+- Primary: Sky Blue (#0ea5e9) - 標準RI/SP用
+- Accent: Cyan (#06b6d4) - 保険RI/SP用
+- Secondary: Slate Gray - テキスト・境界線
+- Success: Green - 削減額表示
+- Warning: Amber - 収益差額
+- Danger: Red - エラー・削除
+
+**影響するファイル**:
+- `tailwind.config.js`: 完全なカラースケール定義
+- `app/globals.css`: スクロールバーカスタマイズ
+- 全UIコンポーネント: 新しい配色適用
+
+---
+
+Generated: 2025-11-28 (更新)  
+Version: 2.1.0  
+Framework: Next.js 15 + React 19 + TypeScript 5.6 + TailwindCSS 3.4  
+
+**主要機能**:
+- ✅ 返金見込み計算・表示
+- ✅ 割引率情報モーダル
+- ✅ SVGアイコンシステム
+- ✅ Alphuas Cloud配色
+- ✅ 累積コスト比較
+- ✅ 損益分岐点表示
