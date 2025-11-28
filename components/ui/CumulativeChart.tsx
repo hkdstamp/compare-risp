@@ -5,6 +5,7 @@ import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement
 import { Line } from 'react-chartjs-2'
 import { CumulativeData, PlanResult } from '@/lib/types'
 import { formatCurrency } from '@/lib/utils'
+import { LineChartIcon, InfoIcon, TargetIcon } from '@/components/icons'
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler)
 
@@ -33,8 +34,8 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
       {
         label: '通常価格',
         data: cumulative.on_demand,
-        borderColor: 'rgba(148, 163, 184, 1)',
-        backgroundColor: 'rgba(148, 163, 184, 0.1)',
+        borderColor: 'rgba(100, 116, 139, 1)', // secondary-500
+        backgroundColor: 'rgba(100, 116, 139, 0.1)',
         borderWidth: 2,
         tension: 0.4,
         fill: true,
@@ -42,8 +43,8 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
       {
         label: '保険RI/SP（累積）',
         data: cumulative.insurance,
-        borderColor: 'rgba(16, 185, 129, 1)',
-        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+        borderColor: 'rgba(34, 197, 94, 1)', // success-500
+        backgroundColor: 'rgba(34, 197, 94, 0.1)',
         borderWidth: 2,
         tension: 0.4,
         fill: true,
@@ -51,8 +52,8 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
       {
         label: '保険RI/SP（総支出）',
         data: insuranceTotalExpenditure,
-        borderColor: 'rgba(16, 185, 129, 0.6)',
-        backgroundColor: 'rgba(16, 185, 129, 0.05)',
+        borderColor: 'rgba(34, 197, 94, 0.6)', // success-500 with opacity
+        backgroundColor: 'rgba(34, 197, 94, 0.05)',
         borderWidth: 2,
         borderDash: [5, 5],
         tension: 0.4,
@@ -62,8 +63,8 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
       {
         label: '標準RI/SP（累積）',
         data: cumulative.standard,
-        borderColor: 'rgba(37, 99, 235, 1)',
-        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+        borderColor: 'rgba(14, 165, 233, 1)', // primary-500
+        backgroundColor: 'rgba(14, 165, 233, 0.1)',
         borderWidth: 2,
         tension: 0.4,
         fill: true,
@@ -71,8 +72,8 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
       {
         label: '標準RI/SP（総支出）',
         data: standardTotalExpenditure,
-        borderColor: 'rgba(37, 99, 235, 0.6)',
-        backgroundColor: 'rgba(37, 99, 235, 0.05)',
+        borderColor: 'rgba(14, 165, 233, 0.6)', // primary-500 with opacity
+        backgroundColor: 'rgba(14, 165, 233, 0.05)',
         borderWidth: 3,
         borderDash: [5, 5],
         tension: 0.4,
@@ -129,12 +130,12 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
             
             // Check if insurance break-even month
             if (insurancePlan.break_even_months !== null && month === insurancePlan.break_even_months) {
-              footer.push('🎯 保険RI/SP 損益分岐点')
+              footer.push('◆ 保険RI/SP 損益分岐点')
             }
             
             // Check if standard break-even month
             if (standardPlan.break_even_months !== null && month === standardPlan.break_even_months) {
-              footer.push('🎯 標準RI/SP 損益分岐点')
+              footer.push('◆ 標準RI/SP 損益分岐点')
             }
             
             return footer
@@ -174,34 +175,35 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
   const termDisplay = termMonths === 12 ? '1年' : termMonths === 36 ? '3年' : `${termMonths}ヶ月`
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6">
+    <div className="bg-white rounded-xl shadow-lg p-6 border border-secondary-200">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-xl font-bold text-gray-900">
-          💹 累積コスト推移（契約期間: {termDisplay}）
+        <h3 className="text-xl font-bold text-secondary-900 flex items-center gap-2">
+          <LineChartIcon size={24} className="text-primary-600" />
+          累積コスト推移（契約期間: {termDisplay}）
         </h3>
         <div className="flex gap-4 text-sm">
           {standardPlan.break_even_months !== null && (
             <div className="flex items-center gap-2">
-              <span className="inline-block w-3 h-3 rounded-full bg-blue-500"></span>
-              <span className="text-gray-600">
-                標準RI/SP 損益分岐: <span className="font-semibold text-blue-600">{standardPlan.break_even_months}ヶ月</span>
+              <TargetIcon size={16} className="text-primary-600" />
+              <span className="text-secondary-600">
+                標準RI/SP 損益分岐: <span className="font-semibold text-primary-600">{standardPlan.break_even_months}ヶ月</span>
               </span>
             </div>
           )}
           {insurancePlan.break_even_months !== null && (
             <div className="flex items-center gap-2">
-              <span className="inline-block w-3 h-3 rounded-full bg-green-500"></span>
-              <span className="text-gray-600">
-                保険RI/SP 損益分岐: <span className="font-semibold text-green-600">{insurancePlan.break_even_months}ヶ月</span>
+              <TargetIcon size={16} className="text-success-600" />
+              <span className="text-secondary-600">
+                保険RI/SP 損益分岐: <span className="font-semibold text-success-600">{insurancePlan.break_even_months}ヶ月</span>
               </span>
             </div>
           )}
         </div>
       </div>
-      <div className="mb-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-        <div className="flex items-start gap-2">
-          <span className="text-blue-600 text-lg">ℹ️</span>
-          <div className="text-sm text-blue-900">
+      <div className="mb-3 p-3 bg-primary-50 border border-primary-200 rounded-lg">
+        <div className="flex items-start gap-3">
+          <InfoIcon size={20} className="text-primary-600 flex-shrink-0 mt-0.5" />
+          <div className="text-sm text-secondary-800">
             <p className="font-semibold mb-1">グラフの見方：</p>
             <ul className="list-disc list-inside space-y-1">
               <li><strong>実線</strong>: 累積ランニングコスト（月々の利用料金の合計）</li>

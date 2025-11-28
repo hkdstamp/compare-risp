@@ -8,7 +8,7 @@ interface RevenueHighlightProps {
 
 export default function RevenueHighlight({ insuranceSavings, standardSavings, revenueDiff }: RevenueHighlightProps) {
   return (
-    <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl shadow-lg p-8">
+    <div className="bg-gradient-to-r from-warning-500 to-warning-600 rounded-xl shadow-lg p-8 border border-warning-400">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="space-y-2">
           <div className="text-white/90 text-sm font-medium">MSP想定粗利 (保険RI/SP)</div>
