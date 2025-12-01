@@ -16,7 +16,7 @@ interface SimulationResultsProps {
   resources: ResourceConfig[]
 }
 
-export default function SimulationResults({ result }: SimulationResultsProps) {
+export default function SimulationResults({ result, insurancePlanKey, usage, resources }: SimulationResultsProps) {
   const revenueDiff = result.insurance.monthly_savings - result.standard.monthly_savings
 
   return (
