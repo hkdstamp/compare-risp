@@ -1,15 +1,19 @@
 'use client'
 
-import { SimulationResult } from '@/lib/types'
+import { SimulationResult, ResourceConfig } from '@/lib/types'
 import { formatCurrency } from '@/lib/utils'
 import CostCards from './ui/CostCards'
 import RevenueHighlight from './ui/RevenueHighlight'
 import CumulativeChart from './ui/CumulativeChart'
 import MonthlyChart from './ui/MonthlyChart'
 import DetailsTable from './ui/DetailsTable'
+import RevenueForecastReport from './ui/RevenueForecastReport'
 
 interface SimulationResultsProps {
   result: SimulationResult
+  insurancePlanKey: string
+  usage: number
+  resources: ResourceConfig[]
 }
 
 export default function SimulationResults({ result }: SimulationResultsProps) {
@@ -43,6 +47,13 @@ export default function SimulationResults({ result }: SimulationResultsProps) {
       </div>
 
       <DetailsTable details={result.details} />
+
+      <RevenueForecastReport 
+        result={result}
+        insurancePlanKey={insurancePlanKey}
+        usage={usage}
+        resources={resources}
+      />
     </section>
   )
 }

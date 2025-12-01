@@ -36,6 +36,22 @@ export interface SimulationResult {
   cumulative: CumulativeData
   details: DetailItem[]
   simulation_id?: string
+  coverage?: number  // 想定カバレッジ (0-1)
+}
+
+// Revenue Forecast types
+export interface RevenueForecastItem {
+  coverage: number        // カバレッジ (%)
+  monthly_cost: number    // 月額コスト
+  premium: number         // 保険料
+  expected_refund: number // 返金見込み
+  revenue: number         // レベニュー (保険料の30%)
+  total_12months: {       // 12ヶ月合計
+    monthly_cost: number
+    premium: number
+    expected_refund: number
+    revenue: number
+  }
 }
 
 export interface CumulativeData {

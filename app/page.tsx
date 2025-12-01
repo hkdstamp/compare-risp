@@ -13,9 +13,11 @@ export default function Home() {
   const [simulationResult, setSimulationResult] = useState<SimulationResult | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [resources, setResources] = useState<ResourceConfig[]>(defaultResources)
+  const [simulationParams, setSimulationParams] = useState<any>(null)
 
   const handleSimulate = async (params: any) => {
     setIsLoading(true)
+    setSimulationParams(params) // Save params for revenue forecast
     try {
       const response = await fetch('/api/simulate', {
         method: 'POST',
@@ -33,6 +35,8 @@ export default function Home() {
       }
 
       const data = await response.json()
+      // Add coverage to result
+      data.coverage = params.coverage
       setSimulationResult(data)
     } catch (error) {
       console.error('Error:', error)
@@ -61,8 +65,13 @@ export default function Home() {
             </div>
           )}
           
-          {simulationResult && !isLoading && (
-            <SimulationResults result={simulationResult} />
+          {simulationResult && !isLoading && simulationParams && (
+            <SimulationResults 
+              result={simulationResult} 
+              insurancePlanKey={simulationParams.insurance}
+              usage={simulationParams.usage}
+              resources={resources}
+            />
           )}
         </main>
         
