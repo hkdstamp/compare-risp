@@ -81,7 +81,7 @@ export default function RevenueForecastReport({
         premium,
         expected_refund: expectedRefund,
         revenue,
-        total_12months
+        total_12months: total12months
       })
     })
 
