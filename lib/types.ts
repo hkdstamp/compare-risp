@@ -52,6 +52,12 @@ export interface RevenueForecastItem {
     expected_refund: number
     revenue: number
   }
+  total_36months: {       // 36ヶ月合計（3年間）
+    monthly_cost: number
+    premium: number
+    expected_refund_3years: number  // 3年間の返金見込（保険期間分を減額）
+    revenue: number
+  }
 }
 
 export interface CumulativeData {

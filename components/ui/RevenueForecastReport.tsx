@@ -29,6 +29,10 @@ export default function RevenueForecastReport({
   const calculateForecast = () => {
     const currentCoverage = result.coverage || 1.0
     const hours = pricingCatalog.metadata.hours_per_month
+    
+    // 保険プランの情報を取得（保険期間の減額計算用）
+    const insurancePlan = pricingCatalog.insurance_plans[insurancePlanKey]
+    const insuranceTermMonths = insurancePlan.term_months // 1 or 12
 
     // カバレッジ範囲: 現在の±10% (ただし0-100%の範囲内)
     const minCoverage = Math.max(0, currentCoverage - 0.1)
@@ -75,13 +79,36 @@ export default function RevenueForecastReport({
         revenue: revenue * 12
       }
 
+      // 3年間（36ヶ月）の計算
+      // 36ヶ月合計 = 12ヶ月合計 × 3
+      const total36months_base = {
+        monthly_cost: total12months.monthly_cost * 3,
+        premium: total12months.premium * 3,
+        expected_refund: total12months.expected_refund * 3,
+        revenue: total12months.revenue * 3
+      }
+
+      // 3年間の返金見込みは保険期間分を減額
+      // 30日保証（1ヶ月）: 1ヶ月分減額
+      // 1年保証（12ヶ月）: 12ヶ月分減額
+      const refundDeduction = expectedRefund * insuranceTermMonths
+      const expectedRefund3Years = total36months_base.expected_refund - refundDeduction
+
+      const total36months = {
+        monthly_cost: total36months_base.monthly_cost,
+        premium: total36months_base.premium,
+        expected_refund_3years: expectedRefund3Years,
+        revenue: total36months_base.revenue
+      }
+
       forecasts.push({
         coverage: coverage * 100, // パーセント表示
         monthly_cost: monthlyCost,
         premium,
         expected_refund: expectedRefund,
         revenue,
-        total_12months: total12months
+        total_12months: total12months,
+        total_36months: total36months
       })
     })
 
@@ -104,7 +131,7 @@ export default function RevenueForecastReport({
             収益見込みレポート
           </h3>
           <p className="text-sm text-secondary-600">
-            想定カバレッジ ±10% 範囲での12ヶ月収益予測
+            想定カバレッジ ±10% 範囲での収益予測（3年契約RI/SP付帯前提）
           </p>
         </div>
       </div>
@@ -119,7 +146,8 @@ export default function RevenueForecastReport({
               <li>設定した想定カバレッジから±10%の範囲で計算</li>
               <li>レベニュー = 保険料 × 30%</li>
               <li>保険料が0の場合、レベニューも0</li>
-              <li>12ヶ月間の合計値を表示</li>
+              <li>3年契約RI/SP付帯前提での36ヶ月計算</li>
+              <li>3年間の返金見込みは保険期間分を減額（30日保証:1ヶ月分、1年保証:12ヶ月分）</li>
             </ul>
           </div>
         </div>
@@ -147,6 +175,12 @@ export default function RevenueForecastReport({
               </th>
               <th className="px-4 py-3 text-right text-sm font-semibold text-warning-700 bg-warning-100">
                 レベニュー<br/>(12ヶ月)
+              </th>
+              <th className="px-4 py-3 text-right text-sm font-semibold text-accent-600 bg-accent-50">
+                3年間<br/>返金見込
+              </th>
+              <th className="px-4 py-3 text-right text-sm font-semibold text-primary-700 bg-primary-100">
+                レベニュー<br/>(36ヶ月)
               </th>
             </tr>
           </thead>
@@ -188,6 +222,16 @@ export default function RevenueForecastReport({
                   <td className="px-4 py-3 text-right bg-warning-50">
                     <div className="font-bold text-warning-700 text-lg">
                       {formatCurrency(item.total_12months.revenue)}
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 text-right bg-accent-50">
+                    <div className="font-bold text-accent-600">
+                      {formatCurrency(item.total_36months.expected_refund_3years)}
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 text-right bg-primary-50">
+                    <div className="font-bold text-primary-700 text-lg">
+                      {formatCurrency(item.total_36months.revenue)}
                     </div>
                   </td>
                 </tr>
@@ -236,6 +280,24 @@ export default function RevenueForecastReport({
                   {formatCurrency(Math.max(...forecastData.map(d => d.total_12months.revenue)))}
                 </div>
               </td>
+              <td className="px-4 py-3 text-right bg-accent-100">
+                <div className="font-bold text-accent-700 text-lg">
+                  {formatCurrency(Math.min(...forecastData.map(d => d.total_36months.expected_refund_3years)))}
+                </div>
+                <div className="text-xs text-secondary-600">～</div>
+                <div className="font-bold text-accent-700 text-lg">
+                  {formatCurrency(Math.max(...forecastData.map(d => d.total_36months.expected_refund_3years)))}
+                </div>
+              </td>
+              <td className="px-4 py-3 text-right bg-primary-200">
+                <div className="font-bold text-primary-800 text-lg">
+                  {formatCurrency(Math.min(...forecastData.map(d => d.total_36months.revenue)))}
+                </div>
+                <div className="text-xs text-secondary-600">～</div>
+                <div className="font-bold text-primary-800 text-lg">
+                  {formatCurrency(Math.max(...forecastData.map(d => d.total_36months.revenue)))}
+                </div>
+              </td>
             </tr>
           </tfoot>
         </table>
@@ -245,7 +307,8 @@ export default function RevenueForecastReport({
       <div className="mt-4 text-xs text-secondary-600 space-y-1">
         <p>※ レベニュー = 保険料 × 30%</p>
         <p>※ 保険料が0の場合、レベニューも0として計算されます</p>
-        <p>※ 12ヶ月合計は月額の12倍で計算しています</p>
+        <p>※ 12ヶ月合計は月額の12倍、36ヶ月合計は12ヶ月合計の3倍で計算</p>
+        <p>※ 3年間の返金見込みは、保険期間分を減額（30日保証: 1ヶ月分減額、1年保証: 12ヶ月分減額）</p>
         <p>※ 背景色が強調されている行が現在の設定値です</p>
       </div>
     </section>
