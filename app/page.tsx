@@ -8,6 +8,7 @@ import Footer from '@/components/Footer'
 import ResourceSelector from '@/components/ResourceSelector'
 import { SimulationResult, ResourceConfig } from '@/lib/types'
 import { defaultResources } from '@/lib/pricing-catalog'
+import { cn } from '@/lib/utils'
 
 // PostMessage APIの型定義
 interface PostMessageData {
@@ -20,7 +21,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false)
   const [resources, setResources] = useState<ResourceConfig[]>(defaultResources)
   const [simulationParams, setSimulationParams] = useState<any>(null)
-  const [isEmbedded, setIsEmbedded] = useState(false)
+  const [isEmbedded, setIsEmbedded] = useState(true)
 
   // PostMessage APIの初期化
   useEffect(() => {
@@ -169,8 +170,8 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen">
-      <div className="mx-auto px-4 py-6">
+    <div className={cn("min-h-screen transition-colors duration-500", !isEmbedded && "bg-blue-50")}>
+      <div className={cn("mx-auto px-4 py-6", !isEmbedded && "max-w-7xl")}>
         <Header />
         
         <main className="space-y-6">
