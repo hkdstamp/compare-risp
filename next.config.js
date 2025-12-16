@@ -24,6 +24,34 @@ const nextConfig = {
   },
   // AWS Amplify configuration
   trailingSlash: true,
+  
+  // Workspace root設定（複数lockfile警告対策）
+  outputFileTracingRoot: require('path').join(__dirname),
+
+  // 開発サーバーのポート設定
+  ...(process.env.NODE_ENV === 'development' && {
+    env: {
+      PORT: '3012',
+    },
+  }),
+
+  // iframe埋め込み対応: Content-Security-Policyでframe-ancestorsを設定
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'Content-Security-Policy',
+            // iframe埋め込みを許可
+            value: process.env.NODE_ENV === 'development'
+              ? "frame-ancestors 'self' http://localhost:* https://localhost:*"
+              : "frame-ancestors 'self' https://alphaus.cloud https://*.alphaus.cloud https://*.*.alphaus.cloud",
+          },
+        ],
+      },
+    ];
+  },
 }
 
 module.exports = nextConfig
