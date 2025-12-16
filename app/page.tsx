@@ -170,7 +170,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen">
-      <div className="container mx-auto px-4 py-6">
+      <div className="mx-auto px-4 py-6">
         <Header />
         
         <main className="space-y-6">
