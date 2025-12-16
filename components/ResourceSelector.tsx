@@ -82,10 +82,13 @@ export default function ResourceSelector({ resources, onChange }: ResourceSelect
                   onChange={(e) => {
                     const newService = e.target.value
                     const firstInstance = getInstanceOptions(newService)[0]?.value
-                    updateResource(index, 'service', newService)
-                    if (firstInstance) {
-                      updateResource(index, 'instance', firstInstance)
+                    const updated = [...resources]
+                    updated[index] = {
+                      ...updated[index],
+                      service: newService,
+                      instance: firstInstance || updated[index].instance
                     }
+                    onChange(updated)
                   }}
                   className="w-full px-3 py-2 border border-secondary-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white text-secondary-900"
                 >
