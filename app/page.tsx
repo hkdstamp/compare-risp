@@ -36,7 +36,7 @@ export default function Home() {
         'http://localhost:3000',
         'http://localhost:3001',
         'http://localhost:3010',
-        'https://your-company.com', // 本番環境のオリジンに置き換え
+        'https://wave.onedev.alphaus.cloud', // 本番環境のオリジンに置き換え
         // 必要に応じて他のオリジンを追加
       ];
 
