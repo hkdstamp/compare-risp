@@ -35,6 +35,7 @@ export function calculateInsurancePlan(
     // 2. For coverage > 0%, refunds apply when savings difference is negative
     //    - Compare actual savings vs 100% coverage savings
     //    - If actual savings is less (negative difference), refund compensates the gap
+    // 3. Subtract base savings from calculated refund; if result is negative, refund = 0
     
     const premiumAt100Coverage = onDemandRate * hours * res.quantity * plan.discount_rate * plan.premium_rate
     let expectedRefund = 0
@@ -52,11 +53,15 @@ export function calculateInsurancePlan(
       const costAt100 = discountedAt100 + premiumAt100Coverage
       const savingsAt100 = baseline - costAt100
       
-      // If actual savings is less than 100% savings (negative difference), refund the gap
+      // If actual savings is less than 100% savings (negative difference), calculate refund
       const savingsDiff = actualSavings - savingsAt100
       if (savingsDiff < 0) {
-        // Refund compensates the negative difference to bring savings back to 100% level
-        expectedRefund = -savingsDiff
+        // Initial refund compensates the negative difference
+        const initialRefund = -savingsDiff
+        
+        // Subtract base savings (actualSavings) from refund
+        // If result is negative, refund = 0
+        expectedRefund = Math.max(0, initialRefund - actualSavings)
       }
     }
 
