@@ -32,7 +32,10 @@ export function calculateInsurancePlan(
     // Calculate expected refund
     // New logic:
     // 1. Unapplied portions are refundable only when coverage is 0%
-    // 2. Refunds apply only to the portion where the difference from 100% coverage is negative
+    // 2. For coverage > 0%, refunds apply when savings difference is negative
+    //    - Compare actual savings vs 100% coverage savings
+    //    - If actual savings is less (negative difference), refund compensates the gap
+    
     const premiumAt100Coverage = onDemandRate * hours * res.quantity * plan.discount_rate * plan.premium_rate
     let expectedRefund = 0
     
@@ -40,10 +43,20 @@ export function calculateInsurancePlan(
       // When coverage is 0%, all unapplied portions are refundable
       expectedRefund = premiumAt100Coverage - premium
     } else {
-      // When coverage > 0%, only refund if actual premium is less than 100% coverage premium
-      const diff = premiumAt100Coverage - premium
-      if (diff > 0) {
-        expectedRefund = diff
+      // When coverage > 0%, calculate based on savings difference
+      // Calculate savings at actual coverage
+      const actualSavings = baseline - monthlyCost
+      
+      // Calculate savings at 100% coverage
+      const discountedAt100 = onDemandRate * hours * res.quantity * usage * (1.0 - plan.discount_rate)
+      const costAt100 = discountedAt100 + premiumAt100Coverage
+      const savingsAt100 = baseline - costAt100
+      
+      // If actual savings is less than 100% savings (negative difference), refund the gap
+      const savingsDiff = actualSavings - savingsAt100
+      if (savingsDiff < 0) {
+        // Refund compensates the negative difference to bring savings back to 100% level
+        expectedRefund = -savingsDiff
       }
     }
 
