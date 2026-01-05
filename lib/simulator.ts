@@ -27,7 +27,9 @@ export function calculateInsurancePlan(
     const premiumBase = onDemandRate * hours * coverageQty * plan.discount_rate
     const premium = premiumBase * plan.premium_rate
     const remainingCost = onDemandRate * hours * remainingQty * usage
-    const monthlyCost = discountedUsageCost + premium + remainingCost
+    
+    // Initial monthly cost calculation (with premium)
+    const monthlyCostWithPremium = discountedUsageCost + premium + remainingCost
 
     // Calculate expected refund
     // New logic:
@@ -45,8 +47,8 @@ export function calculateInsurancePlan(
       expectedRefund = premiumAt100Coverage - premium
     } else {
       // When coverage > 0%, calculate based on savings difference
-      // Calculate savings at actual coverage
-      const actualSavings = baseline - monthlyCost
+      // Calculate savings at actual coverage (with premium)
+      const actualSavings = baseline - monthlyCostWithPremium
       
       // Calculate savings at 100% coverage
       const discountedAt100 = onDemandRate * hours * res.quantity * usage * (1.0 - plan.discount_rate)
@@ -64,6 +66,11 @@ export function calculateInsurancePlan(
         expectedRefund = Math.max(0, initialRefund - actualSavings)
       }
     }
+    
+    // Final monthly cost: if refund occurs, premium = 0
+    const monthlyCost = expectedRefund > 0 
+      ? discountedUsageCost + remainingCost  // Premium = 0 when refund exists
+      : monthlyCostWithPremium                // Premium included when no refund
 
     details.push({
       resource: `${res.service}:${res.instance}`,
