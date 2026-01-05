@@ -30,9 +30,22 @@ export function calculateInsurancePlan(
     const monthlyCost = discountedUsageCost + premium + remainingCost
 
     // Calculate expected refund
-    // Refund = Premium at 100% coverage - Premium at actual coverage
+    // New logic:
+    // 1. Unapplied portions are refundable only when coverage is 0%
+    // 2. Refunds apply only to the portion where the difference from 100% coverage is negative
     const premiumAt100Coverage = onDemandRate * hours * res.quantity * plan.discount_rate * plan.premium_rate
-    const expectedRefund = premiumAt100Coverage - premium
+    let expectedRefund = 0
+    
+    if (coverage === 0) {
+      // When coverage is 0%, all unapplied portions are refundable
+      expectedRefund = premiumAt100Coverage - premium
+    } else {
+      // When coverage > 0%, only refund if actual premium is less than 100% coverage premium
+      const diff = premiumAt100Coverage - premium
+      if (diff > 0) {
+        expectedRefund = diff
+      }
+    }
 
     details.push({
       resource: `${res.service}:${res.instance}`,
