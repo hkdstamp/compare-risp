@@ -26,12 +26,12 @@ export function calculateInsurancePlan(
     const remainingCost = onDemandRate * hours * remainingQty * usage
     
     // Insurance RI/SP pricing logic:
-    // - Insurance RI/SP 30-day guarantee: 60% of on-demand monthly cost
-    // - Insurance RI/SP 1-year guarantee: 60% of on-demand monthly cost
+    // - Insurance RI/SP 30-day guarantee: 60% of on-demand monthly cost at 100% usage
+    // - Insurance RI/SP 1-year guarantee: 60% of on-demand monthly cost at 100% usage
     const INSURANCE_RISP_RATE = 0.60
     
     // Premium and refund calculation logic:
-    // 1. Insurance RI/SP monthly cost = on-demand monthly cost × 60%
+    // 1. Insurance RI/SP monthly cost = on-demand monthly cost (100% usage) × 60%
     // 2. Calculate: (on-demand monthly cost × coverage) - insurance RI/SP monthly cost
     // 3. If result < 0: premium = 0, refund = abs(result)
     // 4. If result >= 0: premium = result × premium_rate, refund = 0
@@ -40,11 +40,13 @@ export function calculateInsurancePlan(
     // - 30-day guarantee: 50%
     // - 1-year guarantee: 33%
     
-    // On-demand cost for covered portion
+    // On-demand cost for covered portion (with actual usage rate)
     const onDemandCoveredCost = onDemandRate * hours * coverageQty * usage
     
-    // Insurance RI/SP cost (60% of on-demand cost for covered portion)
-    const insuranceCoveredCost = onDemandCoveredCost * INSURANCE_RISP_RATE
+    // Insurance RI/SP cost (60% of on-demand cost at 100% usage for covered portion)
+    // IMPORTANT: Always use 100% usage rate for insurance RI/SP pricing
+    const onDemandCoveredCostAt100Usage = onDemandRate * hours * coverageQty * 1.0
+    const insuranceCoveredCost = onDemandCoveredCostAt100Usage * INSURANCE_RISP_RATE
     
     // Calculate difference
     const costDifference = onDemandCoveredCost - insuranceCoveredCost
