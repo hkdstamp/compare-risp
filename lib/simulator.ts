@@ -24,53 +24,41 @@ export function calculateInsurancePlan(
 
     const baseline = onDemandRate * hours * res.quantity * usage
     const discountedUsageCost = onDemandRate * hours * coverageQty * usage * (1.0 - plan.discount_rate)
-    const premiumBase = onDemandRate * hours * coverageQty * plan.discount_rate
-    const premium = premiumBase * plan.premium_rate
     const remainingCost = onDemandRate * hours * remainingQty * usage
     
-    // Initial monthly cost calculation (with premium)
-    const monthlyCostWithPremium = discountedUsageCost + premium + remainingCost
-
-    // Calculate expected refund
-    // New logic:
-    // 1. Unapplied portions are refundable only when coverage is 0%
-    // 2. For coverage > 0%, refunds apply when savings difference is negative
-    //    - Compare actual savings vs 100% coverage savings
-    //    - If actual savings is less (negative difference), refund compensates the gap
-    // 3. Subtract base savings from calculated refund; if result is negative, refund = 0
+    // New premium and refund calculation logic:
+    // 1. Calculate: (on-demand monthly cost × coverage) - insurance RI/SP monthly cost
+    // 2. If result is negative: premium = 0, refund = abs(result)
+    // 3. If result is >= 0: premium = result × premium_rate, refund = 0
+    //
+    // Premium rates:
+    // - 30-day guarantee: 50%
+    // - 1-year guarantee: 33%
     
-    const premiumAt100Coverage = onDemandRate * hours * res.quantity * plan.discount_rate * plan.premium_rate
+    // On-demand cost for covered portion
+    const onDemandCoveredCost = onDemandRate * hours * coverageQty * usage
+    
+    // Insurance RI/SP cost (discounted usage cost for covered portion)
+    const insuranceCoveredCost = discountedUsageCost
+    
+    // Calculate difference
+    const costDifference = onDemandCoveredCost - insuranceCoveredCost
+    
+    let premium = 0
     let expectedRefund = 0
     
-    if (coverage === 0) {
-      // When coverage is 0%, all unapplied portions are refundable
-      expectedRefund = premiumAt100Coverage - premium
+    if (costDifference < 0) {
+      // If negative, premium = 0 and refund = abs(difference)
+      premium = 0
+      expectedRefund = -costDifference
     } else {
-      // When coverage > 0%, calculate based on savings difference
-      // Calculate savings at actual coverage (with premium)
-      const actualSavings = baseline - monthlyCostWithPremium
-      
-      // Calculate savings at 100% coverage
-      const discountedAt100 = onDemandRate * hours * res.quantity * usage * (1.0 - plan.discount_rate)
-      const costAt100 = discountedAt100 + premiumAt100Coverage
-      const savingsAt100 = baseline - costAt100
-      
-      // If actual savings is less than 100% savings (negative difference), calculate refund
-      const savingsDiff = actualSavings - savingsAt100
-      if (savingsDiff < 0) {
-        // Initial refund compensates the negative difference
-        const initialRefund = -savingsDiff
-        
-        // Subtract base savings (actualSavings) from refund
-        // If result is negative, refund = 0
-        expectedRefund = Math.max(0, initialRefund - actualSavings)
-      }
+      // If >= 0, premium = difference × premium_rate
+      premium = costDifference * plan.premium_rate
+      expectedRefund = 0
     }
     
-    // Final monthly cost: if refund occurs, premium = 0
-    const monthlyCost = expectedRefund > 0 
-      ? discountedUsageCost + remainingCost  // Premium = 0 when refund exists
-      : monthlyCostWithPremium                // Premium included when no refund
+    // Monthly cost = discounted usage cost + premium + remaining on-demand cost
+    const monthlyCost = discountedUsageCost + premium + remainingCost
 
     details.push({
       resource: `${res.service}:${res.instance}`,
