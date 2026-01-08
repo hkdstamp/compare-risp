@@ -23,13 +23,18 @@ export function calculateInsurancePlan(
     const remainingQty = Math.max(res.quantity - coverageQty, 0)
 
     const baseline = onDemandRate * hours * res.quantity * usage
-    const discountedUsageCost = onDemandRate * hours * coverageQty * usage * (1.0 - plan.discount_rate)
     const remainingCost = onDemandRate * hours * remainingQty * usage
     
-    // New premium and refund calculation logic:
-    // 1. Calculate: (on-demand monthly cost × coverage) - insurance RI/SP monthly cost
-    // 2. If result is negative: premium = 0, refund = abs(result)
-    // 3. If result is >= 0: premium = result × premium_rate, refund = 0
+    // Insurance RI/SP pricing logic:
+    // - Insurance RI/SP 30-day guarantee: 60% of on-demand monthly cost
+    // - Insurance RI/SP 1-year guarantee: 60% of on-demand monthly cost
+    const INSURANCE_RISP_RATE = 0.60
+    
+    // Premium and refund calculation logic:
+    // 1. Insurance RI/SP monthly cost = on-demand monthly cost × 60%
+    // 2. Calculate: (on-demand monthly cost × coverage) - insurance RI/SP monthly cost
+    // 3. If result < 0: premium = 0, refund = abs(result)
+    // 4. If result >= 0: premium = result × premium_rate, refund = 0
     //
     // Premium rates:
     // - 30-day guarantee: 50%
@@ -38,8 +43,8 @@ export function calculateInsurancePlan(
     // On-demand cost for covered portion
     const onDemandCoveredCost = onDemandRate * hours * coverageQty * usage
     
-    // Insurance RI/SP cost (discounted usage cost for covered portion)
-    const insuranceCoveredCost = discountedUsageCost
+    // Insurance RI/SP cost (60% of on-demand cost for covered portion)
+    const insuranceCoveredCost = onDemandCoveredCost * INSURANCE_RISP_RATE
     
     // Calculate difference
     const costDifference = onDemandCoveredCost - insuranceCoveredCost
@@ -57,8 +62,8 @@ export function calculateInsurancePlan(
       expectedRefund = 0
     }
     
-    // Monthly cost = discounted usage cost + premium + remaining on-demand cost
-    const monthlyCost = discountedUsageCost + premium + remainingCost
+    // Monthly cost = insurance RI/SP cost + premium + remaining on-demand cost
+    const monthlyCost = insuranceCoveredCost + premium + remainingCost
 
     details.push({
       resource: `${res.service}:${res.instance}`,
