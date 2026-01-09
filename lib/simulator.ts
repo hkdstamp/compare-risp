@@ -31,17 +31,21 @@ export function calculateInsurancePlan(
     // - Uses target resource's on-demand monthly cost
     //
     // Insurance RI/SP monthly cost:
-    // - 30-day guarantee: 40% of each resource's on-demand monthly cost at 100% usage
-    // - 1-year guarantee: 40% of each resource's on-demand monthly cost at 100% usage
+    // - 30-day guarantee: 40% of target resource's on-demand monthly cost at 100% usage
+    // - 1-year guarantee: 40% of target resource's on-demand monthly cost at 100% usage
     //
     // Premium rates:
     // - 30-day guarantee: 50%
     // - 1-year guarantee: 33%
     //
     // Calculation steps:
-    // 1. Calculate: (each resource's on-demand monthly cost × coverage) - insurance RI/SP monthly cost
-    // 2. If result < 0: premium = 0, refund = abs(result)
-    // 3. If result >= 0: premium = result × premium_rate, refund = 0
+    // 1. Calculate savings: (target resource's on-demand monthly cost × coverage) - insurance RI/SP monthly cost
+    // 2. Calculate refund:
+    //    - If savings >= 0: refund = 0
+    //    - If savings < 0: refund = abs(savings)
+    // 3. Calculate premium:
+    //    - If refund > 0: premium = 0
+    //    - If refund = 0: premium = savings × premium_rate
     
     const INSURANCE_RISP_RATE = 0.40
     
@@ -53,20 +57,21 @@ export function calculateInsurancePlan(
     const onDemandCoveredCostAt100Usage = onDemandRate * hours * coverageQty * 1.0
     const insuranceCoveredCost = onDemandCoveredCostAt100Usage * INSURANCE_RISP_RATE
     
-    // Calculate cost difference
-    const costDifference = onDemandCoveredCost - insuranceCoveredCost
+    // Step 1: Calculate savings amount
+    const savingsAmount = onDemandCoveredCost - insuranceCoveredCost
     
-    let premium = 0
+    // Step 2: Calculate refund
     let expectedRefund = 0
+    if (savingsAmount < 0) {
+      // If savings is negative, refund = abs(savings)
+      expectedRefund = -savingsAmount
+    }
     
-    if (costDifference < 0) {
-      // If negative: premium = 0, refund = abs(difference)
-      premium = 0
-      expectedRefund = -costDifference
-    } else {
-      // If >= 0: premium = difference × premium_rate, refund = 0
-      premium = costDifference * plan.premium_rate
-      expectedRefund = 0
+    // Step 3: Calculate premium
+    let premium = 0
+    if (expectedRefund === 0) {
+      // If no refund (savings >= 0), premium = savings × premium_rate
+      premium = savingsAmount * plan.premium_rate
     }
     
     // Monthly cost = insurance RI/SP cost + premium + remaining on-demand cost
