@@ -27,8 +27,8 @@ export function calculateInsurancePlan(
     
     // ===== Insurance RI/SP Pricing and Premium/Refund Calculation =====
     //
-    // On-demand pricing:
-    // - Uses target resource's on-demand monthly cost
+    // On-demand monthly cost:
+    // - Target resource's on-demand price × usage rate
     //
     // Insurance RI/SP monthly cost:
     // - 30-day guarantee: 40% of target resource's on-demand monthly cost at 100% usage
@@ -39,10 +39,11 @@ export function calculateInsurancePlan(
     // - 1-year guarantee: 33%
     //
     // Calculation steps:
-    // 1. Calculate savings: (target resource's on-demand monthly cost × coverage) - insurance RI/SP monthly cost
-    // 2. Calculate refund:
+    // 1. Calculate savings amount:
+    //    savings = (target resource's on-demand monthly cost × expected coverage) - insurance RI/SP monthly cost
+    // 2. Calculate refund amount:
     //    - If savings >= 0: refund = 0
-    //    - If savings < 0: refund = abs(savings)
+    //    - If savings < 0: refund = abs(savings) = savings × (-1)
     // 3. Calculate premium:
     //    - If refund > 0: premium = 0
     //    - If refund = 0: premium = savings × premium_rate
