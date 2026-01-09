@@ -25,41 +25,46 @@ export function calculateInsurancePlan(
     const baseline = onDemandRate * hours * res.quantity * usage
     const remainingCost = onDemandRate * hours * remainingQty * usage
     
-    // Insurance RI/SP pricing logic:
-    // - Insurance RI/SP 30-day guarantee: 60% of on-demand monthly cost at 100% usage
-    // - Insurance RI/SP 1-year guarantee: 60% of on-demand monthly cost at 100% usage
-    const INSURANCE_RISP_RATE = 0.60
-    
-    // Premium and refund calculation logic:
-    // 1. Insurance RI/SP monthly cost = on-demand monthly cost (100% usage) × 60%
-    // 2. Calculate: (on-demand monthly cost × coverage) - insurance RI/SP monthly cost
-    // 3. If result < 0: premium = 0, refund = abs(result)
-    // 4. If result >= 0: premium = result × premium_rate, refund = 0
+    // ===== Insurance RI/SP Pricing and Premium/Refund Calculation =====
+    //
+    // On-demand pricing:
+    // - Uses target resource's on-demand monthly cost
+    //
+    // Insurance RI/SP monthly cost:
+    // - 30-day guarantee: 60% of each resource's on-demand monthly cost at 100% usage
+    // - 1-year guarantee: 60% of each resource's on-demand monthly cost at 100% usage
     //
     // Premium rates:
     // - 30-day guarantee: 50%
     // - 1-year guarantee: 33%
+    //
+    // Calculation steps:
+    // 1. Calculate: (each resource's on-demand monthly cost × coverage) - insurance RI/SP monthly cost
+    // 2. If result < 0: premium = 0, refund = abs(result)
+    // 3. If result >= 0: premium = result × premium_rate, refund = 0
+    
+    const INSURANCE_RISP_RATE = 0.60
     
     // On-demand cost for covered portion (with actual usage rate)
     const onDemandCoveredCost = onDemandRate * hours * coverageQty * usage
     
     // Insurance RI/SP cost (60% of on-demand cost at 100% usage for covered portion)
-    // IMPORTANT: Always use 100% usage rate for insurance RI/SP pricing
+    // IMPORTANT: Always use 100% usage rate for insurance RI/SP pricing per resource
     const onDemandCoveredCostAt100Usage = onDemandRate * hours * coverageQty * 1.0
     const insuranceCoveredCost = onDemandCoveredCostAt100Usage * INSURANCE_RISP_RATE
     
-    // Calculate difference
+    // Calculate cost difference
     const costDifference = onDemandCoveredCost - insuranceCoveredCost
     
     let premium = 0
     let expectedRefund = 0
     
     if (costDifference < 0) {
-      // If negative, premium = 0 and refund = abs(difference)
+      // If negative: premium = 0, refund = abs(difference)
       premium = 0
       expectedRefund = -costDifference
     } else {
-      // If >= 0, premium = difference × premium_rate
+      // If >= 0: premium = difference × premium_rate, refund = 0
       premium = costDifference * plan.premium_rate
       expectedRefund = 0
     }
