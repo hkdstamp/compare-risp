@@ -31,8 +31,8 @@ export function calculateInsurancePlan(
     // - Uses target resource's on-demand monthly cost
     //
     // Insurance RI/SP monthly cost:
-    // - 30-day guarantee: 60% of each resource's on-demand monthly cost at 100% usage
-    // - 1-year guarantee: 60% of each resource's on-demand monthly cost at 100% usage
+    // - 30-day guarantee: 40% of each resource's on-demand monthly cost at 100% usage
+    // - 1-year guarantee: 40% of each resource's on-demand monthly cost at 100% usage
     //
     // Premium rates:
     // - 30-day guarantee: 50%
@@ -43,12 +43,12 @@ export function calculateInsurancePlan(
     // 2. If result < 0: premium = 0, refund = abs(result)
     // 3. If result >= 0: premium = result × premium_rate, refund = 0
     
-    const INSURANCE_RISP_RATE = 0.60
+    const INSURANCE_RISP_RATE = 0.40
     
     // On-demand cost for covered portion (with actual usage rate)
     const onDemandCoveredCost = onDemandRate * hours * coverageQty * usage
     
-    // Insurance RI/SP cost (60% of on-demand cost at 100% usage for covered portion)
+    // Insurance RI/SP cost (40% of on-demand cost at 100% usage for covered portion)
     // IMPORTANT: Always use 100% usage rate for insurance RI/SP pricing per resource
     const onDemandCoveredCostAt100Usage = onDemandRate * hours * coverageQty * 1.0
     const insuranceCoveredCost = onDemandCoveredCostAt100Usage * INSURANCE_RISP_RATE
