@@ -68,8 +68,8 @@ export default function RevenueForecastReport({
       const premium = planResult.result.premium
       const expectedRefund = planResult.result.expected_refund || 0
 
-      // レベニュー = 保険料の30% (保険料が0の場合は0)
-      const revenue = premium > 0 ? premium * 0.30 : 0
+      // レベニュー = 保険料の20% (保険料が0の場合は0)
+      const revenue = premium > 0 ? premium * 0.20 : 0
 
       // 12ヶ月合計
       const total12months = {
@@ -144,7 +144,7 @@ export default function RevenueForecastReport({
             <p className="font-semibold mb-1">計算条件：</p>
             <ul className="list-disc list-inside space-y-1 ml-2">
               <li>設定した想定カバレッジから±10%の範囲で計算</li>
-              <li>レベニュー = 保険料 × 30%</li>
+              <li>レベニュー = 保険料 × 20%</li>
               <li>保険料が0の場合、レベニューも0</li>
               <li>3年契約RI/SP付帯前提での36ヶ月計算</li>
               <li>3年間の返金見込みは保険期間分を減額（30日保証:1ヶ月分、1年保証:12ヶ月分）</li>
@@ -305,7 +305,7 @@ export default function RevenueForecastReport({
 
       {/* 注釈 */}
       <div className="mt-4 text-xs text-secondary-600 space-y-1">
-        <p>※ レベニュー = 保険料 × 30%</p>
+        <p>※ レベニュー = 保険料 × 20%</p>
         <p>※ 保険料が0の場合、レベニューも0として計算されます</p>
         <p>※ 12ヶ月合計は月額の12倍、36ヶ月合計は12ヶ月合計の3倍で計算</p>
         <p>※ 3年間の返金見込みは、保険期間分を減額（30日保証: 1ヶ月分減額、1年保証: 12ヶ月分減額）</p>
