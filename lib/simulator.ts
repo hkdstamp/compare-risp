@@ -49,13 +49,12 @@ export function calculateInsurancePlan(
     
     const INSURANCE_RISP_RATE = 0.40
     
-    // On-demand cost for covered portion (with actual usage rate)
-    const onDemandCoveredCost = onDemandRate * hours * coverageQty * usage
+    // On-demand cost for covered portion (MUST use 100% usage rate for coverage calculation)
+    // Coverage applies to quantity, not usage rate
+    const onDemandCoveredCost = onDemandRate * hours * coverageQty * 1.0
     
     // Insurance RI/SP cost (40% of on-demand cost at 100% usage for covered portion)
-    // IMPORTANT: Always use 100% usage rate for insurance RI/SP pricing per resource
-    const onDemandCoveredCostAt100Usage = onDemandRate * hours * coverageQty * 1.0
-    const insuranceCoveredCost = onDemandCoveredCostAt100Usage * INSURANCE_RISP_RATE
+    const insuranceCoveredCost = onDemandCoveredCost * INSURANCE_RISP_RATE
     
     // Step 1: Calculate savings amount
     const savingsAmount = onDemandCoveredCost - insuranceCoveredCost
