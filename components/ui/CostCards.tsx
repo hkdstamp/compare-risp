@@ -44,7 +44,7 @@ export default function CostCards({ baselineCost, insurance, standard }: CostCar
             </div>
             {insurance.expected_refund && insurance.expected_refund > 0 && (
               <div className="text-xs text-success-600 mt-1">
-                (基本削減: {formatCurrency(insurance.monthly_savings - insurance.expected_refund)} + 返金見込: {formatCurrency(insurance.expected_refund)})
+                (実質削減: {formatCurrency(insurance.monthly_savings - insurance.expected_refund)} + 返金見込: {formatCurrency(insurance.expected_refund)})
               </div>
             )}
           </div>

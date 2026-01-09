@@ -77,8 +77,8 @@ export function calculateInsurancePlan(
       premium = savingsAmount * plan.premium_rate
     }
     
-    // Monthly cost = insurance RI/SP cost + premium + remaining on-demand cost
-    const monthlyCost = insuranceCoveredCost + premium + remainingCost
+    // Monthly cost = insurance RI/SP cost + premium + remaining on-demand cost - refund
+    const monthlyCost = insuranceCoveredCost + premium + remainingCost - expectedRefund
 
     details.push({
       resource: `${res.service}:${res.instance}`,
