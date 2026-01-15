@@ -20,7 +20,7 @@ export default function DetailsTable({ details }: DetailsTableProps) {
             <tr className="bg-secondary-100 border-b-2 border-secondary-300">
               <th className="px-4 py-3 text-left font-semibold text-secondary-700">リソース</th>
               <th className="px-4 py-3 text-right font-semibold text-secondary-700">通常価格</th>
-              <th className="px-4 py-3 text-right font-semibold text-secondary-700">保険RI/SP</th>
+              <th className="px-4 py-3 text-right font-semibold text-secondary-700">保険コミットメント</th>
               <th className="px-4 py-3 text-right font-semibold text-secondary-700">保険料</th>
               <th className="px-4 py-3 text-right font-semibold text-secondary-700">返金見込</th>
               <th className="px-4 py-3 text-right font-semibold text-secondary-700">保険削減額</th>

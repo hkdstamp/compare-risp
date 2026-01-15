@@ -31,7 +31,7 @@ export default function CostCards({ baselineCost, insurance, standard }: CostCar
           <div className="p-2 bg-accent-100 rounded-lg">
             <ShieldIcon size={28} className="text-accent-600" />
           </div>
-          <h3 className="text-lg font-bold text-secondary-900">保険RI/SP</h3>
+          <h3 className="text-lg font-bold text-secondary-900">保険コミットメント</h3>
         </div>
         <div className="space-y-3">
           <div>

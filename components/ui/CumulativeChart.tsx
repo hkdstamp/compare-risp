@@ -24,7 +24,7 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
   const standardTotalCost = standardPlan.initial_cost + (standardPlan.monthly_cost * termMonths)
   const standardTotalExpenditure = cumulative.months.map(() => standardTotalCost)
   
-  // Insurance RI/SP total expenditure: initial cost + total monthly cost over contract term
+  // Insurance Commitment total expenditure: initial cost + total monthly cost over contract term
   const insuranceTotalCost = insurancePlan.initial_cost + (insurancePlan.monthly_cost * termMonths)
   const insuranceTotalExpenditure = cumulative.months.map(() => insuranceTotalCost)
 
@@ -41,7 +41,7 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
         fill: true,
       },
       {
-        label: '保険RI/SP（累積）',
+        label: '保険コミットメント（累積）',
         data: cumulative.insurance,
         borderColor: 'rgba(34, 197, 94, 1)', // success-500
         backgroundColor: 'rgba(34, 197, 94, 0.1)',
@@ -50,7 +50,7 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
         fill: true,
       },
       {
-        label: '保険RI/SP（総支出）',
+        label: '保険コミットメント（総支出）',
         data: insuranceTotalExpenditure,
         borderColor: 'rgba(34, 197, 94, 0.6)', // success-500 with opacity
         backgroundColor: 'rgba(34, 197, 94, 0.05)',
@@ -130,7 +130,7 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
             
             // Check if insurance break-even month
             if (insurancePlan.break_even_months !== null && month === insurancePlan.break_even_months) {
-              footer.push('◆ 保険RI/SP 損益分岐点')
+              footer.push('◆ 保険コミットメント 損益分岐点')
             }
             
             // Check if standard break-even month
@@ -194,7 +194,7 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
             <div className="flex items-center gap-2">
               <TargetIcon size={16} className="text-success-600" />
               <span className="text-secondary-600">
-                保険RI/SP 損益分岐: <span className="font-semibold text-success-600">{insurancePlan.break_even_months}ヶ月</span>
+                保険コミットメント 損益分岐: <span className="font-semibold text-success-600">{insurancePlan.break_even_months}ヶ月</span>
               </span>
             </div>
           )}

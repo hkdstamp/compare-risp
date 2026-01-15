@@ -162,7 +162,7 @@ export default function RevenueForecastReport({
                 想定<br/>カバレッジ
               </th>
               <th className="px-4 py-3 text-right text-sm font-semibold text-secondary-900">
-                保険RI/SP<br/>月額
+                保険コミットメント<br/>月額
               </th>
               <th className="px-4 py-3 text-right text-sm font-semibold text-secondary-900">
                 保険料<br/>(月額)

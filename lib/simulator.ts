@@ -25,12 +25,12 @@ export function calculateInsurancePlan(
     const baseline = onDemandRate * hours * res.quantity * usage
     const remainingCost = onDemandRate * hours * remainingQty * usage
     
-    // ===== Insurance RI/SP Pricing and Premium/Refund Calculation =====
+    // ===== Insurance Commitment Pricing and Premium/Refund Calculation =====
     //
     // On-demand monthly cost:
     // - Target resource's on-demand price × usage rate
     //
-    // Insurance RI/SP monthly cost:
+    // Insurance Commitment monthly cost:
     // - 30-day guarantee: 40% of target resource's on-demand monthly cost at 100% usage
     // - 1-year guarantee: 40% of target resource's on-demand monthly cost at 100% usage
     //
@@ -40,7 +40,7 @@ export function calculateInsurancePlan(
     //
     // Calculation steps:
     // 1. Calculate savings amount:
-    //    savings = (target resource's on-demand monthly cost × expected coverage) - insurance RI/SP monthly cost
+    //    savings = (target resource's on-demand monthly cost × expected coverage) - insurance commitment monthly cost
     // 2. Calculate refund amount:
     //    - If savings >= 0: refund = 0
     //    - If savings < 0: refund = abs(savings) = savings × (-1)
@@ -48,19 +48,19 @@ export function calculateInsurancePlan(
     //    - If refund > 0: premium = 0
     //    - If refund = 0: premium = savings × premium_rate
     
-    const INSURANCE_RISP_RATE = 0.40
+    const INSURANCE_COMMITMENT_RATE = 0.40
     
     // On-demand cost for covered portion (MUST use 100% usage rate for coverage calculation)
     // Coverage applies to quantity, not usage rate
     const onDemandCoveredCost = onDemandRate * hours * coverageQty * 1.0
     
-    // Insurance RI/SP cost (ALWAYS uses 100% coverage, regardless of expected coverage)
-    // CRITICAL: Insurance RI/SP = 40% of TOTAL resource's on-demand cost at 100% usage and 100% coverage
+    // Insurance Commitment cost (40% of TOTAL resource's on-demand cost at 100% usage × coverage)
+    // CRITICAL: Insurance Commitment = 40% of ALL resources (not just covered portion) × coverage
     const onDemandTotalCostAt100Usage = onDemandRate * hours * res.quantity * 1.0
-    const insuranceCoveredCost = onDemandTotalCostAt100Usage * INSURANCE_RISP_RATE
+    const insuranceCoveredCost = onDemandTotalCostAt100Usage * INSURANCE_COMMITMENT_RATE * coverage
     
     // Step 1: Calculate savings amount
-    // savings = on-demand covered cost - insurance RI/SP at 100% coverage
+    // savings = on-demand covered cost - insurance commitment cost
     const savingsAmount = onDemandCoveredCost - insuranceCoveredCost
     
     // Step 2: Calculate refund
@@ -77,7 +77,7 @@ export function calculateInsurancePlan(
       premium = savingsAmount * plan.premium_rate
     }
     
-    // Monthly cost = insurance RI/SP cost + premium + remaining on-demand cost - refund
+    // Monthly cost = insurance commitment cost + premium + remaining on-demand cost - refund
     const monthlyCost = insuranceCoveredCost + premium + remainingCost - expectedRefund
 
     details.push({
@@ -103,7 +103,7 @@ export function calculateInsurancePlan(
   // Effective savings including expected refund
   const effectiveMonthlySavings = monthlySavings + totalExpectedRefund
 
-  // Insurance RI/SP break-even calculation
+  // Insurance Commitment break-even calculation
   // IMPORTANT: Use the STANDARD RI/SP contract term (not insurance plan's term)
   // because we compare insurance costs over the same period as standard RI/SP
   // Total Expenditure = 0 (no initial) + (monthly_cost × standard_term_months)
@@ -123,7 +123,7 @@ export function calculateInsurancePlan(
 
   return {
     result: {
-      name: `Insurance RI/SP ${plan.name}`,
+      name: `保険コミットメント ${plan.name}`,
       monthly_cost: totalMonthlyCost,
       monthly_savings: effectiveMonthlySavings,
       initial_cost: 0,
