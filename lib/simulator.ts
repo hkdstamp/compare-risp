@@ -27,14 +27,14 @@ export function calculateInsurancePlan(
     
     // ===== Insurance Commitment Pricing and Premium/Refund Calculation =====
     //
-    // NEW APPROACH: Use 3-year AllUpfront Standard RI/SP at 100% usage as baseline
+    // NEW APPROACH: Use 3-year NoUpfront Standard RI/SP at 100% usage as baseline
     //
     // Baseline for comparison:
-    // - Standard RI/SP 3-year AllUpfront at 100% usage (for ALL resources)
+    // - Standard RI/SP 3-year NoUpfront at 100% usage (for ALL resources)
     // - This is a FIXED reference point, independent of coverage
     //
     // Insurance Commitment Cost Calculation:
-    // 1. Get Standard RI/SP 3yr AllUpfront monthly cost (amortized) at 100% usage
+    // 1. Get Standard RI/SP 3yr NoUpfront monthly cost at 100% usage
     // 2. Insurance Commitment = this baseline cost (not multiplied by coverage)
     // 3. Actual cost scales with coverage: insuranceCost = baselineCost × coverage
     //
@@ -43,33 +43,31 @@ export function calculateInsurancePlan(
     // - 1-year guarantee: 33%
     //
     // Calculation steps:
-    // 1. Calculate baseline (3yr AllUpfront at 100% usage for comparison)
+    // 1. Calculate baseline (3yr NoUpfront at 100% usage for comparison)
     // 2. Calculate actual insurance commitment cost (scaled by coverage)
     // 3. Calculate savings amount: savings = on-demand covered cost - insurance commitment cost
     // 4. Calculate refund: if savings < 0, refund = abs(savings)
     // 5. Calculate premium: if refund = 0, premium = savings × premium_rate
     
-    // Get 3-year AllUpfront pricing as baseline
+    // Get 3-year NoUpfront pricing as baseline
     const resourcePricing = catalog.resources[res.service][res.instance]
-    let baseline3yrAllUpfront = 0
+    let baseline3yrNoUpfront = 0
     
-    if (resourcePricing.standard_ri && resourcePricing.standard_ri['3yr'] && resourcePricing.standard_ri['3yr']['AllUpfront']) {
-      const riPlan = resourcePricing.standard_ri['3yr']['AllUpfront']
-      // Calculate monthly amortized cost: (upfront / 36 months) + (hourly × hours × quantity)
-      const monthlyAmortized = (riPlan.upfront_usd * res.quantity) / 36
-      const monthlyRecurring = riPlan.hourly_usd * hours * res.quantity
-      baseline3yrAllUpfront = monthlyAmortized + monthlyRecurring
+    if (resourcePricing.standard_ri && resourcePricing.standard_ri['3yr'] && resourcePricing.standard_ri['3yr']['NoUpfront']) {
+      const riPlan = resourcePricing.standard_ri['3yr']['NoUpfront']
+      // Calculate monthly cost: hourly × hours × quantity (no upfront payment)
+      baseline3yrNoUpfront = riPlan.hourly_usd * hours * res.quantity
     } else if (resourcePricing.savings_plans && resourcePricing.savings_plans['3yr']) {
-      // Fallback to 3yr Savings Plan if AllUpfront not available
-      baseline3yrAllUpfront = resourcePricing.savings_plans['3yr'].hourly_usd * hours * res.quantity
+      // Fallback to 3yr Savings Plan if NoUpfront not available
+      baseline3yrNoUpfront = resourcePricing.savings_plans['3yr'].hourly_usd * hours * res.quantity
     } else {
       // Final fallback: use on-demand with 60% discount (typical 3yr discount)
-      baseline3yrAllUpfront = onDemandRate * hours * res.quantity * 0.40
+      baseline3yrNoUpfront = onDemandRate * hours * res.quantity * 0.40
     }
     
     // Insurance Commitment cost = baseline × coverage
     // This represents the cost for the covered portion
-    const insuranceCoveredCost = baseline3yrAllUpfront * coverage
+    const insuranceCoveredCost = baseline3yrNoUpfront * coverage
     
     // On-demand cost for covered portion (use actual usage rate)
     const onDemandCoveredCost = onDemandRate * hours * coverageQty * usage
