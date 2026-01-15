@@ -27,37 +27,52 @@ export function calculateInsurancePlan(
     
     // ===== Insurance Commitment Pricing and Premium/Refund Calculation =====
     //
-    // On-demand monthly cost:
-    // - Target resource's on-demand price × usage rate
+    // NEW APPROACH: Use 3-year AllUpfront Standard RI/SP at 100% usage as baseline
     //
-    // Insurance Commitment monthly cost:
-    // - 30-day guarantee: 40% of target resource's on-demand monthly cost at 100% usage
-    // - 1-year guarantee: 40% of target resource's on-demand monthly cost at 100% usage
+    // Baseline for comparison:
+    // - Standard RI/SP 3-year AllUpfront at 100% usage (for ALL resources)
+    // - This is a FIXED reference point, independent of coverage
+    //
+    // Insurance Commitment Cost Calculation:
+    // 1. Get Standard RI/SP 3yr AllUpfront monthly cost (amortized) at 100% usage
+    // 2. Insurance Commitment = this baseline cost (not multiplied by coverage)
+    // 3. Actual cost scales with coverage: insuranceCost = baselineCost × coverage
     //
     // Premium rates:
     // - 30-day guarantee: 50%
     // - 1-year guarantee: 33%
     //
     // Calculation steps:
-    // 1. Calculate savings amount:
-    //    savings = (target resource's on-demand monthly cost × expected coverage) - insurance commitment monthly cost
-    // 2. Calculate refund amount:
-    //    - If savings >= 0: refund = 0
-    //    - If savings < 0: refund = abs(savings) = savings × (-1)
-    // 3. Calculate premium:
-    //    - If refund > 0: premium = 0
-    //    - If refund = 0: premium = savings × premium_rate
+    // 1. Calculate baseline (3yr AllUpfront at 100% usage for comparison)
+    // 2. Calculate actual insurance commitment cost (scaled by coverage)
+    // 3. Calculate savings amount: savings = on-demand covered cost - insurance commitment cost
+    // 4. Calculate refund: if savings < 0, refund = abs(savings)
+    // 5. Calculate premium: if refund = 0, premium = savings × premium_rate
     
-    const INSURANCE_COMMITMENT_RATE = 0.40
+    // Get 3-year AllUpfront pricing as baseline
+    const resourcePricing = catalog.resources[res.service][res.instance]
+    let baseline3yrAllUpfront = 0
     
-    // On-demand cost for covered portion (MUST use 100% usage rate for coverage calculation)
-    // Coverage applies to quantity, not usage rate
-    const onDemandCoveredCost = onDemandRate * hours * coverageQty * 1.0
+    if (resourcePricing.standard_ri && resourcePricing.standard_ri['3yr'] && resourcePricing.standard_ri['3yr']['AllUpfront']) {
+      const riPlan = resourcePricing.standard_ri['3yr']['AllUpfront']
+      // Calculate monthly amortized cost: (upfront / 36 months) + (hourly × hours × quantity)
+      const monthlyAmortized = (riPlan.upfront_usd * res.quantity) / 36
+      const monthlyRecurring = riPlan.hourly_usd * hours * res.quantity
+      baseline3yrAllUpfront = monthlyAmortized + monthlyRecurring
+    } else if (resourcePricing.savings_plans && resourcePricing.savings_plans['3yr']) {
+      // Fallback to 3yr Savings Plan if AllUpfront not available
+      baseline3yrAllUpfront = resourcePricing.savings_plans['3yr'].hourly_usd * hours * res.quantity
+    } else {
+      // Final fallback: use on-demand with 60% discount (typical 3yr discount)
+      baseline3yrAllUpfront = onDemandRate * hours * res.quantity * 0.40
+    }
     
-    // Insurance Commitment cost (40% of TOTAL resource's on-demand cost at 100% usage × coverage)
-    // CRITICAL: Insurance Commitment = 40% of ALL resources (not just covered portion) × coverage
-    const onDemandTotalCostAt100Usage = onDemandRate * hours * res.quantity * 1.0
-    const insuranceCoveredCost = onDemandTotalCostAt100Usage * INSURANCE_COMMITMENT_RATE * coverage
+    // Insurance Commitment cost = baseline × coverage
+    // This represents the cost for the covered portion
+    const insuranceCoveredCost = baseline3yrAllUpfront * coverage
+    
+    // On-demand cost for covered portion (use actual usage rate)
+    const onDemandCoveredCost = onDemandRate * hours * coverageQty * usage
     
     // Step 1: Calculate savings amount
     // savings = on-demand covered cost - insurance commitment cost
