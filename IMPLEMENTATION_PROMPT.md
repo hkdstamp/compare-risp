@@ -11,7 +11,7 @@ AWS Managed Service Provider (MSP) 向けのコスト最適化シミュレーシ
 ### 核となるビジネスロジック
 
 1. **保険コミットメント**: 短期保証（30日/1年）で柔軟性が高く、一定の料金率と保険料が発生
-   - **料金体系**: 標準RI/SP 3年NoUpfrontの100%使用時コストを基準として、カバレッジに応じて課金
+   - **料金体系**: 標準RI/SP 3年NoUpfrontの100%使用時コストを固定料金として採用（カバレッジに関係なく一定）
    - **保険料率**: 30日保証50%、1年保証33%
    - **返金機能**: カバレッジが低い場合、削減額がマイナスになると返金が発生
 2. **標準RI/SP**: AWS標準の1年/3年予約で、NoUpfront/PartialUpfront/AllUpfrontの支払いオプション
@@ -893,9 +893,9 @@ export function calculateInsurancePlan(
  * 
  * 2. **保険コミットメント月額の算出**
  *    ```
- *    // 3年NoUpfront基準コストの算出
+ *    // 3年NoUpfront基準コストの算出（固定料金）
  *    baseline3yrNoUpfront = 3年NoUpfront時間単価 × 時間数 × 全台数
- *    insuranceCoveredCost = baseline3yrNoUpfront × coverage
+ *    insuranceCoveredCost = baseline3yrNoUpfront  // カバレッジに関係なく固定
  *    ```
  * 
  * 3. **削減額の算出**

@@ -31,23 +31,24 @@ export function calculateInsurancePlan(
     //
     // Baseline for comparison:
     // - Standard RI/SP 3-year NoUpfront at 100% usage (for ALL resources)
-    // - This is a FIXED reference point, independent of coverage
+    // - This is a FIXED amount that does NOT change with coverage
     //
     // Insurance Commitment Cost Calculation:
-    // 1. Get Standard RI/SP 3yr NoUpfront monthly cost at 100% usage
-    // 2. Insurance Commitment = this baseline cost (not multiplied by coverage)
-    // 3. Actual cost scales with coverage: insuranceCost = baselineCost × coverage
+    // 1. Get Standard RI/SP 3yr NoUpfront monthly cost at 100% usage for ALL resources
+    // 2. Insurance Commitment = this baseline cost (FIXED, NOT multiplied by coverage)
+    // 3. This is the monthly fee you pay regardless of coverage level
     //
     // Premium rates:
     // - 30-day guarantee: 50%
     // - 1-year guarantee: 33%
     //
     // Calculation steps:
-    // 1. Calculate baseline (3yr NoUpfront at 100% usage for comparison)
-    // 2. Calculate actual insurance commitment cost (scaled by coverage)
-    // 3. Calculate savings amount: savings = on-demand covered cost - insurance commitment cost
-    // 4. Calculate refund: if savings < 0, refund = abs(savings)
-    // 5. Calculate premium: if refund = 0, premium = savings × premium_rate
+    // 1. Calculate baseline (3yr NoUpfront at 100% usage for ALL resources)
+    // 2. Insurance commitment cost = baseline (FIXED, independent of coverage)
+    // 3. Calculate on-demand cost for covered portion only
+    // 4. Calculate savings amount: savings = on-demand covered cost - insurance commitment cost
+    // 5. Calculate refund: if savings < 0, refund = abs(savings) (unused coverage refunded)
+    // 6. Calculate premium: if refund = 0, premium = savings × premium_rate
     
     // Get 3-year NoUpfront pricing as baseline
     const resourcePricing = catalog.resources[res.service][res.instance]
@@ -65,15 +66,17 @@ export function calculateInsurancePlan(
       baseline3yrNoUpfront = onDemandRate * hours * res.quantity * 0.40
     }
     
-    // Insurance Commitment cost = baseline × coverage
-    // This represents the cost for the covered portion
-    const insuranceCoveredCost = baseline3yrNoUpfront * coverage
+    // CRITICAL: Insurance Commitment cost is FIXED (always baseline, NOT affected by coverage)
+    // The insurance commitment is based on 3yr NoUpfront for ALL resources at 100% usage
+    // Coverage does NOT change the insurance commitment cost itself
+    const insuranceCoveredCost = baseline3yrNoUpfront
     
     // On-demand cost for covered portion (use actual usage rate)
     const onDemandCoveredCost = onDemandRate * hours * coverageQty * usage
     
     // Step 1: Calculate savings amount
-    // savings = on-demand covered cost - insurance commitment cost
+    // For coverage comparison: compare on-demand covered cost vs insurance commitment
+    // If coverage < 100%, the unused portion should be refunded
     const savingsAmount = onDemandCoveredCost - insuranceCoveredCost
     
     // Step 2: Calculate refund
