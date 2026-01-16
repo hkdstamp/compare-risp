@@ -23,16 +23,78 @@ export function calculateInsurancePlan(
     const remainingQty = Math.max(res.quantity - coverageQty, 0)
 
     const baseline = onDemandRate * hours * res.quantity * usage
-    const discountedUsageCost = onDemandRate * hours * coverageQty * usage * (1.0 - plan.discount_rate)
-    const premiumBase = onDemandRate * hours * coverageQty * plan.discount_rate
-    const premium = premiumBase * plan.premium_rate
     const remainingCost = onDemandRate * hours * remainingQty * usage
-    const monthlyCost = discountedUsageCost + premium + remainingCost
-
-    // Calculate expected refund
-    // Refund = Premium at 100% coverage - Premium at actual coverage
-    const premiumAt100Coverage = onDemandRate * hours * res.quantity * plan.discount_rate * plan.premium_rate
-    const expectedRefund = premiumAt100Coverage - premium
+    
+    // ===== Insurance Commitment Pricing and Premium/Refund Calculation =====
+    //
+    // NEW APPROACH: Use 3-year NoUpfront Standard RI/SP at 100% usage as baseline
+    //
+    // Baseline for comparison:
+    // - Standard RI/SP 3-year NoUpfront at 100% usage (for ALL resources)
+    // - This is a FIXED amount that does NOT change with coverage
+    //
+    // Insurance Commitment Cost Calculation:
+    // 1. Get Standard RI/SP 3yr NoUpfront monthly cost at 100% usage for ALL resources
+    // 2. Insurance Commitment = this baseline cost (FIXED, NOT multiplied by coverage)
+    // 3. This is the monthly fee you pay regardless of coverage level
+    //
+    // Premium rates:
+    // - 30-day guarantee: 50%
+    // - 1-year guarantee: 33%
+    //
+    // Calculation steps:
+    // 1. Calculate baseline (3yr NoUpfront at 100% usage for ALL resources)
+    // 2. Insurance commitment cost = baseline (FIXED, independent of coverage)
+    // 3. Calculate on-demand cost for covered portion only
+    // 4. Calculate savings amount: savings = on-demand covered cost - insurance commitment cost
+    // 5. Calculate refund: if savings < 0, refund = abs(savings) (unused coverage refunded)
+    // 6. Calculate premium: if refund = 0, premium = savings × premium_rate
+    
+    // Get 3-year NoUpfront pricing as baseline
+    const resourcePricing = catalog.resources[res.service][res.instance]
+    let baseline3yrNoUpfront = 0
+    
+    if (resourcePricing.standard_ri && resourcePricing.standard_ri['3yr'] && resourcePricing.standard_ri['3yr']['NoUpfront']) {
+      const riPlan = resourcePricing.standard_ri['3yr']['NoUpfront']
+      // Calculate monthly cost: hourly × hours × quantity (no upfront payment)
+      baseline3yrNoUpfront = riPlan.hourly_usd * hours * res.quantity
+    } else if (resourcePricing.savings_plans && resourcePricing.savings_plans['3yr']) {
+      // Fallback to 3yr Savings Plan if NoUpfront not available
+      baseline3yrNoUpfront = resourcePricing.savings_plans['3yr'].hourly_usd * hours * res.quantity
+    } else {
+      // Final fallback: use on-demand with 60% discount (typical 3yr discount)
+      baseline3yrNoUpfront = onDemandRate * hours * res.quantity * 0.40
+    }
+    
+    // CRITICAL: Insurance Commitment cost is FIXED (always baseline, NOT affected by coverage)
+    // The insurance commitment is based on 3yr NoUpfront for ALL resources at 100% usage
+    // Coverage does NOT change the insurance commitment cost itself
+    const insuranceCoveredCost = baseline3yrNoUpfront
+    
+    // On-demand cost for covered portion (use actual usage rate)
+    const onDemandCoveredCost = onDemandRate * hours * coverageQty * usage
+    
+    // Step 1: Calculate savings amount
+    // For coverage comparison: compare on-demand covered cost vs insurance commitment
+    // If coverage < 100%, the unused portion should be refunded
+    const savingsAmount = onDemandCoveredCost - insuranceCoveredCost
+    
+    // Step 2: Calculate refund
+    let expectedRefund = 0
+    if (savingsAmount < 0) {
+      // If savings is negative, refund = abs(savings)
+      expectedRefund = -savingsAmount
+    }
+    
+    // Step 3: Calculate premium
+    let premium = 0
+    if (expectedRefund === 0) {
+      // If no refund (savings >= 0), premium = savings × premium_rate
+      premium = savingsAmount * plan.premium_rate
+    }
+    
+    // Monthly cost = insurance commitment cost + premium + remaining on-demand cost - refund
+    const monthlyCost = insuranceCoveredCost + premium + remainingCost - expectedRefund
 
     details.push({
       resource: `${res.service}:${res.instance}`,
@@ -57,7 +119,7 @@ export function calculateInsurancePlan(
   // Effective savings including expected refund
   const effectiveMonthlySavings = monthlySavings + totalExpectedRefund
 
-  // Insurance RI/SP break-even calculation
+  // Insurance Commitment break-even calculation
   // IMPORTANT: Use the STANDARD RI/SP contract term (not insurance plan's term)
   // because we compare insurance costs over the same period as standard RI/SP
   // Total Expenditure = 0 (no initial) + (monthly_cost × standard_term_months)
@@ -77,7 +139,7 @@ export function calculateInsurancePlan(
 
   return {
     result: {
-      name: `Insurance RI/SP ${plan.name}`,
+      name: `保険コミットメント ${plan.name}`,
       monthly_cost: totalMonthlyCost,
       monthly_savings: effectiveMonthlySavings,
       initial_cost: 0,

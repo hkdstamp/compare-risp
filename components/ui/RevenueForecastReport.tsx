@@ -27,27 +27,38 @@ export default function RevenueForecastReport({
   }, [result, insurancePlanKey, usage, resources])
 
   const calculateForecast = () => {
-    const currentCoverage = result.coverage || 1.0
+    const currentCoverage = result.coverage !== undefined ? result.coverage : 1.0
     const hours = pricingCatalog.metadata.hours_per_month
     
     // 保険プランの情報を取得（保険期間の減額計算用）
     const insurancePlan = pricingCatalog.insurance_plans[insurancePlanKey]
     const insuranceTermMonths = insurancePlan.term_months // 1 or 12
 
-    // カバレッジ範囲: 現在の±10% (ただし0-100%の範囲内)
-    const minCoverage = Math.max(0, currentCoverage - 0.1)
-    const maxCoverage = Math.min(1.0, currentCoverage + 0.1)
-
     const forecasts: RevenueForecastItem[] = []
 
-    // -10%, -5%, 現在, +5%, +10%の5パターンを計算
-    const coveragePoints = [
-      minCoverage,
-      currentCoverage - 0.05 >= minCoverage ? currentCoverage - 0.05 : minCoverage,
-      currentCoverage,
-      currentCoverage + 0.05 <= maxCoverage ? currentCoverage + 0.05 : maxCoverage,
-      maxCoverage
-    ]
+    // カバレッジポイントの計算
+    let coveragePoints: number[]
+    
+    if (currentCoverage === 0) {
+      // カバレッジ0%の場合: 0%, 5%, 10%, 15%, 20% の5パターン
+      coveragePoints = [0, 0.05, 0.10, 0.15, 0.20]
+    } else if (currentCoverage === 1.0) {
+      // カバレッジ100%の場合: 80%, 85%, 90%, 95%, 100% の5パターン
+      coveragePoints = [0.80, 0.85, 0.90, 0.95, 1.0]
+    } else {
+      // カバレッジ範囲: 現在の±10% (ただし0-100%の範囲内)
+      const minCoverage = Math.max(0, currentCoverage - 0.1)
+      const maxCoverage = Math.min(1.0, currentCoverage + 0.1)
+      
+      // -10%, -5%, 現在, +5%, +10%の5パターンを計算
+      coveragePoints = [
+        minCoverage,
+        currentCoverage - 0.05 >= minCoverage ? currentCoverage - 0.05 : minCoverage,
+        currentCoverage,
+        currentCoverage + 0.05 <= maxCoverage ? currentCoverage + 0.05 : maxCoverage,
+        maxCoverage
+      ]
+    }
 
     // 重複を除去
     const uniqueCoveragePoints = Array.from(new Set(coveragePoints))
@@ -68,8 +79,8 @@ export default function RevenueForecastReport({
       const premium = planResult.result.premium
       const expectedRefund = planResult.result.expected_refund || 0
 
-      // レベニュー = 保険料の30% (保険料が0の場合は0)
-      const revenue = premium > 0 ? premium * 0.30 : 0
+      // レベニュー = 保険料の20% (保険料が0の場合は0)
+      const revenue = premium > 0 ? premium * 0.20 : 0
 
       // 12ヶ月合計
       const total12months = {
@@ -131,7 +142,12 @@ export default function RevenueForecastReport({
             収益見込みレポート
           </h3>
           <p className="text-sm text-secondary-600">
-            想定カバレッジ ±10% 範囲での収益予測（3年契約RI/SP付帯前提）
+            {result.coverage === 0 
+              ? '想定カバレッジ 0%～20% 範囲での収益予測（3年契約RI/SP付帯前提）'
+              : result.coverage === 1.0
+              ? '想定カバレッジ 80%～100% 範囲での収益予測（3年契約RI/SP付帯前提）'
+              : '想定カバレッジ ±10% 範囲での収益予測（3年契約RI/SP付帯前提）'
+            }
           </p>
         </div>
       </div>
@@ -143,8 +159,15 @@ export default function RevenueForecastReport({
           <div className="text-sm text-warning-900">
             <p className="font-semibold mb-1">計算条件：</p>
             <ul className="list-disc list-inside space-y-1 ml-2">
-              <li>設定した想定カバレッジから±10%の範囲で計算</li>
-              <li>レベニュー = 保険料 × 30%</li>
+              <li>
+                {result.coverage === 0 
+                  ? '想定カバレッジ0%の場合: 0%～20%の範囲で計算'
+                  : result.coverage === 1.0
+                  ? '想定カバレッジ100%の場合: 80%～100%の範囲で計算'
+                  : '設定した想定カバレッジから±10%の範囲で計算'
+                }
+              </li>
+              <li>レベニュー = 保険料 × 20%</li>
               <li>保険料が0の場合、レベニューも0</li>
               <li>3年契約RI/SP付帯前提での36ヶ月計算</li>
               <li>3年間の返金見込みは保険期間分を減額（30日保証:1ヶ月分、1年保証:12ヶ月分）</li>
@@ -162,7 +185,7 @@ export default function RevenueForecastReport({
                 想定<br/>カバレッジ
               </th>
               <th className="px-4 py-3 text-right text-sm font-semibold text-secondary-900">
-                保険RI/SP<br/>月額
+                保険コミットメント<br/>月額
               </th>
               <th className="px-4 py-3 text-right text-sm font-semibold text-secondary-900">
                 保険料<br/>(月額)
@@ -186,7 +209,7 @@ export default function RevenueForecastReport({
           </thead>
           <tbody>
             {forecastData.map((item, index) => {
-              const isCurrentCoverage = Math.abs(item.coverage - ((result.coverage || 1.0) * 100)) < 0.01
+              const isCurrentCoverage = Math.abs(item.coverage - ((result.coverage !== undefined ? result.coverage : 1.0) * 100)) < 0.01
               
               return (
                 <tr 
@@ -305,7 +328,7 @@ export default function RevenueForecastReport({
 
       {/* 注釈 */}
       <div className="mt-4 text-xs text-secondary-600 space-y-1">
-        <p>※ レベニュー = 保険料 × 30%</p>
+        <p>※ レベニュー = 保険料 × 20%</p>
         <p>※ 保険料が0の場合、レベニューも0として計算されます</p>
         <p>※ 12ヶ月合計は月額の12倍、36ヶ月合計は12ヶ月合計の3倍で計算</p>
         <p>※ 3年間の返金見込みは、保険期間分を減額（30日保証: 1ヶ月分減額、1年保証: 12ヶ月分減額）</p>
