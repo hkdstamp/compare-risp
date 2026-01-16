@@ -45,7 +45,7 @@ export default function DiscountRateInfo() {
                 </h4>
                 <div className="bg-success-50 border-l-4 border-success-500 p-4 mb-4">
                   <p className="text-sm text-secondary-700">
-                    <strong>注記：</strong>ComputeSP 3年相当で算定
+                    <strong>注記：</strong>RI３年契約（提供なしは、１年契約）、または、ComputeSP 3年相当で算定
                   </p>
                 </div>
                 <div className="overflow-x-auto">
