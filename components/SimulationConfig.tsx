@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { formatPercentage } from '@/lib/utils'
 import DiscountRateInfo from '@/components/ui/DiscountRateInfo'
-import { ShieldIcon, CalendarIcon, DollarIcon, ChartBarIcon, ActivityIcon, RocketIcon, RefreshIcon } from '@/components/icons'
+import { ShieldIcon, CalendarIcon, DollarIcon, ChartBarIcon, ActivityIcon, RocketIcon, RefreshIcon, InfoIcon } from '@/components/icons'
 
 interface SimulationConfigProps {
   onSimulate: (params: any) => void
@@ -137,6 +137,19 @@ export default function SimulationConfig({ onSimulate, isLoading }: SimulationCo
             className="w-full h-2 bg-secondary-200 rounded-lg appearance-none cursor-pointer accent-primary-600"
           />
           <small className="text-secondary-500 mt-1">リソースの実稼働率</small>
+        </div>
+      </div>
+
+      {/* Important Note */}
+      <div className="mb-6 bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-lg">
+        <div className="flex items-start gap-3">
+          <InfoIcon size={20} className="text-amber-600 flex-shrink-0 mt-0.5" />
+          <div>
+            <p className="text-sm text-secondary-700 font-medium mb-1">重要な注意事項</p>
+            <p className="text-sm text-secondary-600">
+              対象リソースのサービスに対応する標準RI/SPが１年契約のみの場合、１年保証の保険コミットメントは提供されません。本シミュレーションでは考慮していないため、ご留意ください。
+            </p>
+          </div>
         </div>
       </div>
 
