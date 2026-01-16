@@ -37,11 +37,11 @@ export default function DiscountRateInfo() {
 
             {/* Content */}
             <div className="p-6 space-y-6">
-              {/* Insurance RI/SP Section */}
+              {/* Insurance Commitment Section */}
               <section>
                 <h4 className="text-lg font-bold text-secondary-900 mb-3 flex items-center gap-2">
                   <ShieldIcon size={22} className="text-accent-600" />
-                  保険RI/SP
+                  保険コミットメント
                 </h4>
                 <div className="bg-success-50 border-l-4 border-success-500 p-4 mb-4">
                   <p className="text-sm text-secondary-700">
@@ -201,15 +201,15 @@ export default function DiscountRateInfo() {
                   </div>
                   <div className="flex items-start gap-2">
                     <span className="text-primary-600 font-bold">2.</span>
-                    <p className="text-secondary-700"><strong>初期費用を避けたい：</strong>SP 1年 (40.0%) または 保険RI/SP 1年保証 (40.2%)</p>
+                    <p className="text-secondary-700"><strong>初期費用を避けたい：</strong>SP 1年 (40.0%) または 保険コミットメント 1年保証 (40.2%)</p>
                   </div>
                   <div className="flex items-start gap-2">
                     <span className="text-primary-600 font-bold">3.</span>
-                    <p className="text-secondary-700"><strong>柔軟性を重視：</strong>保険RI/SP 1年保証 (40.2%) ← 高割引率＋短期契約＋返金保証</p>
+                    <p className="text-secondary-700"><strong>柔軟性を重視：</strong>保険コミットメント 1年保証 (40.2%) ← 高割引率＋短期契約＋返金保証</p>
                   </div>
                   <div className="flex items-start gap-2">
                     <span className="text-primary-600 font-bold">4.</span>
-                    <p className="text-secondary-700"><strong>超短期利用：</strong>保険RI/SP 30日保証 (30.0%)</p>
+                    <p className="text-secondary-700"><strong>超短期利用：</strong>保険コミットメント 30日保証 (30.0%)</p>
                   </div>
                 </div>
               </section>

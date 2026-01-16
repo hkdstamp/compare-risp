@@ -4,15 +4,16 @@
 
 ## 🎯 プロジェクト概要
 
-**MSP向け保険RI/SP & 標準RI/SP コスト最適化・収益モデルシミュレーションツール**
+**MSP向け保険コミットメント & 標準RI/SP コスト最適化・収益モデルシミュレーションツール**
 
-AWS Managed Service Provider (MSP) 向けのコスト最適化シミュレーションツールです。保険型Reserved Instance/Savings Plan（保険RI/SP）と標準RI/SPの2つのモデルを比較し、最適な購入戦略を提案します。
+AWS Managed Service Provider (MSP) 向けのコスト最適化シミュレーションツールです。保険型コミットメント（保険コミットメント）と標準RI/SPの2つのモデルを比較し、最適な購入戦略を提案します。
 
 ### 核となるビジネスロジック
 
-1. **保険RI/SP**: 短期保証（30日/1年）で柔軟性が高く、一定の割引率とプレミアム料金が発生
-   - **返金見込み機能**: 想定カバレッジが100%未満の場合、未使用分の保険料を返金見込みとして計算
-   - カバレッジを下げることで、未使用分の保険料が返金として還元される
+1. **保険コミットメント**: 短期保証（30日/1年）で柔軟性が高く、一定の料金率と保険料が発生
+   - **料金体系**: 標準RI/SP 3年NoUpfrontの100%使用時コストを固定料金として採用（カバレッジに関係なく一定）
+   - **保険料率**: 30日保証50%、1年保証33%
+   - **返金機能**: カバレッジが低い場合、削減額がマイナスになると返金が発生
 2. **標準RI/SP**: AWS標準の1年/3年予約で、NoUpfront/PartialUpfront/AllUpfrontの支払いオプション
 3. **累積コスト比較**: 通常価格と各プランの累積コストを可視化し、損益分岐点を表示
 4. **割引率情報モーダル**: 各プランの割引率、保険料率、実効割引率を確認できる情報モーダル
@@ -90,7 +91,7 @@ interface IconProps {
 }
 
 // 主要アイコン
-export function ShieldIcon        // 保険RI/SP
+export function ShieldIcon        // 保険コミットメント
 export function CalendarIcon      // 契約期間
 export function DollarIcon        // 支払方法
 export function ChartBarIcon      // 統計
@@ -156,7 +157,7 @@ import { ShieldIcon, CoinsIcon, CalendarIcon } from '@/components/icons'
 
 #### 機能
 
-- **保険RI/SP情報表示**:
+- **保険コミットメント情報表示**:
   - 30日保証プラン（割引率60%、保険料率50%、実効割引率30.0%）
   - 1年保証プラン（割引率60%、保険料率33%、実効割引率40.2%）
   - 特徴: 短期契約、未使用分返金、初期費用ゼロ
@@ -173,9 +174,9 @@ import { ShieldIcon, CoinsIcon, CalendarIcon } from '@/components/icons'
 
 - **使い分けガイドライン**:
   - 最大割引を求める → RI 3年 AllUpfront (62.4%)
-  - 初期費用を避けたい → SP 1年 (40.0%) または 保険RI/SP 1年 (40.2%)
-  - 柔軟性を重視 → 保険RI/SP 1年 (40.2%)
-  - 超短期利用 → 保険RI/SP 30日 (30.0%)
+  - 初期費用を避けたい → SP 1年 (40.0%) または 保険コミットメント 1年 (40.2%)
+  - 柔軟性を重視 → 保険コミットメント 1年 (40.2%)
+  - 超短期利用 → 保険コミットメント 30日 (30.0%)
 
 #### 実装ポイント
 
@@ -216,10 +217,10 @@ export default function DiscountRateInfo() {
 
             {/* コンテンツ */}
             <div className="p-6 space-y-6">
-              {/* 保険RI/SPセクション */}
+              {/* 保険コミットメントセクション */}
               <section>
                 <h3 className="text-xl font-bold text-accent-700 mb-2">
-                  保険RI/SP
+                  保険コミットメント
                 </h3>
                 <p className="text-sm text-secondary-600 mb-4">
                   ※ ComputeSP 3年相当で算定
@@ -289,8 +290,8 @@ export default function DiscountRateInfo() {
 #### 機能
 - **5本のライン表示**:
   1. 通常価格（グレー実線）: On-Demand累積コスト
-  2. 保険RI/SP累積（緑実線）: 月次ランニングコストの累積
-  3. 保険RI/SP総支出（緑破線）: 初期費用 + 全期間の月額料金合計（固定値）
+  2. 保険コミットメント累積（緑実線）: 月次ランニングコストの累積
+  3. 保険コミットメント総支出（緑破線）: 初期費用 + 全期間の月額料金合計（固定値）
   4. 標準RI/SP累積（青実線）: 月次ランニングコストの累積
   5. 標準RI/SP総支出（青破線）: 初期費用 + 全期間の月額料金合計（固定値）
 
@@ -344,7 +345,7 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
         fill: true,
       },
       {
-        label: '保険RI/SP（累積）',
+        label: '保険コミットメント（累積）',
         data: cumulative.insurance,
         borderColor: 'rgba(16, 185, 129, 1)',
         borderWidth: 2,
@@ -352,7 +353,7 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
         fill: true,
       },
       {
-        label: '保険RI/SP（総支出）',
+        label: '保険コミットメント（総支出）',
         data: insuranceTotalExpenditure,
         borderColor: 'rgba(16, 185, 129, 0.6)',
         borderWidth: 2,
@@ -415,7 +416,7 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
             let footer = []
             
             if (insurancePlan.break_even_months === month) {
-              footer.push('🎯 保険RI/SP 損益分岐点')
+              footer.push('🎯 保険コミットメント 損益分岐点')
             }
             if (standardPlan.break_even_months === month) {
               footer.push('🎯 標準RI/SP 損益分岐点')
@@ -468,7 +469,7 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
             <div className="flex items-center gap-2">
               <span className="inline-block w-3 h-3 rounded-full bg-green-500"></span>
               <span className="text-gray-600">
-                保険RI/SP 損益分岐: <span className="font-semibold text-green-600">{insurancePlan.break_even_months}ヶ月</span>
+                保険コミットメント 損益分岐: <span className="font-semibold text-green-600">{insurancePlan.break_even_months}ヶ月</span>
               </span>
             </div>
           )}
@@ -501,7 +502,7 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
 #### 機能
 
 - **通常価格カード**: オンデマンド価格表示
-- **保険RI/SPカード**: 
+- **保険コミットメントカード**: 
   - 月額コスト
   - 月間削減額（基本削減 + 返金見込みの内訳表示）★
   - 💰 返金見込み（単独表示）★
@@ -522,7 +523,7 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
 import { formatCurrency } from '@/lib/utils'
 import { ShieldIcon, CalendarIcon, CoinsIcon, BalanceIcon } from '@/components/icons'
 
-// 保険RI/SPカード内の返金見込み表示
+// 保険コミットメントカード内の返金見込み表示
 {insurance.expected_refund && insurance.expected_refund > 0 && (
   <>
     {/* 月間削減額の内訳 */}
@@ -574,7 +575,7 @@ import { ShieldIcon, CalendarIcon, CoinsIcon, BalanceIcon } from '@/components/i
 |------|------|
 | リソース | サービス:インスタンスタイプ |
 | 通常価格 | オンデマンド月額コスト |
-| 保険RI/SP | 保険プラン月額コスト |
+| 保険コミットメント | 保険プラン月額コスト |
 | 保険料 | プレミアム料金 |
 | **返金見込** | 未使用分の返金額 ★ |
 | 保険削減額 | 月間削減額（内訳付き）★ |
@@ -595,7 +596,7 @@ import { SearchIcon } from '@/components/icons'
   <tr>
     <th>リソース</th>
     <th>通常価格</th>
-    <th>保険RI/SP</th>
+    <th>保険コミットメント</th>
     <th>保険料</th>
     <th className="text-accent-600">返金見込</th> {/* 新規追加 */}
     <th>保険削減額</th>
@@ -801,11 +802,11 @@ export default function ResourceSelector({ resources, onChange }: ResourceSelect
 
 ### 6. lib/simulator.ts（コア計算ロジック）★★★
 
-保険RI/SPと標準RI/SPのコスト計算エンジン
+保険コミットメントと標準RI/SPのコスト計算エンジン
 
 #### 主要関数
 
-**calculateInsurancePlan**: 保険RI/SPの月次コスト計算
+**calculateInsurancePlan**: 保険コミットメントの月次コスト計算
 ```typescript
 export function calculateInsurancePlan(
   catalog: PricingCatalog,
@@ -864,7 +865,7 @@ export function calculateInsurancePlan(
   
   return {
     result: {
-      name: `Insurance RI/SP ${plan.name}`,
+      name: `Insurance Commitment ${plan.name}`,
       monthly_cost: totalMonthlyCost,
       monthly_savings: effectiveMonthlySavings,  // 実効削減額 ★
       initial_cost: 0,
@@ -877,22 +878,74 @@ export function calculateInsurancePlan(
 }
 
 /**
- * 返金見込みの計算ロジック
+ * 最新の計算ロジック（2026年1月実装）
  * 
- * 想定カバレッジが100%未満の場合、未使用分の保険料が返金される。
+ * ### 基本パラメータ:
+ * - 保険コミットメント料金: 標準RI/SP 3年NoUpfrontの100%使用時コストを基準
+ * - 保険料率: 30日保証 50% / 1年保証 33%
  * 
- * 計算式:
- *   返金見込み = 100%カバレッジ時の保険料 - 実際のカバレッジでの保険料
+ * ### 計算手順:
  * 
- * 例: カバレッジ70%の場合
- *   - 100%カバレッジ時: $71.48
- *   - 70%カバレッジ時: $50.04
- *   - 返金見込み: $71.48 - $50.04 = $21.44
+ * 1. **オンデマンドカバー分の算出**
+ *    ```
+ *    onDemandCoveredCost = onDemandRate × hours × coverageQty × 1.0
+ *    ```
  * 
- * 効果:
- *   - カバレッジを下げることで返金見込みが増加
- *   - 実効削減額 = 基本削減額 + 返金見込み
- *   - 柔軟なリソース計画が可能
+ * 2. **保険コミットメント月額の算出**
+ *    ```
+ *    // 3年NoUpfront基準コストの算出（固定料金）
+ *    baseline3yrNoUpfront = 3年NoUpfront時間単価 × 時間数 × 全台数
+ *    insuranceCoveredCost = baseline3yrNoUpfront  // カバレッジに関係なく固定
+ *    ```
+ * 
+ * 3. **削減額の算出**
+ *    ```
+ *    savingsAmount = onDemandCoveredCost - insuranceCoveredCost
+ *    ```
+ * 
+ * 4. **返金額の決定**
+ *    ```
+ *    if (savingsAmount < 0):
+ *      expectedRefund = -savingsAmount
+ *    else:
+ *      expectedRefund = 0
+ *    ```
+ * 
+ * 5. **保険料の算出**
+ *    ```
+ *    if (expectedRefund === 0):
+ *      premium = savingsAmount × plan.premium_rate
+ *    else:
+ *      premium = 0
+ *    ```
+ * 
+ * 6. **月額コストの算出**
+ *    ```
+ *    monthlyCost = insuranceCoveredCost + premium + remainingCost - expectedRefund
+ *    ```
+ * 
+ * ### 計算例:
+ * 
+ * **ケース1: カバレッジ70%（返金なし）**
+ * - オンデマンドカバー: $212.69
+ * - 保険コミットメント月額: $85.03
+ * - 削減額: $127.66 (正の値)
+ * - 返金: $0
+ * - 保険料: $127.66 × 0.33 = $42.13
+ * - 月額コスト: $85.03 + $42.13 + $91.10 = $218.26
+ * 
+ * **ケース2: カバレッジ30%（返金なし）**
+ * - オンデマンドカバー: $91.10
+ * - 保険コミットメント月額: $36.44
+ * - 削減額: $54.66 (正の値)
+ * - 返金: $0
+ * - 保険料: $54.66 × 0.33 = $18.04
+ * - 月額コスト: $36.44 + $18.04 + $212.58 = $267.06
+ * 
+ * ### レベニュー計算:
+ * ```
+ * revenue = premium × 0.20  // 保険料の20%
+ * ```
  */
 ```
 
@@ -967,7 +1020,7 @@ export function calculateCumulativeCosts(
     // 通常価格の累積コスト
     on_demand.push(baselineMonthly * month)
     
-    // 保険RI/SPの累積コスト（月次コストのみ、初期費用なし）
+    // 保険コミットメントの累積コスト（月次コストのみ、初期費用なし）
     insurance.push(insurancePlan.monthly_cost * month)
     
     // 標準RI/SPの累積コスト（月次コストのみ、初期費用は別途）
@@ -984,7 +1037,7 @@ export function calculateCumulativeCosts(
 - これにより、累積コストと総支出を分けて可視化できる
 
 **返金見込みの計算**:
-- 保険RI/SPの特徴的な機能
+- 保険コミットメントの特徴的な機能
 - カバレッジを下げることで未使用分の保険料が返金として還元
 - 実効削減額 = 基本削減額 + 返金見込み
 
@@ -1020,14 +1073,14 @@ export interface PlanResult {
 export interface CumulativeData {
   months: number[]        // [1, 2, 3, ..., 12] or [..., 36]
   on_demand: number[]     // 通常価格の累積コスト
-  insurance: number[]     // 保険RI/SPの累積ランニングコスト
+  insurance: number[]     // 保険コミットメントの累積ランニングコスト
   standard: number[]      // 標準RI/SPの累積ランニングコスト
 }
 
 // シミュレーション結果
 export interface SimulationResult {
   baseline_cost: number       // ベースライン月次コスト
-  insurance: PlanResult       // 保険RI/SPの結果
+  insurance: PlanResult       // 保険コミットメントの結果
   standard: PlanResult        // 標準RI/SPの結果
   cumulative: CumulativeData  // 累積コストデータ
   details: DetailItem[]       // リソース別詳細
@@ -1197,7 +1250,7 @@ export const pricingCatalog: PricingCatalog = {
 }
 
 /**
- * 保険RI/SPの実効割引率の計算
+ * 保険コミットメントの実効割引率の計算
  * 
  * 実効割引率 = (オンデマンド月額 - 月額合計) / オンデマンド月額
  * 
@@ -1210,7 +1263,7 @@ export const pricingCatalog: PricingCatalog = {
  * 
  * 結論:
  *   1年保証（40.2%）≈ RI AllUpfront（41.2%）≈ SP 1年（40.0%）
- *   保険RI/SPは標準RI/SPと同等の割引率を実現
+ *   保険コミットメントは標準RI/SPと同等の割引率を実現
  */
 }
 
@@ -1295,7 +1348,7 @@ const colors = {
     800: '#1e293b',
     900: '#0f172a',
   },
-  // Accent: Cyan（アクセント - 保険RI/SP用）
+  // Accent: Cyan（アクセント - 保険コミットメント用）
   accent: {
     50: '#ecfeff',
     100: '#cffafe',
@@ -1362,7 +1415,7 @@ const colors = {
 
 - **Primary (Sky Blue)**: ボタン、標準RI/SP関連、主要アクション
 - **Secondary (Slate Gray)**: 通常価格、テキスト、境界線
-- **Accent (Cyan)**: 保険RI/SP関連、強調表示
+- **Accent (Cyan)**: 保険コミットメント関連、強調表示
 - **Success (Green)**: 削減額、ポジティブ指標
 - **Warning (Amber)**: 収益差額、注意喚起
 - **Danger (Red)**: エラー、削除アクション
@@ -1415,7 +1468,7 @@ xl: '1280px'  // 大画面
 
 ### 0. 返金見込みの実装
 
-**重要**: 保険RI/SPの特徴的な機能
+**重要**: 保険コミットメントの特徴的な機能
 
 #### 計算ロジック
 
@@ -1677,9 +1730,9 @@ module.exports = nextConfig
 詳細な計算ロジック、割引率の詳細、返金見込みの計算方法などが記載されています。
 
 **主要セクション**:
-1. 割引率の詳細 (RI/SP/保険RI/SP)
+1. 割引率の詳細 (RI/SP/保険コミットメント)
 2. 基本用語定義
-3. 保険RI/SP計算 (返金見込み含む)
+3. 保険コミットメント計算 (返金見込み含む)
 4. 標準RI/SP計算
 5. 累積コスト計算
 6. UI設計
@@ -1963,13 +2016,13 @@ insurance_plans: {
 - [ ] `tailwind.config.js` - Alphuas Cloud風カラーパレット
   - [ ] Primary (Sky Blue)
   - [ ] Secondary (Slate Gray)
-  - [ ] Accent (Cyan - 保険RI/SP用)
+  - [ ] Accent (Cyan - 保険コミットメント用)
   - [ ] Success, Warning, Danger
   - [ ] 全スケール（50-950）定義
 
 ### Phase 11: ドキュメント作成 ★
 - [ ] `CALCULATION_SPECIFICATION.md` - 計算仕様詳細
-  - [ ] 割引率の詳細（RI/SP/保険RI/SP）
+  - [ ] 割引率の詳細（RI/SP/保険コミットメント）
   - [ ] 返金見込み計算ロジック
   - [ ] 実効削減額の計算方法
   - [ ] 計算例とグラフ仕様
@@ -2020,7 +2073,7 @@ insurance_plans: {
 ### 1. 返金見込み機能 ★★★
 
 **追加日**: 2025-11-28  
-**目的**: 保険RI/SPでカバレッジを100%未満に設定した際の未使用分保険料を返金見込みとして計算・表示
+**目的**: 保険コミットメントでカバレッジを100%未満に設定した際の未使用分保険料を返金見込みとして計算・表示
 
 **計算ロジック**:
 - 返金見込み = 100%カバレッジ時の保険料 - 実際のカバレッジでの保険料
@@ -2039,7 +2092,7 @@ insurance_plans: {
 **目的**: 各プランの割引率、保険料率、実効割引率を詳細に確認できるモーダル
 
 **表示内容**:
-- 保険RI/SP: 30日保証 (30.0%), 1年保証 (40.2%)
+- 保険コミットメント: 30日保証 (30.0%), 1年保証 (40.2%)
 - 標準RI/SP: RI 1年/3年, SP 1年/3年
 - 使い分けガイドライン
 
@@ -2066,7 +2119,7 @@ insurance_plans: {
 
 **カラーパレット**:
 - Primary: Sky Blue (#0ea5e9) - 標準RI/SP用
-- Accent: Cyan (#06b6d4) - 保険RI/SP用
+- Accent: Cyan (#06b6d4) - 保険コミットメント用
 - Secondary: Slate Gray - テキスト・境界線
 - Success: Green - 削減額表示
 - Warning: Amber - 収益差額

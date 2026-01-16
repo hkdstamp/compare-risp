@@ -26,7 +26,7 @@ export default function MonthlyChart({ baselineCost, insurance, standard }: Mont
         borderWidth: 2,
       },
       {
-        label: '保険RI/SP',
+        label: '保険コミットメント',
         data: [insurance.monthly_cost, insurance.monthly_savings],
         backgroundColor: 'rgba(34, 197, 94, 0.7)', // success-500
         borderColor: 'rgba(34, 197, 94, 1)',

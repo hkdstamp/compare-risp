@@ -52,7 +52,7 @@ export default function SimulationConfig({ onSimulate, isLoading }: SimulationCo
         <div className="flex flex-col">
           <label className="flex items-center gap-2 font-semibold text-secondary-700 mb-2">
             <ShieldIcon size={20} className="text-accent-600" />
-            保険RI/SPプラン
+            保険コミットメントプラン
           </label>
           <select
             value={insurance}
