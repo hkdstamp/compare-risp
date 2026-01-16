@@ -37,6 +37,7 @@ export default function CostCards({ baselineCost, insurance, standard }: CostCar
           <div>
             <div className="text-3xl font-bold text-secondary-900">{formatCurrency(insurance.monthly_cost)}</div>
             <div className="text-sm text-secondary-600">月額コスト</div>
+            <div className="text-xs text-secondary-500 mt-1">※ 適用されない分のオンデマンドコストを含みます</div>
           </div>
           <div className="bg-success-50 px-3 py-2 rounded-lg border border-success-200">
             <div className="text-sm font-semibold text-success-700">
@@ -73,6 +74,7 @@ export default function CostCards({ baselineCost, insurance, standard }: CostCar
           <div>
             <div className="text-3xl font-bold text-secondary-900">{formatCurrency(standard.monthly_cost)}</div>
             <div className="text-sm text-secondary-600">月額コスト</div>
+            <div className="text-xs text-secondary-500 mt-1">※ 適用されない分のオンデマンドコストを含みます</div>
           </div>
           <div className="bg-primary-50 px-3 py-2 rounded-lg border border-primary-200">
             <div className="text-sm font-semibold text-primary-700">削減額: {formatCurrency(standard.monthly_savings)}</div>
