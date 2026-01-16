@@ -34,20 +34,31 @@ export default function RevenueForecastReport({
     const insurancePlan = pricingCatalog.insurance_plans[insurancePlanKey]
     const insuranceTermMonths = insurancePlan.term_months // 1 or 12
 
-    // カバレッジ範囲: 現在の±10% (ただし0-100%の範囲内)
-    const minCoverage = Math.max(0, currentCoverage - 0.1)
-    const maxCoverage = Math.min(1.0, currentCoverage + 0.1)
-
     const forecasts: RevenueForecastItem[] = []
 
-    // -10%, -5%, 現在, +5%, +10%の5パターンを計算
-    const coveragePoints = [
-      minCoverage,
-      currentCoverage - 0.05 >= minCoverage ? currentCoverage - 0.05 : minCoverage,
-      currentCoverage,
-      currentCoverage + 0.05 <= maxCoverage ? currentCoverage + 0.05 : maxCoverage,
-      maxCoverage
-    ]
+    // カバレッジポイントの計算
+    let coveragePoints: number[]
+    
+    if (currentCoverage === 0) {
+      // カバレッジ0%の場合: 0%, 5%, 10%, 15%, 20% の5パターン
+      coveragePoints = [0, 0.05, 0.10, 0.15, 0.20]
+    } else if (currentCoverage === 1.0) {
+      // カバレッジ100%の場合: 80%, 85%, 90%, 95%, 100% の5パターン
+      coveragePoints = [0.80, 0.85, 0.90, 0.95, 1.0]
+    } else {
+      // カバレッジ範囲: 現在の±10% (ただし0-100%の範囲内)
+      const minCoverage = Math.max(0, currentCoverage - 0.1)
+      const maxCoverage = Math.min(1.0, currentCoverage + 0.1)
+      
+      // -10%, -5%, 現在, +5%, +10%の5パターンを計算
+      coveragePoints = [
+        minCoverage,
+        currentCoverage - 0.05 >= minCoverage ? currentCoverage - 0.05 : minCoverage,
+        currentCoverage,
+        currentCoverage + 0.05 <= maxCoverage ? currentCoverage + 0.05 : maxCoverage,
+        maxCoverage
+      ]
+    }
 
     // 重複を除去
     const uniqueCoveragePoints = Array.from(new Set(coveragePoints))
@@ -131,7 +142,12 @@ export default function RevenueForecastReport({
             収益見込みレポート
           </h3>
           <p className="text-sm text-secondary-600">
-            想定カバレッジ ±10% 範囲での収益予測（3年契約RI/SP付帯前提）
+            {result.coverage === 0 
+              ? '想定カバレッジ 0%～20% 範囲での収益予測（3年契約RI/SP付帯前提）'
+              : result.coverage === 1.0
+              ? '想定カバレッジ 80%～100% 範囲での収益予測（3年契約RI/SP付帯前提）'
+              : '想定カバレッジ ±10% 範囲での収益予測（3年契約RI/SP付帯前提）'
+            }
           </p>
         </div>
       </div>
@@ -143,7 +159,14 @@ export default function RevenueForecastReport({
           <div className="text-sm text-warning-900">
             <p className="font-semibold mb-1">計算条件：</p>
             <ul className="list-disc list-inside space-y-1 ml-2">
-              <li>設定した想定カバレッジから±10%の範囲で計算</li>
+              <li>
+                {result.coverage === 0 
+                  ? '想定カバレッジ0%の場合: 0%～20%の範囲で計算'
+                  : result.coverage === 1.0
+                  ? '想定カバレッジ100%の場合: 80%～100%の範囲で計算'
+                  : '設定した想定カバレッジから±10%の範囲で計算'
+                }
+              </li>
               <li>レベニュー = 保険料 × 20%</li>
               <li>保険料が0の場合、レベニューも0</li>
               <li>3年契約RI/SP付帯前提での36ヶ月計算</li>
