@@ -201,7 +201,9 @@
 
 ### 3. 保険コミットメント計算
 
-#### 2.1 月額コスト計算
+#### 2.1 月額コスト計算（2026年1月最新版）
+
+**重要**: 保険コミットメント料金は**固定**です。カバレッジに関係なく常に同じ金額を支払います。
 
 ```typescript
 // カバレッジ対象リソース
@@ -210,59 +212,113 @@ coverageQty = リソース数量 × カバレッジ率
 // 残りリソース（オンデマンド使用）
 remainingQty = リソース数量 - coverageQty
 
-// 割引後の使用コスト
-discountedUsageCost = オンデマンド時間単価 × 稼働時間 × coverageQty × 利用率 × (1.0 - 割引率)
+// 【重要】保険コミットメント固定料金の算出
+// 標準RI/SP 3年NoUpfrontの100%使用時コストを基準として固定
+if (標準RI 3年NoUpfrontが存在) {
+  baseline3yrNoUpfront = 3年NoUpfront時間単価 × 稼働時間 × リソース数量
+} else if (Savings Plans 3年が存在) {
+  baseline3yrNoUpfront = SP 3年時間単価 × 稼働時間 × リソース数量
+} else {
+  baseline3yrNoUpfront = オンデマンド時間単価 × 稼働時間 × リソース数量 × 0.40
+}
 
-// 保険プレミアム
-premiumBase = オンデマンド時間単価 × 稼働時間 × coverageQty × 割引率
-premium = premiumBase × 保険料率
+// 保険コミットメント料金（固定・カバレッジに無関係）
+insuranceCoveredCost = baseline3yrNoUpfront
+
+// オンデマンドカバー分の算出
+onDemandCoveredCost = オンデマンド時間単価 × 稼働時間 × coverageQty × 利用率
+
+// 削減額の算出
+savingsAmount = onDemandCoveredCost - insuranceCoveredCost
+
+// 返金額の決定
+if (savingsAmount < 0) {
+  expectedRefund = -savingsAmount
+} else {
+  expectedRefund = 0
+}
+
+// 保険料の算出
+if (expectedRefund === 0) {
+  premium = savingsAmount × 保険料率
+} else {
+  premium = 0
+}
 
 // 残りリソースのコスト
 remainingCost = オンデマンド時間単価 × 稼働時間 × remainingQty × 利用率
 
 // 月額合計
-monthlyCost = discountedUsageCost + premium + remainingCost
+monthlyCost = insuranceCoveredCost + premium + remainingCost - expectedRefund
 ```
 
-#### 2.2 返金見込み計算（Expected Refund）
+**新しい計算方式のポイント**:
+- ✅ 保険コミットメント料金は**固定**（カバレッジに無関係）
+- ✅ 基準は「標準RI/SP 3年NoUpfrontの100%使用時コスト」
+- ✅ カバレッジが低い場合は返金が発生
+- ✅ 返金発生時は保険料が0になる
 
-保険コミットメントでは、想定カバレッジを100%未満に設定した場合、未使用分の保険料が返金見込みとして計算されます。
+#### 2.2 返金見込み計算（Expected Refund）- 2026年1月最新版
+
+保険コミットメント料金は固定のため、カバレッジが低い場合に「未使用分」として返金が発生します。
 
 ```typescript
-// 100%カバレッジ時の保険料
-premiumAt100Coverage = オンデマンド時間単価 × 稼働時間 × リソース数量 × 割引率 × 保険料率
+// 保険コミットメント固定料金（カバレッジに無関係）
+insuranceCost = baseline3yrNoUpfront
 
-// 実際のカバレッジでの保険料
-premiumBase = オンデマンド時間単価 × 稼働時間 × (リソース数量 × カバレッジ率) × 割引率
-premiumActual = premiumBase × 保険料率
+// オンデマンドカバー分
+onDemandCoveredCost = オンデマンド時間単価 × 稼働時間 × (リソース数量 × カバレッジ) × 利用率
+
+// 削減額
+savingsAmount = onDemandCoveredCost - insuranceCost
 
 // 返金見込み
-expectedRefund = premiumAt100Coverage - premiumActual
+if (savingsAmount < 0) {
+  // 保険料がオンデマンドより高い場合、差額を返金
+  expectedRefund = -savingsAmount
+  premium = 0  // 返金発生時は保険料なし
+} else {
+  // 削減成功の場合、保険料発生
+  expectedRefund = 0
+  premium = savingsAmount × 保険料率
+}
 ```
 
 **重要ポイント**:
-- ✅ カバレッジが低いほど返金見込みが大きくなる
-- ✅ カバレッジ100%では返金見込みは0
-- ✅ カバレッジ50%では保険料の50%が返金見込みとなる
+- ✅ 保険コミットメント料金は**固定**（カバレッジに無関係）
+- ✅ カバレッジが低いと、オンデマンドカバー分 < 保険料 となり返金発生
+- ✅ 返金額 = 保険料 - オンデマンドカバー分（マイナス値の絶対値）
+- ✅ 返金発生時は保険料が0になる
 
-**計算例**:
+**計算例（EC2 t3.medium 10台）**:
 
 ```
 前提条件:
-- EC2 t3.large × 3台
-- オンデマンド時間単価: $0.1088
+- オンデマンド時間単価: $0.0544
+- 3年NoUpfront時間単価: $0.0235
 - 稼働時間: 730時間/月
-- 割引率: 60%
-- 保険料率: 50%
+- 保険料率: 33% (1年保証)
 
-カバレッジ70%の場合:
-- 100%カバレッジ時の保険料: $0.1088 × 730 × 3 × 0.60 × 0.50 = $71.48
-- 70%カバレッジ時の保険料: $0.1088 × 730 × 2.1 × 0.60 × 0.50 = $50.04
-- 返金見込み: $71.48 - $50.04 = $21.44
+カバレッジ100%の場合（返金なし）:
+- 保険コミットメント: $171.55 (固定)
+- オンデマンドカバー: $397.12 (10台分)
+- 削減額: $225.57 (正の値)
+- 返金: $0
+- 保険料: $225.57 × 0.33 = $74.44
 
-カバレッジ50%の場合:
-- 50%カバレッジ時の保険料: $0.1088 × 730 × 1.5 × 0.60 × 0.50 = $35.74
-- 返金見込み: $71.48 - $35.74 = $35.74
+カバレッジ50%の場合（返金なし）:
+- 保険コミットメント: $171.55 (固定・変わらず)
+- オンデマンドカバー: $198.56 (5台分)
+- 削減額: $27.01 (正の値)
+- 返金: $0
+- 保険料: $27.01 × 0.33 = $8.91
+
+カバレッジ30%の場合（返金発生）:
+- 保険コミットメント: $171.55 (固定・変わらず)
+- オンデマンドカバー: $119.14 (3台分)
+- 削減額: -$52.41 (マイナス)
+- 返金: $52.41 (未使用分)
+- 保険料: $0 (返金発生時)
 ```
 
 #### 2.3 月間削減額計算（実効削減額）
