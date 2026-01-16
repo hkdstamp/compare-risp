@@ -27,7 +27,7 @@ export default function RevenueForecastReport({
   }, [result, insurancePlanKey, usage, resources])
 
   const calculateForecast = () => {
-    const currentCoverage = result.coverage || 1.0
+    const currentCoverage = result.coverage !== undefined ? result.coverage : 1.0
     const hours = pricingCatalog.metadata.hours_per_month
     
     // 保険プランの情報を取得（保険期間の減額計算用）
@@ -209,7 +209,7 @@ export default function RevenueForecastReport({
           </thead>
           <tbody>
             {forecastData.map((item, index) => {
-              const isCurrentCoverage = Math.abs(item.coverage - ((result.coverage || 1.0) * 100)) < 0.01
+              const isCurrentCoverage = Math.abs(item.coverage - ((result.coverage !== undefined ? result.coverage : 1.0) * 100)) < 0.01
               
               return (
                 <tr 
