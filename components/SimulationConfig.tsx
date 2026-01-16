@@ -62,7 +62,7 @@ export default function SimulationConfig({ onSimulate, isLoading }: SimulationCo
             <option value="30d">30日保証 (60%割引 / 50%保険料)</option>
             <option value="1y">1年保証 (60%割引 / 33%保険料)</option>
           </select>
-          <small className="text-secondary-500 mt-1">保証期間終了後、未使用分は返金</small>
+          <small className="text-secondary-500 mt-1">保証期間終了後、Savingsの損失分は返金</small>
         </div>
 
         {/* Standard Term */}
