@@ -45,7 +45,7 @@ export default function DiscountRateInfo() {
                 </h4>
                 <div className="bg-success-50 border-l-4 border-success-500 p-4 mb-4">
                   <p className="text-sm text-secondary-700">
-                    <strong>注記：</strong>RI３年契約（提供なしは、１年契約）、または、ComputeSP 3年相当で算定
+                    <strong>注記：</strong>EC2はComputeSP 3年相当（40%割引）で算定、その他サービスは3年RI/SPで算定
                   </p>
                 </div>
                 <div className="overflow-x-auto">
@@ -62,26 +62,26 @@ export default function DiscountRateInfo() {
                     <tbody>
                       <tr className="hover:bg-secondary-50">
                         <td className="border border-secondary-300 px-4 py-2 text-secondary-900">30日保証</td>
-                        <td className="border border-secondary-300 px-4 py-2 text-center font-semibold text-success-600">60%</td>
+                        <td className="border border-secondary-300 px-4 py-2 text-center font-semibold text-success-600">40%</td>
                         <td className="border border-secondary-300 px-4 py-2 text-center text-secondary-700">50%</td>
-                        <td className="border border-secondary-300 px-4 py-2 text-center font-semibold text-primary-600">30.0%</td>
-                        <td className="border border-secondary-300 px-4 py-2 text-right text-secondary-900">$55.60</td>
+                        <td className="border border-secondary-300 px-4 py-2 text-center font-semibold text-primary-600">20.0%</td>
+                        <td className="border border-secondary-300 px-4 py-2 text-right text-secondary-900">$63.53</td>
                       </tr>
                       <tr className="hover:bg-secondary-50">
                         <td className="border border-secondary-300 px-4 py-2 text-secondary-900">1年保証</td>
-                        <td className="border border-secondary-300 px-4 py-2 text-center font-semibold text-success-600">60%</td>
+                        <td className="border border-secondary-300 px-4 py-2 text-center font-semibold text-success-600">40%</td>
                         <td className="border border-secondary-300 px-4 py-2 text-center text-secondary-700">33%</td>
-                        <td className="border border-secondary-300 px-4 py-2 text-center font-semibold text-primary-600">40.2%</td>
-                        <td className="border border-secondary-300 px-4 py-2 text-right text-secondary-900">$47.50</td>
+                        <td className="border border-secondary-300 px-4 py-2 text-center font-semibold text-primary-600">26.8%</td>
+                        <td className="border border-secondary-300 px-4 py-2 text-right text-secondary-900">$58.13</td>
                       </tr>
                     </tbody>
                   </table>
                 </div>
                 <div className="mt-3 text-xs text-secondary-600 space-y-1">
                   <p>✅ 契約期間30日または1年（短期契約が可能）</p>
-                  <p>✅ 未使用分は返金される柔軟性</p>
+                  <p>✅ Savingsの損失分は返金される柔軟性</p>
                   <p>✅ 初期費用ゼロ</p>
-                  <p>✅ 1年保証の実効割引率が標準RI/SPと同等レベル</p>
+                  <p>✅ EC2はComputeSP 3年相当（40%割引）を基準に算定</p>
                 </div>
               </section>
 
@@ -168,15 +168,15 @@ export default function DiscountRateInfo() {
                     <tbody>
                       <tr className="hover:bg-secondary-50">
                         <td className="border border-secondary-300 px-4 py-2 text-secondary-900">1年</td>
-                        <td className="border border-secondary-300 px-4 py-2 text-center font-semibold text-primary-600">40.0%</td>
+                        <td className="border border-secondary-300 px-4 py-2 text-center font-semibold text-primary-600">20.0%</td>
                         <td className="border border-secondary-300 px-4 py-2 text-right text-secondary-900">$0</td>
-                        <td className="border border-secondary-300 px-4 py-2 text-right text-secondary-900">$47.67</td>
+                        <td className="border border-secondary-300 px-4 py-2 text-right text-secondary-900">$63.54</td>
                       </tr>
                       <tr className="hover:bg-secondary-50">
                         <td className="border border-secondary-300 px-4 py-2 text-secondary-900">3年</td>
-                        <td className="border border-secondary-300 px-4 py-2 text-center font-semibold text-primary-600">60.0%</td>
+                        <td className="border border-secondary-300 px-4 py-2 text-center font-semibold text-primary-600">40.0%</td>
                         <td className="border border-secondary-300 px-4 py-2 text-right text-secondary-900">$0</td>
-                        <td className="border border-secondary-300 px-4 py-2 text-right text-secondary-900">$31.75</td>
+                        <td className="border border-secondary-300 px-4 py-2 text-right text-secondary-900">$47.65</td>
                       </tr>
                     </tbody>
                   </table>
@@ -201,15 +201,15 @@ export default function DiscountRateInfo() {
                   </div>
                   <div className="flex items-start gap-2">
                     <span className="text-primary-600 font-bold">2.</span>
-                    <p className="text-secondary-700"><strong>初期費用を避けたい：</strong>SP 1年 (40.0%) または 保険コミットメント 1年保証 (40.2%)</p>
+                    <p className="text-secondary-700"><strong>初期費用を避けたい：</strong>RI 3年 NoUpfront (56.8%) または SP 3年 (40.0%)</p>
                   </div>
                   <div className="flex items-start gap-2">
                     <span className="text-primary-600 font-bold">3.</span>
-                    <p className="text-secondary-700"><strong>柔軟性を重視：</strong>保険コミットメント 1年保証 (40.2%) ← 高割引率＋短期契約＋返金保証</p>
+                    <p className="text-secondary-700"><strong>柔軟性を重視：</strong>保険コミットメント 1年保証 (26.8%) ← 短期契約＋返金保証</p>
                   </div>
                   <div className="flex items-start gap-2">
                     <span className="text-primary-600 font-bold">4.</span>
-                    <p className="text-secondary-700"><strong>超短期利用：</strong>保険コミットメント 30日保証 (30.0%)</p>
+                    <p className="text-secondary-700"><strong>超短期利用：</strong>保険コミットメント 30日保証 (20.0%)</p>
                   </div>
                 </div>
               </section>
