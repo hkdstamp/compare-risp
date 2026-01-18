@@ -454,13 +454,13 @@ export const pricingCatalog: PricingCatalog = {
   insurance_plans: {
     "30d": {
       name: "30-day guarantee",
-      discount_rate: 0.60,
+      discount_rate: 0.40,
       premium_rate: 0.50,
       term_months: 1
     },
     "1y": {
       name: "1-year guarantee",
-      discount_rate: 0.60,
+      discount_rate: 0.40,
       premium_rate: 0.33,
       term_months: 12
     }
