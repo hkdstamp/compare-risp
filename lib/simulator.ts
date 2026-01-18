@@ -50,26 +50,33 @@ export function calculateInsurancePlan(
     // 5. Calculate refund: if savings < 0, refund = abs(savings) (unused coverage refunded)
     // 6. Calculate premium: if refund = 0, premium = savings × premium_rate
     
-    // Get 3-year NoUpfront pricing as baseline
+    // Get baseline for insurance commitment
+    // For EC2: Use ComputeSP 3yr NoUpfront equivalent (40% discount from on-demand)
+    // For other services: Use 3yr NoUpfront RI → 3yr SP → on-demand × 0.40
     const resourcePricing = catalog.resources[res.service][res.instance]
-    let baseline3yrNoUpfront = 0
+    let baselineInsuranceCommitment = 0
     
-    if (resourcePricing.standard_ri && resourcePricing.standard_ri['3yr'] && resourcePricing.standard_ri['3yr']['NoUpfront']) {
-      const riPlan = resourcePricing.standard_ri['3yr']['NoUpfront']
-      // Calculate monthly cost: hourly × hours × quantity (no upfront payment)
-      baseline3yrNoUpfront = riPlan.hourly_usd * hours * res.quantity
-    } else if (resourcePricing.savings_plans && resourcePricing.savings_plans['3yr']) {
-      // Fallback to 3yr Savings Plan if NoUpfront not available
-      baseline3yrNoUpfront = resourcePricing.savings_plans['3yr'].hourly_usd * hours * res.quantity
+    if (res.service === 'ec2') {
+      // EC2: Use ComputeSP 3yr equivalent (40% discount from on-demand)
+      baselineInsuranceCommitment = onDemandRate * hours * res.quantity * 0.60
     } else {
-      // Final fallback: use on-demand with 60% discount (typical 3yr discount)
-      baseline3yrNoUpfront = onDemandRate * hours * res.quantity * 0.40
+      // Other services: fallback chain
+      if (resourcePricing.standard_ri && resourcePricing.standard_ri['3yr'] && resourcePricing.standard_ri['3yr']['NoUpfront']) {
+        const riPlan = resourcePricing.standard_ri['3yr']['NoUpfront']
+        baselineInsuranceCommitment = riPlan.hourly_usd * hours * res.quantity
+      } else if (resourcePricing.savings_plans && resourcePricing.savings_plans['3yr']) {
+        baselineInsuranceCommitment = resourcePricing.savings_plans['3yr'].hourly_usd * hours * res.quantity
+      } else {
+        // Final fallback: use on-demand with 60% discount (40% off)
+        baselineInsuranceCommitment = onDemandRate * hours * res.quantity * 0.40
+      }
     }
     
     // CRITICAL: Insurance Commitment cost is FIXED (always baseline, NOT affected by coverage)
-    // The insurance commitment is based on 3yr NoUpfront for ALL resources at 100% usage
+    // For EC2: based on ComputeSP 3yr (40% discount from on-demand)
+    // For other services: based on 3yr NoUpfront for ALL resources at 100% usage
     // Coverage does NOT change the insurance commitment cost itself
-    const insuranceCoveredCost = baseline3yrNoUpfront
+    const insuranceCoveredCost = baselineInsuranceCommitment
     
     // On-demand cost for covered portion (use actual usage rate)
     const onDemandCoveredCost = onDemandRate * hours * coverageQty * usage
