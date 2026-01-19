@@ -139,7 +139,7 @@ export default function CustomerCostComparison({ baselineCost, insurance, standa
             <div className="text-sm text-accent-700 mb-2">✅ 保険コミットメントの特徴</div>
             <ul className="text-xs text-secondary-700 space-y-1">
               <li>• 初期費用ゼロで導入可能</li>
-              <li>• 使用量に応じて返金あり</li>
+              <li>• Savingsの損失に応じて返金あり</li>
               <li>• 柔軟な契約期間（30日/1年）</li>
               <li>• 高いコスト削減効果</li>
             </ul>
