@@ -13,9 +13,10 @@ interface CumulativeChartProps {
   cumulative: CumulativeData
   standardPlan: PlanResult
   insurancePlan: PlanResult
+  isMSPMode?: boolean
 }
 
-export default function CumulativeChart({ cumulative, standardPlan, insurancePlan }: CumulativeChartProps) {
+export default function CumulativeChart({ cumulative, standardPlan, insurancePlan, isMSPMode = true }: CumulativeChartProps) {
   // Calculate total contract expenditure (constant for all months)
   // Total = Initial cost + (Monthly cost × Contract term)
   const termMonths = cumulative.months.length

@@ -4,9 +4,10 @@ import { SearchIcon } from '@/components/icons'
 
 interface DetailsTableProps {
   details: DetailItem[]
+  isMSPMode?: boolean
 }
 
-export default function DetailsTable({ details }: DetailsTableProps) {
+export default function DetailsTable({ details, isMSPMode = true }: DetailsTableProps) {
   return (
     <div className="bg-white rounded-xl shadow-lg p-6 border border-secondary-200">
       <h3 className="text-xl font-bold text-secondary-900 mb-4 flex items-center gap-2">
@@ -21,12 +22,12 @@ export default function DetailsTable({ details }: DetailsTableProps) {
               <th className="px-4 py-3 text-left font-semibold text-secondary-700">リソース</th>
               <th className="px-4 py-3 text-right font-semibold text-secondary-700">通常価格</th>
               <th className="px-4 py-3 text-right font-semibold text-secondary-700">保険コミットメント</th>
-              <th className="px-4 py-3 text-right font-semibold text-secondary-700">保険料</th>
+              {isMSPMode && <th className="px-4 py-3 text-right font-semibold text-secondary-700">保険料</th>}
               <th className="px-4 py-3 text-right font-semibold text-secondary-700">返金見込</th>
-              <th className="px-4 py-3 text-right font-semibold text-secondary-700">保険削減額</th>
+              <th className="px-4 py-3 text-right font-semibold text-secondary-700">{isMSPMode ? '保険削減額' : 'コスト削減'}</th>
               <th className="px-4 py-3 text-right font-semibold text-secondary-700">標準RI/SP</th>
               <th className="px-4 py-3 text-right font-semibold text-secondary-700">標準初期コスト</th>
-              <th className="px-4 py-3 text-right font-semibold text-secondary-700">標準削減額</th>
+              <th className="px-4 py-3 text-right font-semibold text-secondary-700">{isMSPMode ? '標準削減額' : 'コスト削減'}</th>
             </tr>
           </thead>
           <tbody>
@@ -35,7 +36,7 @@ export default function DetailsTable({ details }: DetailsTableProps) {
                 <td className="px-4 py-3 font-semibold text-secondary-900">{detail.resource}</td>
                 <td className="px-4 py-3 text-right text-secondary-700">{formatCurrency(detail.baseline_cost)}</td>
                 <td className="px-4 py-3 text-right text-secondary-700">{formatCurrency(detail.insurance_cost)}</td>
-                <td className="px-4 py-3 text-right text-secondary-700">{formatCurrency(detail.insurance_premium)}</td>
+                {isMSPMode && <td className="px-4 py-3 text-right text-secondary-700">{formatCurrency(detail.insurance_premium)}</td>}
                 <td className="px-4 py-3 text-right font-medium text-accent-600">
                   {formatCurrency(detail.insurance_expected_refund)}
                 </td>

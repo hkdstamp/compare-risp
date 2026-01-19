@@ -6,9 +6,10 @@ interface CostCardsProps {
   baselineCost: number
   insurance: PlanResult
   standard: PlanResult
+  isMSPMode?: boolean
 }
 
-export default function CostCards({ baselineCost, insurance, standard }: CostCardsProps) {
+export default function CostCards({ baselineCost, insurance, standard, isMSPMode = true }: CostCardsProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       {/* Baseline Card */}
@@ -41,7 +42,7 @@ export default function CostCards({ baselineCost, insurance, standard }: CostCar
           </div>
           <div className="bg-success-50 px-3 py-2 rounded-lg border border-success-200">
             <div className="text-sm font-semibold text-success-700">
-              月間削減額: {formatCurrency(insurance.monthly_savings)}
+              {isMSPMode ? '月間削減額' : 'コスト削減'}: {formatCurrency(insurance.monthly_savings)}
             </div>
             {insurance.expected_refund && insurance.expected_refund > 0 && (
               <div className="text-xs text-success-600 mt-1">
@@ -49,7 +50,9 @@ export default function CostCards({ baselineCost, insurance, standard }: CostCar
               </div>
             )}
           </div>
-          <div className="text-sm text-secondary-600">保険料: {formatCurrency(insurance.premium)}</div>
+          {isMSPMode && (
+            <div className="text-sm text-secondary-600">保険料: {formatCurrency(insurance.premium)}</div>
+          )}
           {insurance.expected_refund && insurance.expected_refund > 0 && (
             <div className="flex items-center gap-2 text-sm text-accent-600 font-medium">
               <CoinsIcon size={16} />
@@ -57,7 +60,7 @@ export default function CostCards({ baselineCost, insurance, standard }: CostCar
             </div>
           )}
           <div className="text-sm text-secondary-600">
-            損益分岐: {insurance.break_even_months ? `${insurance.break_even_months}ヶ月` : '-'}
+            {isMSPMode ? '損益分岐' : 'コスト回収期間'}: {insurance.break_even_months ? `${insurance.break_even_months}ヶ月` : '-'}
           </div>
         </div>
       </div>
@@ -77,11 +80,11 @@ export default function CostCards({ baselineCost, insurance, standard }: CostCar
             <div className="text-xs text-secondary-500 mt-1">※ 適用されない分のオンデマンドコストを含みます</div>
           </div>
           <div className="bg-primary-50 px-3 py-2 rounded-lg border border-primary-200">
-            <div className="text-sm font-semibold text-primary-700">削減額: {formatCurrency(standard.monthly_savings)}</div>
+            <div className="text-sm font-semibold text-primary-700">{isMSPMode ? '削減額' : 'コスト削減'}: {formatCurrency(standard.monthly_savings)}</div>
           </div>
           <div className="text-sm text-secondary-600">初期コスト: {formatCurrency(standard.initial_cost)}</div>
           <div className="text-sm text-secondary-600">
-            損益分岐: {standard.break_even_months ? `${standard.break_even_months}ヶ月` : '-'}
+            {isMSPMode ? '損益分岐' : 'コスト回収期間'}: {standard.break_even_months ? `${standard.break_even_months}ヶ月` : '-'}
           </div>
         </div>
       </div>
