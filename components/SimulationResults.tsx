@@ -14,9 +14,10 @@ interface SimulationResultsProps {
   insurancePlanKey: string
   usage: number
   resources: ResourceConfig[]
+  isMSPMode?: boolean
 }
 
-export default function SimulationResults({ result, insurancePlanKey, usage, resources }: SimulationResultsProps) {
+export default function SimulationResults({ result, insurancePlanKey, usage, resources, isMSPMode = true }: SimulationResultsProps) {
   const revenueDiff = result.insurance.monthly_savings - result.standard.monthly_savings
 
   return (
@@ -25,35 +26,42 @@ export default function SimulationResults({ result, insurancePlanKey, usage, res
         baselineCost={result.baseline_cost}
         insurance={result.insurance}
         standard={result.standard}
+        isMSPMode={isMSPMode}
       />
 
-      <RevenueHighlight
-        insuranceSavings={result.insurance.monthly_savings}
-        standardSavings={result.standard.monthly_savings}
-        revenueDiff={revenueDiff}
-      />
+      {isMSPMode && (
+        <RevenueHighlight
+          insuranceSavings={result.insurance.monthly_savings}
+          standardSavings={result.standard.monthly_savings}
+          revenueDiff={revenueDiff}
+        />
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <CumulativeChart 
           cumulative={result.cumulative}
           standardPlan={result.standard}
           insurancePlan={result.insurance}
+          isMSPMode={isMSPMode}
         />
         <MonthlyChart
           baselineCost={result.baseline_cost}
           insurance={result.insurance}
           standard={result.standard}
+          isMSPMode={isMSPMode}
         />
       </div>
 
-      <DetailsTable details={result.details} />
+      <DetailsTable details={result.details} isMSPMode={isMSPMode} />
 
-      <RevenueForecastReport 
-        result={result}
-        insurancePlanKey={insurancePlanKey}
-        usage={usage}
-        resources={resources}
-      />
+      {isMSPMode && (
+        <RevenueForecastReport 
+          result={result}
+          insurancePlanKey={insurancePlanKey}
+          usage={usage}
+          resources={resources}
+        />
+      )}
     </section>
   )
 }

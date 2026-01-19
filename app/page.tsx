@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import SimulationConfig from '@/components/SimulationConfig'
 import SimulationResults from '@/components/SimulationResults'
 import Header from '@/components/Header'
@@ -16,12 +17,16 @@ interface PostMessageData {
   [key: string]: any;
 }
 
-export default function Home() {
+function HomeContent() {
+  const searchParams = useSearchParams()
   const [simulationResult, setSimulationResult] = useState<SimulationResult | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [resources, setResources] = useState<ResourceConfig[]>(defaultResources)
   const [simulationParams, setSimulationParams] = useState<any>(null)
   const [isEmbedded, setIsEmbedded] = useState(true)
+  
+  // モード判定: URLパラメータ mode=customer なら顧客モード、それ以外はMSPモード
+  const isMSPMode = searchParams.get('mode') !== 'customer'
 
   // PostMessage APIの初期化
   useEffect(() => {
@@ -194,6 +199,7 @@ export default function Home() {
               insurancePlanKey={simulationParams.insurance}
               usage={simulationParams.usage}
               resources={resources}
+              isMSPMode={isMSPMode}
             />
           )}
         </main>
@@ -201,5 +207,13 @@ export default function Home() {
         <Footer />
       </div>
     </div>
+  )
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <HomeContent />
+    </Suspense>
   )
 }

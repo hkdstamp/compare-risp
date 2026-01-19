@@ -12,11 +12,12 @@ interface MonthlyChartProps {
   baselineCost: number
   insurance: PlanResult
   standard: PlanResult
+  isMSPMode?: boolean
 }
 
-export default function MonthlyChart({ baselineCost, insurance, standard }: MonthlyChartProps) {
+export default function MonthlyChart({ baselineCost, insurance, standard, isMSPMode = true }: MonthlyChartProps) {
   const data = {
-    labels: ['月次コスト', '月次削減額'],
+    labels: ['月次コスト', isMSPMode ? '月次削減額' : 'コスト削減'],
     datasets: [
       {
         label: '通常価格',
