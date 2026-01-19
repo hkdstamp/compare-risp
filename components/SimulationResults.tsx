@@ -8,6 +8,7 @@ import CumulativeChart from './ui/CumulativeChart'
 import MonthlyChart from './ui/MonthlyChart'
 import DetailsTable from './ui/DetailsTable'
 import RevenueForecastReport from './ui/RevenueForecastReport'
+import CustomerCostComparison from './ui/CustomerCostComparison'
 
 interface SimulationResultsProps {
   result: SimulationResult
@@ -34,6 +35,14 @@ export default function SimulationResults({ result, insurancePlanKey, usage, res
           insuranceSavings={result.insurance.monthly_savings}
           standardSavings={result.standard.monthly_savings}
           revenueDiff={revenueDiff}
+        />
+      )}
+
+      {!isMSPMode && (
+        <CustomerCostComparison
+          baselineCost={result.baseline_cost}
+          insurance={result.insurance}
+          standard={result.standard}
         />
       )}
 
