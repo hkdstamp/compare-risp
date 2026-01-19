@@ -1,6 +1,6 @@
 import { PlanResult } from '@/lib/types'
 import { formatCurrency } from '@/lib/utils'
-import { TrendingDownIcon, ShieldIcon, FileTextIcon, CoinsIcon } from '@/components/icons'
+import { ChartBarIcon, ShieldIcon, FileTextIcon, CoinsIcon, TrendingUpIcon } from '@/components/icons'
 
 interface CustomerCostComparisonProps {
   baselineCost: number
@@ -19,7 +19,7 @@ export default function CustomerCostComparison({ baselineCost, insurance, standa
   return (
     <div className="bg-gradient-to-br from-primary-50 to-accent-50 rounded-xl shadow-lg p-6 border-2 border-primary-200">
       <h3 className="text-2xl font-bold text-secondary-900 mb-6 flex items-center gap-3">
-        <TrendingDownIcon size={28} className="text-primary-600" />
+        <ChartBarIcon size={28} className="text-primary-600" />
         コスト削減効果の比較
       </h3>
       
@@ -28,7 +28,7 @@ export default function CustomerCostComparison({ baselineCost, insurance, standa
         <div className="bg-white rounded-lg p-5 shadow-md border border-secondary-200">
           <div className="flex items-center gap-2 mb-3">
             <div className="p-2 bg-secondary-100 rounded-lg">
-              <TrendingDownIcon size={20} className="text-secondary-600" />
+              <TrendingUpIcon size={20} className="text-secondary-600" />
             </div>
             <h4 className="font-bold text-secondary-900">通常価格</h4>
           </div>
