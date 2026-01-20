@@ -172,16 +172,6 @@ export default function ResourceSelector({ resources, onChange }: ResourceSelect
         </div>
       </div>
 
-      <div className="mt-3 p-3 bg-warning-50 border border-warning-200 rounded-lg">
-        <div className="flex items-start gap-2">
-          <InfoIcon size={18} className="text-warning-600 flex-shrink-0 mt-0.5" />
-          <div className="text-xs text-warning-900">
-            <p className="font-semibold">⚠️ 注意事項：</p>
-            <p className="mt-1">対象リソースにサービスが複数混在する場合、未提供のSPを考慮して計算していないためご留意ください。</p>
-          </div>
-        </div>
-      </div>
-
       <div className="mt-4 flex items-center justify-between p-4 bg-secondary-100 rounded-lg border border-secondary-200">
         <div>
           <span className="text-sm font-medium text-secondary-700">合計リソース数: </span>
