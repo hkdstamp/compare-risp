@@ -190,7 +190,7 @@ export default function DiscountRateInfo() {
                 </div>
 
                 {/* EC2 Savings Plans */}
-                <h5 className="font-semibold text-secondary-800 mb-2 mt-4">EC2 Savings Plans (EC2-SP)</h5>
+                <h5 className="font-semibold text-secondary-800 mb-2 mt-4">EC2 Instance Savings Plans (EC2-SP)</h5>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm border-collapse">
                     <thead>
@@ -204,15 +204,15 @@ export default function DiscountRateInfo() {
                     <tbody>
                       <tr className="hover:bg-secondary-50">
                         <td className="border border-secondary-300 px-4 py-2 text-secondary-900">1年</td>
-                        <td className="border border-secondary-300 px-4 py-2 text-center font-semibold text-primary-600">20.0%</td>
+                        <td className="border border-secondary-300 px-4 py-2 text-center font-semibold text-primary-600">40.0%</td>
                         <td className="border border-secondary-300 px-4 py-2 text-right text-secondary-900">$0</td>
-                        <td className="border border-secondary-300 px-4 py-2 text-right text-secondary-900">$63.54</td>
+                        <td className="border border-secondary-300 px-4 py-2 text-right text-secondary-900">$47.67</td>
                       </tr>
                       <tr className="hover:bg-secondary-50">
                         <td className="border border-secondary-300 px-4 py-2 text-secondary-900">3年</td>
-                        <td className="border border-secondary-300 px-4 py-2 text-center font-semibold text-primary-600">40.0%</td>
+                        <td className="border border-secondary-300 px-4 py-2 text-center font-semibold text-primary-600">60.0%</td>
                         <td className="border border-secondary-300 px-4 py-2 text-right text-secondary-900">$0</td>
-                        <td className="border border-secondary-300 px-4 py-2 text-right text-secondary-900">$47.65</td>
+                        <td className="border border-secondary-300 px-4 py-2 text-right text-secondary-900">$31.75</td>
                       </tr>
                     </tbody>
                   </table>
@@ -220,8 +220,10 @@ export default function DiscountRateInfo() {
                 <div className="mt-3 text-xs text-secondary-600 space-y-1">
                   <p>✅ 初期費用ゼロ（全額後払い）</p>
                   <p>✅ EC2 インスタンスのみに適用</p>
-                  <p>✅ インスタンスファミリー、リージョン、OS、テナンシーを指定可能</p>
+                  <p>✅ インスタンスファミリー内で柔軟に適用可能</p>
+                  <p>✅ RIよりも高い割引率（1年40%, 3年60%）</p>
                   <p>⚠️ <strong>重要：</strong>非EC2リソース（RDS等）は RI 3年 NoUpfront で算出</p>
+                  <p>ℹ️ <strong>計算基準：</strong>東京リージョンの実際の料金データを使用</p>
                 </div>
               </section>
 

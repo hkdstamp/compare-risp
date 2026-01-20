@@ -102,6 +102,11 @@ export interface PricingCatalog {
             hourly_usd: number
           }
         }
+        ec2_savings_plans?: {
+          [term: string]: {
+            hourly_usd: number
+          }
+        }
       }
     }
   }
