@@ -468,9 +468,7 @@ export const pricingCatalog: PricingCatalog = {
 }
 
 export const defaultResources: ResourceConfig[] = [
-  { service: "ec2", instance: "t3.large", quantity: 3, usage: 1.0, coverage: 1.0 },
-  { service: "ec2", instance: "t3.xlarge", quantity: 2, usage: 1.0, coverage: 1.0 },
-  { service: "rds", instance: "db.t4g.large", quantity: 2, usage: 1.0, coverage: 1.0 }
+  { service: "ec2", instance: "t3.large", quantity: 3, usage: 1.0, coverage: 1.0 }
 ]
 
 // Service and instance type metadata for UI
