@@ -93,7 +93,7 @@ export default function DiscountRateInfo() {
                 </h4>
                 <div className="bg-primary-50 border-l-4 border-primary-500 p-4 mb-4">
                   <p className="text-sm text-secondary-700">
-                    <strong>注記：</strong>SPは、ComputeSavingsPlansから簡易的に算定
+                    <strong>注記：</strong>SPはEC2のみ適用可能。RDS、ElastiCache等はRIのみ対応
                   </p>
                 </div>
 
@@ -185,6 +185,7 @@ export default function DiscountRateInfo() {
                   <p>✅ 初期費用ゼロ（全額後払い）</p>
                   <p>✅ インスタンスファミリー、リージョン、OSをまたいで適用可能</p>
                   <p>✅ 柔軟性が高く、RIより使いやすい</p>
+                  <p>⚠️ <strong>EC2専用：</strong>RDS、ElastiCache等ではRIに自動フォールバック</p>
                 </div>
               </section>
 
@@ -201,7 +202,7 @@ export default function DiscountRateInfo() {
                   </div>
                   <div className="flex items-start gap-2">
                     <span className="text-primary-600 font-bold">2.</span>
-                    <p className="text-secondary-700"><strong>初期費用を避けたい：</strong>RI 3年 NoUpfront (56.8%) または SP 3年 (40.0%)</p>
+                    <p className="text-secondary-700"><strong>初期費用を避けたい：</strong>RI 3年 NoUpfront (56.8%) または SP 3年 (40.0% ※EC2のみ)</p>
                   </div>
                   <div className="flex items-start gap-2">
                     <span className="text-primary-600 font-bold">3.</span>
@@ -214,8 +215,69 @@ export default function DiscountRateInfo() {
                 </div>
               </section>
 
+              {/* Service Support Section */}
+              <section className="bg-amber-50 border-l-4 border-amber-500 rounded-r-lg p-4">
+                <h4 className="text-sm font-bold text-secondary-900 mb-2 flex items-center gap-2">
+                  <InfoIcon size={18} className="text-amber-600" />
+                  サービス別サポート状況
+                </h4>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs border-collapse">
+                    <thead>
+                      <tr className="bg-amber-100">
+                        <th className="border border-amber-300 px-3 py-2 text-left text-secondary-700">サービス</th>
+                        <th className="border border-amber-300 px-3 py-2 text-center text-secondary-700">Savings Plans</th>
+                        <th className="border border-amber-300 px-3 py-2 text-center text-secondary-700">Reserved Instances</th>
+                        <th className="border border-amber-300 px-3 py-2 text-left text-secondary-700">シミュレーター動作</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr className="hover:bg-amber-50">
+                        <td className="border border-amber-300 px-3 py-2 font-semibold">EC2</td>
+                        <td className="border border-amber-300 px-3 py-2 text-center text-success-600">✅ 対応</td>
+                        <td className="border border-amber-300 px-3 py-2 text-center text-success-600">✅ 対応</td>
+                        <td className="border border-amber-300 px-3 py-2 text-xs">SP選択時はSP適用</td>
+                      </tr>
+                      <tr className="hover:bg-amber-50">
+                        <td className="border border-amber-300 px-3 py-2 font-semibold">RDS</td>
+                        <td className="border border-amber-300 px-3 py-2 text-center text-error-600">❌ 非対応</td>
+                        <td className="border border-amber-300 px-3 py-2 text-center text-success-600">✅ 対応</td>
+                        <td className="border border-amber-300 px-3 py-2 text-xs">SP選択時は自動的にRI適用</td>
+                      </tr>
+                      <tr className="hover:bg-amber-50">
+                        <td className="border border-amber-300 px-3 py-2 font-semibold">ElastiCache</td>
+                        <td className="border border-amber-300 px-3 py-2 text-center text-error-600">❌ 非対応</td>
+                        <td className="border border-amber-300 px-3 py-2 text-center text-success-600">✅ 対応</td>
+                        <td className="border border-amber-300 px-3 py-2 text-xs">SP選択時は自動的にRI適用</td>
+                      </tr>
+                      <tr className="hover:bg-amber-50">
+                        <td className="border border-amber-300 px-3 py-2 font-semibold">OpenSearch</td>
+                        <td className="border border-amber-300 px-3 py-2 text-center text-error-600">❌ 非対応</td>
+                        <td className="border border-amber-300 px-3 py-2 text-center text-success-600">✅ 対応</td>
+                        <td className="border border-amber-300 px-3 py-2 text-xs">SP選択時は自動的にRI適用</td>
+                      </tr>
+                      <tr className="hover:bg-amber-50">
+                        <td className="border border-amber-300 px-3 py-2 font-semibold">Redshift</td>
+                        <td className="border border-amber-300 px-3 py-2 text-center text-error-600">❌ 非対応</td>
+                        <td className="border border-amber-300 px-3 py-2 text-center text-success-600">✅ 対応</td>
+                        <td className="border border-amber-300 px-3 py-2 text-xs">SP選択時は自動的にRI適用</td>
+                      </tr>
+                      <tr className="hover:bg-amber-50">
+                        <td className="border border-amber-300 px-3 py-2 font-semibold">DynamoDB</td>
+                        <td className="border border-amber-300 px-3 py-2 text-center text-error-600">❌ 非対応</td>
+                        <td className="border border-amber-300 px-3 py-2 text-center text-amber-600">⚠️ Reserved Capacity</td>
+                        <td className="border border-amber-300 px-3 py-2 text-xs">独自の予約システム</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <p className="text-xs text-amber-800 mt-2">
+                  ⚠️ <strong>重要：</strong>複数サービスを混在させてSPを選択すると、EC2以外は自動的にRI NoUpfrontで計算されます
+                </p>
+              </section>
+
               {/* Footer Note */}
-              <div className="text-xs text-secondary-500 border-t border-secondary-200 pt-4">
+              <div className="text-xs text-secondary-500 border-t border-secondary-200 pt-4 mt-4">
                 <p>※ EC2 t3.large (オンデマンド $0.1088/時間、730時間/月、$79.42/月) を基準とした計算例</p>
                 <p>※ 実際の料金は、リージョン、インスタンスタイプ、利用時間により異なります</p>
               </div>
