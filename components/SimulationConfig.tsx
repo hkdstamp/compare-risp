@@ -13,7 +13,7 @@ interface SimulationConfigProps {
 export default function SimulationConfig({ onSimulate, isLoading }: SimulationConfigProps) {
   const [insurance, setInsurance] = useState('1y')
   const [standardTerm, setStandardTerm] = useState('1yr')
-  const [standardOption, setStandardOption] = useState('NoUpfront')
+  const [standardOption, setStandardOption] = useState('SavingsPlan')
   const [coverage, setCoverage] = useState(100)
   const [usage, setUsage] = useState(100)
 
@@ -30,7 +30,7 @@ export default function SimulationConfig({ onSimulate, isLoading }: SimulationCo
   const handleReset = () => {
     setInsurance('1y')
     setStandardTerm('1yr')
-    setStandardOption('NoUpfront')
+    setStandardOption('SavingsPlan')
     setCoverage(100)
     setUsage(100)
   }
