@@ -184,8 +184,44 @@ export default function DiscountRateInfo() {
                 <div className="mt-3 text-xs text-secondary-600 space-y-1">
                   <p>✅ 初期費用ゼロ（全額後払い）</p>
                   <p>✅ インスタンスファミリー、リージョン、OSをまたいで適用可能</p>
+                  <p>✅ EC2、Lambda、Fargate に適用可能</p>
                   <p>✅ 柔軟性が高く、RIより使いやすい</p>
-                  <p>⚠️ <strong>EC2専用：</strong>RDS、ElastiCache等ではRIに自動フォールバック</p>
+                  <p>⚠️ RDS、ElastiCache等ではRIに自動フォールバック</p>
+                </div>
+
+                {/* EC2 Savings Plans */}
+                <h5 className="font-semibold text-secondary-800 mb-2 mt-4">EC2 Savings Plans (EC2-SP)</h5>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm border-collapse">
+                    <thead>
+                      <tr className="bg-secondary-100">
+                        <th className="border border-secondary-300 px-4 py-2 text-left text-secondary-700">契約期間</th>
+                        <th className="border border-secondary-300 px-4 py-2 text-center text-secondary-700">割引率</th>
+                        <th className="border border-secondary-300 px-4 py-2 text-right text-secondary-700">初期費用</th>
+                        <th className="border border-secondary-300 px-4 py-2 text-right text-secondary-700">月額料金<br/>(EC2 t3.large)</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr className="hover:bg-secondary-50">
+                        <td className="border border-secondary-300 px-4 py-2 text-secondary-900">1年</td>
+                        <td className="border border-secondary-300 px-4 py-2 text-center font-semibold text-primary-600">20.0%</td>
+                        <td className="border border-secondary-300 px-4 py-2 text-right text-secondary-900">$0</td>
+                        <td className="border border-secondary-300 px-4 py-2 text-right text-secondary-900">$63.54</td>
+                      </tr>
+                      <tr className="hover:bg-secondary-50">
+                        <td className="border border-secondary-300 px-4 py-2 text-secondary-900">3年</td>
+                        <td className="border border-secondary-300 px-4 py-2 text-center font-semibold text-primary-600">40.0%</td>
+                        <td className="border border-secondary-300 px-4 py-2 text-right text-secondary-900">$0</td>
+                        <td className="border border-secondary-300 px-4 py-2 text-right text-secondary-900">$47.65</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div className="mt-3 text-xs text-secondary-600 space-y-1">
+                  <p>✅ 初期費用ゼロ（全額後払い）</p>
+                  <p>✅ EC2 インスタンスのみに適用</p>
+                  <p>✅ インスタンスファミリー、リージョン、OS、テナンシーを指定可能</p>
+                  <p>⚠️ <strong>重要：</strong>非EC2リソース（RDS等）は RI 3年 NoUpfront で算出</p>
                 </div>
               </section>
 

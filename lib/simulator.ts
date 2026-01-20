@@ -176,7 +176,8 @@ export function calculateStandardPlan(
   const termMonths = term === '1yr' ? 12 : 36
 
   // Check if this is a Savings Plan
-  const isSavingsPlan = option === 'SavingsPlan'
+  const isSavingsPlan = option === 'SavingsPlan' || option === 'EC2-SavingsPlan'
+  const isEC2SavingsPlan = option === 'EC2-SavingsPlan'
 
   for (const res of resources) {
     const resourcePricing = catalog.resources[res.service][res.instance]
@@ -188,13 +189,22 @@ export function calculateStandardPlan(
     if (isSavingsPlan) {
       // Use Savings Plans pricing
       if (!resourcePricing.savings_plans || !resourcePricing.savings_plans[term]) {
-        // Fallback to RI NoUpfront if SP not available
+        // Fallback to RI NoUpfront if SP not available (for non-EC2 resources)
         const plan = resourcePricing.standard_ri[term]['NoUpfront']
         reservedRate = plan.hourly_usd
         upfront = 0
       } else {
-        reservedRate = resourcePricing.savings_plans[term].hourly_usd
-        upfront = 0  // Savings Plans have no upfront payment
+        // For EC2-SavingsPlan, only EC2 resources use SP pricing; others use RI 3yr NoUpfront
+        if (isEC2SavingsPlan && res.service !== 'ec2') {
+          // Non-EC2 resources: use RI 3yr NoUpfront
+          const plan = resourcePricing.standard_ri['3yr']['NoUpfront']
+          reservedRate = plan.hourly_usd
+          upfront = 0
+        } else {
+          // EC2 resources or Compute Savings Plan: use SP pricing
+          reservedRate = resourcePricing.savings_plans[term].hourly_usd
+          upfront = 0  // Savings Plans have no upfront payment
+        }
       }
     } else {
       // Use Reserved Instance pricing
