@@ -210,10 +210,6 @@ export const pricingCatalog: PricingCatalog = {
             PartialUpfront: { hourly_usd: 0.0504, upfront_usd: 1325 },
             AllUpfront: { hourly_usd: 0.0, upfront_usd: 2596 }
           }
-        },
-        savings_plans: {
-          "1yr": { hourly_usd: 0.34816 },  // 20% discount from on-demand
-          "3yr": { hourly_usd: 0.26112 }   // 40% discount from on-demand
         }
       },
       "db.m5.large": {
