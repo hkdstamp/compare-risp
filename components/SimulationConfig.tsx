@@ -99,6 +99,7 @@ export default function SimulationConfig({ onSimulate, isLoading }: SimulationCo
             </optgroup>
             <optgroup label="Savings Plans (SP)">
               <option value="SavingsPlan">SP - Compute Savings Plan</option>
+              <option value="EC2-SavingsPlan">SP - EC2 Savings Plan</option>
             </optgroup>
           </select>
         </div>
