@@ -67,8 +67,12 @@ export const pricingCatalog: PricingCatalog = {
           }
         },
         savings_plans: {
-          "1yr": { hourly_usd: 0.08704 },  // 20% discount from on-demand
-          "3yr": { hourly_usd: 0.06528 }   // 40% discount from on-demand
+          "1yr": { hourly_usd: 0.08704 },  // Compute SP: 20% discount
+          "3yr": { hourly_usd: 0.06528 }   // Compute SP: 40% discount
+        },
+        ec2_savings_plans: {
+          "1yr": { hourly_usd: 0.0653 },   // EC2 Instance SP: ~40% discount
+          "3yr": { hourly_usd: 0.0435 }    // EC2 Instance SP: ~60% discount
         }
       },
       "t3.xlarge": {
@@ -86,8 +90,12 @@ export const pricingCatalog: PricingCatalog = {
           }
         },
         savings_plans: {
-          "1yr": { hourly_usd: 0.17408 },  // 20% discount from on-demand
-          "3yr": { hourly_usd: 0.13056 }   // 40% discount from on-demand
+          "1yr": { hourly_usd: 0.17408 },  // Compute SP: 20% discount
+          "3yr": { hourly_usd: 0.13056 }   // Compute SP: 40% discount
+        },
+        ec2_savings_plans: {
+          "1yr": { hourly_usd: 0.1306 },   // EC2 Instance SP: ~40% discount
+          "3yr": { hourly_usd: 0.0870 }    // EC2 Instance SP: ~60% discount
         }
       },
       "t3.2xlarge": {
@@ -103,6 +111,14 @@ export const pricingCatalog: PricingCatalog = {
             PartialUpfront: { hourly_usd: 0.087, upfront_usd: 2288 },
             AllUpfront: { hourly_usd: 0.0, upfront_usd: 4300 }
           }
+        },
+        savings_plans: {
+          "1yr": { hourly_usd: 0.34816 },  // Compute SP: 20% discount
+          "3yr": { hourly_usd: 0.26112 }   // Compute SP: 40% discount
+        },
+        ec2_savings_plans: {
+          "1yr": { hourly_usd: 0.2612 },   // EC2 Instance SP: ~40% discount
+          "3yr": { hourly_usd: 0.1740 }    // EC2 Instance SP: ~60% discount
         }
       },
       "m5.large": {

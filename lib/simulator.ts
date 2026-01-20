@@ -188,22 +188,29 @@ export function calculateStandardPlan(
 
     if (isSavingsPlan) {
       // Use Savings Plans pricing
-      if (!resourcePricing.savings_plans || !resourcePricing.savings_plans[term]) {
-        // Fallback to RI NoUpfront if SP not available (for non-EC2 resources)
-        const plan = resourcePricing.standard_ri[term]['NoUpfront']
-        reservedRate = plan.hourly_usd
-        upfront = 0
-      } else {
-        // For EC2-SavingsPlan, only EC2 resources use SP pricing; others use RI 3yr NoUpfront
-        if (isEC2SavingsPlan && res.service !== 'ec2') {
+      if (isEC2SavingsPlan) {
+        // EC2 Instance Savings Plans
+        if (res.service === 'ec2' && resourcePricing.ec2_savings_plans && resourcePricing.ec2_savings_plans[term]) {
+          // EC2 resources: use EC2 Instance SP pricing
+          reservedRate = resourcePricing.ec2_savings_plans[term].hourly_usd
+          upfront = 0
+        } else {
           // Non-EC2 resources: use RI 3yr NoUpfront
           const plan = resourcePricing.standard_ri['3yr']['NoUpfront']
           reservedRate = plan.hourly_usd
           upfront = 0
+        }
+      } else {
+        // Compute Savings Plans
+        if (!resourcePricing.savings_plans || !resourcePricing.savings_plans[term]) {
+          // Fallback to RI NoUpfront if Compute SP not available
+          const plan = resourcePricing.standard_ri[term]['NoUpfront']
+          reservedRate = plan.hourly_usd
+          upfront = 0
         } else {
-          // EC2 resources or Compute Savings Plan: use SP pricing
+          // Use Compute SP pricing
           reservedRate = resourcePricing.savings_plans[term].hourly_usd
-          upfront = 0  // Savings Plans have no upfront payment
+          upfront = 0
         }
       }
     } else {
