@@ -4,7 +4,7 @@ export default function Header() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent">
-            Ripple 保険コミットメント 収益シミュレーター
+            Ripple コミットメント保証 収益シミュレーター
           </h1>
           <p className="text-gray-600 mt-2">
             Ripple/Wave向けコスト最適化・収益モデル分析ツール 

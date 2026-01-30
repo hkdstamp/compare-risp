@@ -52,15 +52,15 @@ export default function SimulationConfig({ onSimulate, isLoading }: SimulationCo
         <div className="flex flex-col">
           <label className="flex items-center gap-2 font-semibold text-secondary-700 mb-2">
             <ShieldIcon size={20} className="text-accent-600" />
-            保険コミットメントプラン
+            コミットメント保証プラン
           </label>
           <select
             value={insurance}
             onChange={(e) => setInsurance(e.target.value)}
             className="px-4 py-2 border border-secondary-300 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition bg-white text-secondary-900"
           >
-            <option value="30d">30日保証 (40%割引 / 50%保険料)</option>
-            <option value="1y">1年保証 (40%割引 / 33%保険料)</option>
+            <option value="30d">30日保証 (40%割引 / 50%リスクプレミアム料)</option>
+            <option value="1y">1年保証 (40%割引 / 33%リスクプレミアム料)</option>
           </select>
           <small className="text-secondary-500 mt-1">保証期間終了後、Savingsの損失分は返金</small>
         </div>
@@ -148,7 +148,7 @@ export default function SimulationConfig({ onSimulate, isLoading }: SimulationCo
           <div>
             <p className="text-sm text-secondary-700 font-medium mb-1">重要な注意事項</p>
             <p className="text-sm text-secondary-600">
-              対象リソースのサービスに対応する標準RI/SPが１年契約のみの場合、１年保証の保険コミットメントは提供されません。本シミュレーションでは考慮していないため、ご留意ください。
+              対象リソースのサービスに対応する標準RI/SPが１年契約のみの場合、１年保証のコミットメント保証は提供されません。本シミュレーションでは考慮していないため、ご留意ください。
             </p>
           </div>
         </div>

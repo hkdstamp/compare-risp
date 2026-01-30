@@ -32,7 +32,7 @@ export default function CostCards({ baselineCost, insurance, standard, isMSPMode
           <div className="p-2 bg-accent-100 rounded-lg">
             <ShieldIcon size={28} className="text-accent-600" />
           </div>
-          <h3 className="text-lg font-bold text-secondary-900">保険コミットメント</h3>
+          <h3 className="text-lg font-bold text-secondary-900">コミットメント保証</h3>
         </div>
         <div className="space-y-3">
           <div>
@@ -51,7 +51,7 @@ export default function CostCards({ baselineCost, insurance, standard, isMSPMode
             )}
           </div>
           {isMSPMode && (
-            <div className="text-sm text-secondary-600">保険料: {formatCurrency(insurance.premium)}</div>
+            <div className="text-sm text-secondary-600">リスクプレミアム料: {formatCurrency(insurance.premium)}</div>
           )}
           {insurance.expected_refund && insurance.expected_refund > 0 && (
             <div className="flex items-center gap-2 text-sm text-accent-600 font-medium">

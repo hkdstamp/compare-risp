@@ -79,7 +79,7 @@ export default function RevenueForecastReport({
       const premium = planResult.result.premium
       const expectedRefund = planResult.result.expected_refund || 0
 
-      // レベニュー = 保険料の20% (保険料が0の場合は0)
+      // レベニュー = リスクプレミアム料の20% (リスクプレミアム料が0の場合は0)
       const revenue = premium > 0 ? premium * 0.20 : 0
 
       // 12ヶ月合計
@@ -167,8 +167,8 @@ export default function RevenueForecastReport({
                   : '設定した想定カバレッジから±10%の範囲で計算'
                 }
               </li>
-              <li>レベニュー = 保険料 × 20%</li>
-              <li>保険料が0の場合、レベニューも0</li>
+              <li>レベニュー = リスクプレミアム料 × 20%</li>
+              <li>リスクプレミアム料が0の場合、レベニューも0</li>
               <li>3年契約RI/SP付帯前提での36ヶ月計算</li>
               <li>3年間の返金見込みは保険期間分を減額（30日保証:1ヶ月分、1年保証:12ヶ月分）</li>
             </ul>
@@ -185,10 +185,10 @@ export default function RevenueForecastReport({
                 想定<br/>カバレッジ
               </th>
               <th className="px-4 py-3 text-right text-sm font-semibold text-secondary-900">
-                保険コミットメント<br/>月額
+                コミットメント保証<br/>月額
               </th>
               <th className="px-4 py-3 text-right text-sm font-semibold text-secondary-900">
-                保険料<br/>(月額)
+                リスクプレミアム料<br/>(月額)
               </th>
               <th className="px-4 py-3 text-right text-sm font-semibold text-secondary-900">
                 返金見込<br/>(月額)
@@ -328,8 +328,8 @@ export default function RevenueForecastReport({
 
       {/* 注釈 */}
       <div className="mt-4 text-xs text-secondary-600 space-y-1">
-        <p>※ レベニュー = 保険料 × 20%</p>
-        <p>※ 保険料が0の場合、レベニューも0として計算されます</p>
+        <p>※ レベニュー = リスクプレミアム料 × 20%</p>
+        <p>※ リスクプレミアム料が0の場合、レベニューも0として計算されます</p>
         <p>※ 12ヶ月合計は月額の12倍、36ヶ月合計は12ヶ月合計の3倍で計算</p>
         <p>※ 3年間の返金見込みは、保険期間分を減額（30日保証: 1ヶ月分減額、1年保証: 12ヶ月分減額）</p>
         <p>※ 背景色が強調されている行が現在の設定値です</p>

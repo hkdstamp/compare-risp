@@ -5,7 +5,7 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Alphaus MSP収益モデルシミュレーター - Ripple & 保険コミットメント',
+  title: 'Alphaus MSP収益モデルシミュレーター - Ripple & コミットメント保証',
   description: 'MSP向けコスト最適化・収益モデル分析ツール - Next.js 15 Edition',
   keywords: ['AWS', 'RI', 'SP', 'MSP', 'Cost Optimization', 'Cloudflare', 'Next.js 15', 'React 19'],
   authors: [{ name: 'Alphaus Cloud Group' }],
