@@ -42,7 +42,7 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
         fill: true,
       },
       {
-        label: '保険コミットメント（累積）',
+        label: 'コミットメント保証（累積）',
         data: cumulative.insurance,
         borderColor: 'rgba(34, 197, 94, 1)', // success-500
         backgroundColor: 'rgba(34, 197, 94, 0.1)',
@@ -51,7 +51,7 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
         fill: true,
       },
       {
-        label: '保険コミットメント（総支出）',
+        label: 'コミットメント保証（総支出）',
         data: insuranceTotalExpenditure,
         borderColor: 'rgba(34, 197, 94, 0.6)', // success-500 with opacity
         backgroundColor: 'rgba(34, 197, 94, 0.05)',
@@ -131,7 +131,7 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
             
             // Check if insurance break-even month
             if (insurancePlan.break_even_months !== null && month === insurancePlan.break_even_months) {
-              footer.push('◆ 保険コミットメント 損益分岐点')
+              footer.push('◆ コミットメント保証 損益分岐点')
             }
             
             // Check if standard break-even month
@@ -195,7 +195,7 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
             <div className="flex items-center gap-2">
               <TargetIcon size={16} className="text-success-600" />
               <span className="text-secondary-600">
-                保険コミットメント 損益分岐: <span className="font-semibold text-success-600">{insurancePlan.break_even_months}ヶ月</span>
+                コミットメント保証 損益分岐: <span className="font-semibold text-success-600">{insurancePlan.break_even_months}ヶ月</span>
               </span>
             </div>
           )}
