@@ -146,7 +146,7 @@ export function calculateInsurancePlan(
 
   return {
     result: {
-      name: `保険コミットメント ${plan.name}`,
+      name: `コミットメント保証 ${plan.name}`,
       monthly_cost: totalMonthlyCost,
       monthly_savings: effectiveMonthlySavings,
       initial_cost: 0,
