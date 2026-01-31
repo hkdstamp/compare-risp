@@ -30,7 +30,7 @@ export default function RevenueForecastReport({
     const currentCoverage = result.coverage !== undefined ? result.coverage : 1.0
     const hours = pricingCatalog.metadata.hours_per_month
     
-    // 保険プランの情報を取得（保険期間の減額計算用）
+    // 保証プランの情報を取得（保証期間の減額計算用）
     const insurancePlan = pricingCatalog.insurance_plans[insurancePlanKey]
     const insuranceTermMonths = insurancePlan.term_months // 1 or 12
 
@@ -99,7 +99,7 @@ export default function RevenueForecastReport({
         revenue: total12months.revenue * 3
       }
 
-      // 3年間の返金見込みは保険期間分を減額
+      // 3年間の返金見込みは保証期間分を減額
       // 30日保証（1ヶ月）: 1ヶ月分減額
       // 1年保証（12ヶ月）: 12ヶ月分減額
       const refundDeduction = expectedRefund * insuranceTermMonths
@@ -170,7 +170,7 @@ export default function RevenueForecastReport({
               <li>レベニュー = リスクプレミアム料 × 20%</li>
               <li>リスクプレミアム料が0の場合、レベニューも0</li>
               <li>3年契約RI/SP付帯前提での36ヶ月計算</li>
-              <li>3年間の返金見込みは保険期間分を減額（30日保証:1ヶ月分、1年保証:12ヶ月分）</li>
+              <li>3年間の返金見込みは保証期間分を減額（30日保証:1ヶ月分、1年保証:12ヶ月分）</li>
             </ul>
           </div>
         </div>
@@ -331,7 +331,7 @@ export default function RevenueForecastReport({
         <p>※ レベニュー = リスクプレミアム料 × 20%</p>
         <p>※ リスクプレミアム料が0の場合、レベニューも0として計算されます</p>
         <p>※ 12ヶ月合計は月額の12倍、36ヶ月合計は12ヶ月合計の3倍で計算</p>
-        <p>※ 3年間の返金見込みは、保険期間分を減額（30日保証: 1ヶ月分減額、1年保証: 12ヶ月分減額）</p>
+        <p>※ 3年間の返金見込みは、保証期間分を減額（30日保証: 1ヶ月分減額、1年保証: 12ヶ月分減額）</p>
         <p>※ 背景色が強調されている行が現在の設定値です</p>
       </div>
     </section>

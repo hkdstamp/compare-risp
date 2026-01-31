@@ -21,11 +21,11 @@ export default function RevenueHighlight({ insuranceSavings, standardSavings, re
         </div>
 
         <div className="space-y-2 bg-white/20 backdrop-blur-sm px-4 py-3 rounded-lg border-2 border-white/30">
-          <div className="text-white/90 text-sm font-medium">収益差額 (保険 vs 標準)</div>
+          <div className="text-white/90 text-sm font-medium">収益差額 (保証 vs 標準)</div>
           <div className={`text-2xl font-bold ${revenueDiff >= 0 ? 'text-green-200' : 'text-red-200'}`}>
             {revenueDiff >= 0 ? '+' : ''}{formatCurrency(Math.abs(revenueDiff))} / 月
             <span className="text-sm ml-2">
-              {revenueDiff > 0 ? '(保険が有利)' : revenueDiff < 0 ? '(標準が有利)' : ''}
+              {revenueDiff > 0 ? '(保証が有利)' : revenueDiff < 0 ? '(標準が有利)' : ''}
             </span>
           </div>
         </div>
