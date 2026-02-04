@@ -44,8 +44,10 @@ export default function DiscountRateInfo() {
                   コミットメント保証
                 </h4>
                 <div className="bg-success-50 border-l-4 border-success-500 p-4 mb-4">
-                  <p className="text-sm text-secondary-700">
-                    <strong>注記：</strong>EC2はComputeSP 3年相当（40%割引）で算定、その他サービスは3年RI/SPで算定
+                  <p className="text-sm text-secondary-700 space-y-1">
+                    <strong>注記：</strong>
+                    <br/>• <strong>30日保証：</strong>EC2はComputeSP 3年相当（40%割引）、その他サービスは3年 RI NoUpfront で算定
+                    <br/>• <strong>1年保証：</strong>EC2はComputeSP 3年相当（40%割引）、RDSは3年 RI PartialUpfront で算定（初期費用あり）、その他サービスは3年 RI NoUpfront で算定
                   </p>
                 </div>
                 <div className="overflow-x-auto">
@@ -80,7 +82,8 @@ export default function DiscountRateInfo() {
                 <div className="mt-3 text-xs text-secondary-600 space-y-1">
                   <p>✅ 契約期間30日または1年（短期契約が可能）</p>
                   <p>✅ Savingsの損失分は返金される柔軟性</p>
-                  <p>✅ 初期費用ゼロ</p>
+                  <p>✅ <strong>30日保証：</strong>初期費用ゼロ</p>
+                  <p>⚠️ <strong>1年保証：</strong>RDSリソース使用時は初期費用が発生（RI 3年 PartialUpfront相当）</p>
                   <p>✅ EC2はComputeSP 3年相当（40%割引）を基準に算定</p>
                 </div>
               </section>
@@ -92,8 +95,10 @@ export default function DiscountRateInfo() {
                   標準RI/SP
                 </h4>
                 <div className="bg-primary-50 border-l-4 border-primary-500 p-4 mb-4">
-                  <p className="text-sm text-secondary-700">
-                    <strong>注記：</strong>SPはEC2のみ適用可能。RDS、ElastiCache等はRIのみ対応
+                  <p className="text-sm text-secondary-700 space-y-1">
+                    <strong>注記：</strong>
+                    <br/>• <strong>Compute SP：</strong>EC2、Lambda、Fargate に適用可能。非対応サービス（RDS、ElastiCache等）は自動的にRI NoUpfrontで計算
+                    <br/>• <strong>EC2 Instance SP：</strong>EC2のみ適用可能。非EC2リソース（RDS、ElastiCache等）は自動的にRI 3年 NoUpfrontで計算
                   </p>
                 </div>
 
@@ -309,9 +314,11 @@ export default function DiscountRateInfo() {
                     </tbody>
                   </table>
                 </div>
-                <p className="text-xs text-amber-800 mt-2">
-                  ⚠️ <strong>重要：</strong>複数サービスを混在させてSPを選択すると、EC2以外は自動的にRI NoUpfrontで計算されます
-                </p>
+                <div className="text-xs text-amber-800 mt-2 space-y-1">
+                  <p>⚠️ <strong>重要：</strong>SPを選択した場合の自動フォールバック</p>
+                  <p className="ml-4">• <strong>Compute SP：</strong>非対応サービスは契約期間に応じた RI NoUpfront で計算</p>
+                  <p className="ml-4">• <strong>EC2 Instance SP：</strong>非EC2リソースは RI 3年 NoUpfront で計算</p>
+                </div>
               </section>
 
               {/* Footer Note */}
