@@ -60,7 +60,7 @@ export function calculateInsurancePlan(
     if (res.service === 'ec2') {
       // EC2: Use ComputeSP 3yr equivalent (40% discount from on-demand)
       baselineInsuranceCommitment = onDemandRate * hours * res.quantity * 0.60
-    } else if (insurancePlanKey === '1y' && res.service === 'rds') {
+    } else if (insuranceKey === '1y' && res.service === 'rds') {
       // Special case: 1-year guarantee + RDS → Use 3yr PartialUpfront RI
       if (resourcePricing.standard_ri && resourcePricing.standard_ri['3yr'] && resourcePricing.standard_ri['3yr']['PartialUpfront']) {
         const riPlan = resourcePricing.standard_ri['3yr']['PartialUpfront']
