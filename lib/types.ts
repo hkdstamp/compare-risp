@@ -74,6 +74,7 @@ export interface DetailItem {
   insurance_premium: number
   insurance_savings: number
   insurance_expected_refund: number
+  insurance_upfront: number  // Add insurance upfront cost
   standard_cost: number
   standard_upfront: number
   standard_savings: number
