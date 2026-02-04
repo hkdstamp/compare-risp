@@ -65,10 +65,13 @@ export function calculateInsurancePlan(
       if (resourcePricing.standard_ri && resourcePricing.standard_ri['3yr'] && resourcePricing.standard_ri['3yr']['PartialUpfront']) {
         const riPlan = resourcePricing.standard_ri['3yr']['PartialUpfront']
         baselineInsuranceCommitment = riPlan.hourly_usd * hours * res.quantity
-      } else {
+      } else if (resourcePricing.standard_ri && resourcePricing.standard_ri['3yr'] && resourcePricing.standard_ri['3yr']['NoUpfront']) {
         // Fallback to 3yr NoUpfront if PartialUpfront not available
         const riPlan = resourcePricing.standard_ri['3yr']['NoUpfront']
         baselineInsuranceCommitment = riPlan.hourly_usd * hours * res.quantity
+      } else {
+        // Final fallback for RDS: use on-demand × 0.60 (40% discount)
+        baselineInsuranceCommitment = onDemandRate * hours * res.quantity * 0.60
       }
     } else {
       // Other services: fallback chain
