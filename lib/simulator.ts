@@ -13,6 +13,7 @@ export function calculateInsurancePlan(
   let totalBaseline = 0
   let totalMonthlyCost = 0
   let totalPremium = 0
+  let totalInsuranceUpfront = 0  // Track total upfront cost for insurance
   const details: DetailItem[] = []
 
   let totalExpectedRefund = 0
@@ -53,12 +54,31 @@ export function calculateInsurancePlan(
     // Get baseline for insurance commitment
     // For EC2: Use ComputeSP 3yr NoUpfront equivalent (40% discount from on-demand)
     // For other services: Use 3yr NoUpfront RI → 3yr SP → on-demand × 0.60
+    // Special case for 1-year guarantee + RDS: Use 3yr PartialUpfront RI (with upfront cost)
     const resourcePricing = catalog.resources[res.service][res.instance]
     let baselineInsuranceCommitment = 0
+    let insuranceUpfrontCost = 0  // Track upfront cost for insurance commitment
     
     if (res.service === 'ec2') {
       // EC2: Use ComputeSP 3yr equivalent (40% discount from on-demand)
       baselineInsuranceCommitment = onDemandRate * hours * res.quantity * 0.60
+      insuranceUpfrontCost = 0  // No upfront for Compute SP
+    } else if (insuranceKey === '1y' && res.service === 'rds') {
+      // Special case: 1-year guarantee + RDS → Use 3yr PartialUpfront RI
+      if (resourcePricing.standard_ri && resourcePricing.standard_ri['3yr'] && resourcePricing.standard_ri['3yr']['PartialUpfront']) {
+        const riPlan = resourcePricing.standard_ri['3yr']['PartialUpfront']
+        baselineInsuranceCommitment = riPlan.hourly_usd * hours * res.quantity
+        insuranceUpfrontCost = riPlan.upfront_usd * res.quantity  // Add upfront cost
+      } else if (resourcePricing.standard_ri && resourcePricing.standard_ri['3yr'] && resourcePricing.standard_ri['3yr']['NoUpfront']) {
+        // Fallback to 3yr NoUpfront if PartialUpfront not available
+        const riPlan = resourcePricing.standard_ri['3yr']['NoUpfront']
+        baselineInsuranceCommitment = riPlan.hourly_usd * hours * res.quantity
+        insuranceUpfrontCost = 0  // No upfront for NoUpfront plan
+      } else {
+        // Final fallback for RDS: use on-demand × 0.60 (40% discount)
+        baselineInsuranceCommitment = onDemandRate * hours * res.quantity * 0.60
+        insuranceUpfrontCost = 0
+      }
     } else {
       // Other services: fallback chain
       if (resourcePricing.standard_ri && resourcePricing.standard_ri['3yr'] && resourcePricing.standard_ri['3yr']['NoUpfront']) {
@@ -70,6 +90,7 @@ export function calculateInsurancePlan(
         // Final fallback: use on-demand × 0.60 (40% discount)
         baselineInsuranceCommitment = onDemandRate * hours * res.quantity * 0.60
       }
+      insuranceUpfrontCost = 0  // No upfront for other services
     }
     
     // CRITICAL: Insurance Commitment cost is FIXED (always baseline, NOT affected by coverage)
@@ -110,6 +131,7 @@ export function calculateInsurancePlan(
       insurance_premium: premium,
       insurance_savings: baseline - monthlyCost,
       insurance_expected_refund: expectedRefund,
+      insurance_upfront: insuranceUpfrontCost,  // Add upfront cost
       standard_cost: 0,
       standard_upfront: 0,
       standard_savings: 0
@@ -119,6 +141,7 @@ export function calculateInsurancePlan(
     totalMonthlyCost += monthlyCost
     totalPremium += premium
     totalExpectedRefund += expectedRefund
+    totalInsuranceUpfront += insuranceUpfrontCost  // Accumulate upfront cost
   }
 
   const monthlySavings = totalBaseline - totalMonthlyCost
@@ -129,11 +152,11 @@ export function calculateInsurancePlan(
   // Insurance Commitment break-even calculation
   // IMPORTANT: Use the STANDARD RI/SP contract term (not insurance plan's term)
   // because we compare insurance costs over the same period as standard RI/SP
-  // Total Expenditure = 0 (no initial) + (monthly_cost × standard_term_months)
+  // Total Expenditure = initial_cost + (monthly_cost × standard_term_months)
   // Break-even: when on-demand cumulative >= total expenditure
   let breakEven = null
   if (monthlySavings > 0) {
-    const totalExpenditure = 0 + (totalMonthlyCost * standardTermMonths)
+    const totalExpenditure = totalInsuranceUpfront + (totalMonthlyCost * standardTermMonths)
     
     // Break-even = when on-demand cumulative exceeds this fixed total
     breakEven = Math.ceil(totalExpenditure / totalBaseline)
@@ -149,7 +172,7 @@ export function calculateInsurancePlan(
       name: `コミットメント保証 ${plan.name}`,
       monthly_cost: totalMonthlyCost,
       monthly_savings: effectiveMonthlySavings,
-      initial_cost: 0,
+      initial_cost: totalInsuranceUpfront,  // Include upfront cost
       premium: totalPremium,
       expected_refund: totalExpectedRefund,
       break_even_months: breakEven

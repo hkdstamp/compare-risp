@@ -59,6 +59,9 @@ export default function CostCards({ baselineCost, insurance, standard, isMSPMode
               返金見込: {formatCurrency(insurance.expected_refund)}
             </div>
           )}
+          {insurance.initial_cost > 0 && (
+            <div className="text-sm text-secondary-600">初期コスト: {formatCurrency(insurance.initial_cost)}</div>
+          )}
           <div className="text-sm text-secondary-600">
             {isMSPMode ? '損益分岐' : 'コスト回収期間'}: {insurance.break_even_months ? `${insurance.break_even_months}ヶ月` : '-'}
           </div>
