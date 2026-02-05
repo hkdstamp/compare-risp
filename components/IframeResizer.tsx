@@ -4,6 +4,17 @@ import { useEffect } from 'react';
 
 export default function IframeResizer() {
   useEffect(() => {
+    // Apply CSS to prevent scroll trapping if in an iframe
+    // This prevents the app from creating its own internal scroll container
+    if (typeof window !== 'undefined' && window.self !== window.top) {
+      document.documentElement.style.setProperty('overflow', 'hidden', 'important');
+      document.documentElement.style.setProperty('height', 'auto', 'important');
+      if (document.body) {
+        document.body.style.setProperty('overflow', 'hidden', 'important');
+        document.body.style.setProperty('height', 'auto', 'important');
+      }
+    }
+
     const sendHeight = () => {
       if (typeof document === 'undefined') return;
       
