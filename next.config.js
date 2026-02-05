@@ -46,7 +46,7 @@ const nextConfig = {
             // iframe埋め込みを許可
             value: process.env.NODE_ENV === 'development'
               ? "frame-ancestors 'self' http://localhost:* https://localhost:*"
-              : "frame-ancestors 'self' https://alphaus.cloud https://*.alphaus.cloud https://*.*.alphaus.cloud",
+              : "frame-ancestors 'self' https://alphaus.cloud https://*.alphaus.cloud https://*.webflow.com https://*.webflow.io",
           },
         ],
       },
