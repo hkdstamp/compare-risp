@@ -18,7 +18,35 @@ export default function IframeResizer() {
       body.style.setProperty('height', 'auto', 'important');
     }
 
+    // Determine and validate the expected parent origin
+    const allowedParentOrigin: string | null = (() => {
+      if (typeof document === 'undefined') return null;
+      // If no referrer, we cannot validate origin.
+      // For security, strict matching is better than defaulting to '*'.
+      // If you need to support 'noreferrer' embeddings, you might need a different strategy 
+      // (e.g. passing origin in query param), but referrer is standard for this.
+      if (!document.referrer) return null;
+
+      try {
+        const url = new URL(document.referrer);
+        const hostname = url.hostname;
+        // Trusted domains: Webflow, Alphaus (own domain), and Localhost for dev
+        const allowedRoots = ['webflow.com', 'webflow.io', 'alphaus.cloud', 'localhost', '127.0.0.1'];
+
+        const isAllowedHost = allowedRoots.some((root) => {
+          return hostname === root || hostname.endsWith(`.${root}`);
+        });
+
+        return isAllowedHost ? url.origin : null;
+      } catch {
+        return null;
+      }
+    })();
+
     const sendHeight = () => {
+      // If we couldn't validate the parent origin, do not send the message.
+      if (!allowedParentOrigin) return;
+
       const rawHeight = docEl.scrollHeight || body.scrollHeight;
       // Add a small buffer (4px) to handle sub-pixel rendering issues.
       // Case: Content is 800.5px. If browser creates 800px iframe, 0.5px overflow traps scroll.
@@ -27,9 +55,9 @@ export default function IframeResizer() {
       
       // Prevent infinite loops: only send if height has actually changed significantly
       if (Math.abs(height - lastHeight) > 4) {
-        console.log(`[IframeResizer] Sending resize: ${height}px (Raw: ${rawHeight}px, Prev: ${lastHeight}px)`);
+        console.log(`[IframeResizer] Sending resize: ${height}px (Raw: ${rawHeight}px, Prev: ${lastHeight}px) to ${allowedParentOrigin}`);
         lastHeight = height;
-        window.parent.postMessage({ type: 'RESIZE', height: height }, '*');
+        window.parent.postMessage({ type: 'RESIZE', height: height }, allowedParentOrigin);
       }
     };
 
