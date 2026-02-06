@@ -21,9 +21,15 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       const saved = localStorage.getItem('app_language') as Language;
       if (saved && (saved === 'ja' || saved === 'en')) {
         setLanguage(saved);
+        return;
       }
     } catch (e) {
       console.warn('LocalStorage access denied (iframe context?)');
+    }
+
+    // Fallback to browser language if no preference is saved
+    if (typeof navigator !== 'undefined' && navigator.language.startsWith('en')) {
+      setLanguage('en');
     }
   }, []);
 

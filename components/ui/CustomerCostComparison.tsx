@@ -13,7 +13,7 @@ export default function CustomerCostComparison({ baselineCost, insurance, standa
   const { t } = useLanguage()
 
   // コミットメント保証の実効コスト（返金を考慮）
-  const insuranceEffectiveCost = insurance.monthly_cost - (insurance.expected_refund || 0)
+  const insuranceEffectiveCost = insurance.monthly_cost - (insurance.expected_refund ?? 0)
   const insuranceTotalSavings = baselineCost - insuranceEffectiveCost
   
   // 標準RI/SPのコスト削減

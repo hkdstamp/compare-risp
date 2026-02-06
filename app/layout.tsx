@@ -31,7 +31,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="ja">
+    <html lang={process.env.NEXT_PUBLIC_DEFAULT_LANG || 'ja'}>
       <body className={inter.className}>
         <LanguageProvider>
           <IframeResizer />
