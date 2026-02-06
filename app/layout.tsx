@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
-import './globals.css'
+import '@/app/globals.css'
 import IframeResizer from '@/components/IframeResizer'
+import { LanguageProvider } from '@/components/LanguageProvider'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -32,8 +33,10 @@ export default function RootLayout({
   return (
     <html lang="ja">
       <body className={inter.className}>
-        <IframeResizer />
-        {children}
+        <LanguageProvider>
+          <IframeResizer />
+          {children}
+        </LanguageProvider>
       </body>
     </html>
   )
