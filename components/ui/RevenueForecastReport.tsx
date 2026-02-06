@@ -6,6 +6,7 @@ import { pricingCatalog } from '@/lib/pricing-catalog'
 import { calculateInsurancePlan } from '@/lib/simulator'
 import { formatCurrency } from '@/lib/utils'
 import { FileTextIcon, TrendingUpIcon } from '@/components/icons'
+import { useLanguage } from '@/components/LanguageProvider'
 
 interface RevenueForecastReportProps {
   result: SimulationResult
@@ -20,6 +21,7 @@ export default function RevenueForecastReport({
   usage, 
   resources 
 }: RevenueForecastReportProps) {
+  const { t } = useLanguage()
   const [forecastData, setForecastData] = useState<RevenueForecastItem[]>([])
 
   useEffect(() => {
@@ -139,14 +141,14 @@ export default function RevenueForecastReport({
         </div>
         <div>
           <h3 className="text-xl font-bold text-secondary-900">
-            収益見込みレポート
+            {t('revenueForecastReport')}
           </h3>
           <p className="text-sm text-secondary-600">
             {result.coverage === 0 
-              ? '想定カバレッジ 0%～20% 範囲での収益予測（3年契約RI/SP付帯前提）'
+              ? t('revenueForecastDesc0to20')
               : result.coverage === 1.0
-              ? '想定カバレッジ 80%～100% 範囲での収益予測（3年契約RI/SP付帯前提）'
-              : '想定カバレッジ ±10% 範囲での収益予測（3年契約RI/SP付帯前提）'
+              ? t('revenueForecastDesc80to100')
+              : t('revenueForecastDescPlusMinus10')
             }
           </p>
         </div>
@@ -157,20 +159,20 @@ export default function RevenueForecastReport({
         <div className="flex items-start gap-2">
           <TrendingUpIcon className="text-warning-600 flex-shrink-0 mt-0.5" size={18} />
           <div className="text-sm text-warning-900">
-            <p className="font-semibold mb-1">計算条件：</p>
+            <p className="font-semibold mb-1">{t('calculationConditions')}</p>
             <ul className="list-disc list-inside space-y-1 ml-2">
               <li>
                 {result.coverage === 0 
-                  ? '想定カバレッジ0%の場合: 0%～20%の範囲で計算'
+                  ? t('conditionCoverage0')
                   : result.coverage === 1.0
-                  ? '想定カバレッジ100%の場合: 80%～100%の範囲で計算'
-                  : '設定した想定カバレッジから±10%の範囲で計算'
+                  ? t('conditionCoverage100')
+                  : t('conditionCoveragePlusMinus')
                 }
               </li>
-              <li>レベニュー = リスクプレミアム料 × 20%</li>
-              <li>リスクプレミアム料が0の場合、レベニューも0</li>
-              <li>3年契約RI/SP付帯前提での36ヶ月計算</li>
-              <li>3年間の返金見込みは保証期間分を減額（30日保証:1ヶ月分、1年保証:12ヶ月分）</li>
+              <li>{t('conditionRevenueFormula')}</li>
+              <li>{t('conditionRevenueZero')}</li>
+              <li>{t('condition3Year')}</li>
+              <li>{t('conditionRefundDeduction')}</li>
             </ul>
           </div>
         </div>
@@ -181,29 +183,29 @@ export default function RevenueForecastReport({
         <table className="w-full border-collapse">
           <thead>
             <tr className="bg-warning-50 border-b-2 border-warning-300">
-              <th className="px-4 py-3 text-left text-sm font-semibold text-secondary-900">
-                想定<br/>カバレッジ
+              <th className="px-4 py-3 text-left text-sm font-semibold text-secondary-900 whitespace-pre-line">
+                {t('headerCoverage')}
               </th>
-              <th className="px-4 py-3 text-right text-sm font-semibold text-secondary-900">
-                コミットメント保証<br/>月額
+              <th className="px-4 py-3 text-right text-sm font-semibold text-secondary-900 whitespace-pre-line">
+                {t('headerWarrantyMonthly')}
               </th>
-              <th className="px-4 py-3 text-right text-sm font-semibold text-secondary-900">
-                リスクプレミアム料<br/>(月額)
+              <th className="px-4 py-3 text-right text-sm font-semibold text-secondary-900 whitespace-pre-line">
+                {t('headerRiskPremiumMonthly')}
               </th>
-              <th className="px-4 py-3 text-right text-sm font-semibold text-secondary-900">
-                返金見込<br/>(月額)
+              <th className="px-4 py-3 text-right text-sm font-semibold text-secondary-900 whitespace-pre-line">
+                {t('headerRefundMonthly')}
               </th>
-              <th className="px-4 py-3 text-right text-sm font-semibold text-warning-700">
-                レベニュー<br/>(月額)
+              <th className="px-4 py-3 text-right text-sm font-semibold text-warning-700 whitespace-pre-line">
+                {t('headerRevenueMonthly')}
               </th>
-              <th className="px-4 py-3 text-right text-sm font-semibold text-warning-700 bg-warning-100">
-                レベニュー<br/>(12ヶ月)
+              <th className="px-4 py-3 text-right text-sm font-semibold text-warning-700 bg-warning-100 whitespace-pre-line">
+                {t('headerRevenue12Months')}
               </th>
-              <th className="px-4 py-3 text-right text-sm font-semibold text-accent-600 bg-accent-50">
-                3年間<br/>返金見込
+              <th className="px-4 py-3 text-right text-sm font-semibold text-accent-600 bg-accent-50 whitespace-pre-line">
+                {t('headerRefund3Years')}
               </th>
-              <th className="px-4 py-3 text-right text-sm font-semibold text-primary-700 bg-primary-100">
-                レベニュー<br/>(36ヶ月)
+              <th className="px-4 py-3 text-right text-sm font-semibold text-primary-700 bg-primary-100 whitespace-pre-line">
+                {t('headerRevenue36Months')}
               </th>
             </tr>
           </thead>
@@ -225,7 +227,7 @@ export default function RevenueForecastReport({
                       </span>
                       {isCurrentCoverage && (
                         <span className="text-xs bg-warning-600 text-white px-2 py-0.5 rounded">
-                          現在
+                          {t('current')}
                         </span>
                       )}
                     </div>
@@ -264,7 +266,7 @@ export default function RevenueForecastReport({
           <tfoot>
             <tr className="bg-warning-100 border-t-2 border-warning-300">
               <td className="px-4 py-3 text-left font-bold text-secondary-900">
-                合計範囲
+                {t('totalRange')}
               </td>
               <td className="px-4 py-3 text-right text-secondary-900 font-semibold">
                 {formatCurrency(Math.min(...forecastData.map(d => d.monthly_cost)))}
@@ -328,11 +330,11 @@ export default function RevenueForecastReport({
 
       {/* 注釈 */}
       <div className="mt-4 text-xs text-secondary-600 space-y-1">
-        <p>※ レベニュー = リスクプレミアム料 × 20%</p>
-        <p>※ リスクプレミアム料が0の場合、レベニューも0として計算されます</p>
-        <p>※ 12ヶ月合計は月額の12倍、36ヶ月合計は12ヶ月合計の3倍で計算</p>
-        <p>※ 3年間の返金見込みは、保証期間分を減額（30日保証: 1ヶ月分減額、1年保証: 12ヶ月分減額）</p>
-        <p>※ 背景色が強調されている行が現在の設定値です</p>
+        <p>{t('noteRevenueFormula')}</p>
+        <p>{t('noteRevenueZero')}</p>
+        <p>{t('noteTotalCalc')}</p>
+        <p>{t('noteRefundDeduction')}</p>
+        <p>{t('noteHighlight')}</p>
       </div>
     </section>
   )

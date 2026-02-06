@@ -1,4 +1,5 @@
 import { formatCurrency } from '@/lib/utils'
+import { useLanguage } from '@/components/LanguageProvider'
 
 interface RevenueHighlightProps {
   insuranceSavings: number
@@ -7,25 +8,27 @@ interface RevenueHighlightProps {
 }
 
 export default function RevenueHighlight({ insuranceSavings, standardSavings, revenueDiff }: RevenueHighlightProps) {
+  const { t } = useLanguage()
+
   return (
     <div className="bg-gradient-to-r from-warning-500 to-warning-600 rounded-xl shadow-lg p-8 border border-warning-400">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="space-y-2">
-          <div className="text-white/90 text-sm font-medium">MSP想定粗利 (コミットメント保証)</div>
-          <div className="text-white text-2xl font-bold">{formatCurrency(insuranceSavings)} / 月</div>
+          <div className="text-white/90 text-sm font-medium">{t('mspGrossProfitWarranty')}</div>
+          <div className="text-white text-2xl font-bold">{formatCurrency(insuranceSavings)} {t('monthly')}</div>
         </div>
 
         <div className="space-y-2">
-          <div className="text-white/90 text-sm font-medium">MSP想定粗利 (標準RI/SP)</div>
-          <div className="text-white text-2xl font-bold">{formatCurrency(standardSavings)} / 月</div>
+          <div className="text-white/90 text-sm font-medium">{t('mspGrossProfitStandard')}</div>
+          <div className="text-white text-2xl font-bold">{formatCurrency(standardSavings)} {t('monthly')}</div>
         </div>
 
         <div className="space-y-2 bg-white/20 backdrop-blur-sm px-4 py-3 rounded-lg border-2 border-white/30">
-          <div className="text-white/90 text-sm font-medium">収益差額 (保証 vs 標準)</div>
+          <div className="text-white/90 text-sm font-medium">{t('profitDiff')}</div>
           <div className={`text-2xl font-bold ${revenueDiff >= 0 ? 'text-green-200' : 'text-red-200'}`}>
-            {revenueDiff >= 0 ? '+' : ''}{formatCurrency(Math.abs(revenueDiff))} / 月
+            {revenueDiff >= 0 ? '+' : ''}{formatCurrency(Math.abs(revenueDiff))} {t('monthly')}
             <span className="text-sm ml-2">
-              {revenueDiff > 0 ? '(保証が有利)' : revenueDiff < 0 ? '(標準が有利)' : ''}
+              {revenueDiff > 0 ? t('warrantyBetter') : revenueDiff < 0 ? t('standardBetter') : ''}
             </span>
           </div>
         </div>

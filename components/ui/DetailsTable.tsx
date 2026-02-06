@@ -1,5 +1,6 @@
 import { DetailItem } from '@/lib/types'
 import { formatCurrency } from '@/lib/utils'
+import { useLanguage } from '@/components/LanguageProvider'
 import { SearchIcon } from '@/components/icons'
 
 interface DetailsTableProps {
@@ -8,27 +9,29 @@ interface DetailsTableProps {
 }
 
 export default function DetailsTable({ details, isMSPMode = true }: DetailsTableProps) {
+  const { t } = useLanguage()
+
   return (
     <div className="bg-white rounded-xl shadow-lg p-6 border border-secondary-200">
       <h3 className="text-xl font-bold text-secondary-900 mb-4 flex items-center gap-2">
         <SearchIcon size={24} className="text-primary-600" />
-        リソース別詳細内訳
+        {t('resourceBreakdown')}
       </h3>
       
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-secondary-100 border-b-2 border-secondary-300">
-              <th className="px-4 py-3 text-left font-semibold text-secondary-700">リソース</th>
-              <th className="px-4 py-3 text-right font-semibold text-secondary-700">通常価格</th>
-              <th className="px-4 py-3 text-right font-semibold text-secondary-700">コミットメント保証</th>
-              {isMSPMode && <th className="px-4 py-3 text-right font-semibold text-secondary-700">リスクプレミアム料</th>}
-              <th className="px-4 py-3 text-right font-semibold text-secondary-700">返金見込</th>
-              <th className="px-4 py-3 text-right font-semibold text-secondary-700">保証初期コスト</th>
-              <th className="px-4 py-3 text-right font-semibold text-secondary-700">{isMSPMode ? '保証削減額' : 'コスト削減'}</th>
-              <th className="px-4 py-3 text-right font-semibold text-secondary-700">標準RI/SP</th>
-              <th className="px-4 py-3 text-right font-semibold text-secondary-700">標準初期コスト</th>
-              <th className="px-4 py-3 text-right font-semibold text-secondary-700">{isMSPMode ? '標準削減額' : 'コスト削減'}</th>
+              <th className="px-4 py-3 text-left font-semibold text-secondary-700">{t('resource')}</th>
+              <th className="px-4 py-3 text-right font-semibold text-secondary-700">{t('onDemandCost')}</th>
+              <th className="px-4 py-3 text-right font-semibold text-secondary-700">{t('commitmentWarranty')}</th>
+              {isMSPMode && <th className="px-4 py-3 text-right font-semibold text-secondary-700">{t('riskPremium')}</th>}
+              <th className="px-4 py-3 text-right font-semibold text-secondary-700">{t('expectedRefund')}</th>
+              <th className="px-4 py-3 text-right font-semibold text-secondary-700">{t('warrantyInitialCost')}</th>
+              <th className="px-4 py-3 text-right font-semibold text-secondary-700">{isMSPMode ? t('warrantySavings') : t('costSavings')}</th>
+              <th className="px-4 py-3 text-right font-semibold text-secondary-700">{t('standardRiSp')}</th>
+              <th className="px-4 py-3 text-right font-semibold text-secondary-700">{t('standardInitialCost')}</th>
+              <th className="px-4 py-3 text-right font-semibold text-secondary-700">{isMSPMode ? t('standardSavings') : t('costSavings')}</th>
             </tr>
           </thead>
           <tbody>
