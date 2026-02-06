@@ -173,7 +173,7 @@ export const translations = {
   },
   en: {
     // Header
-    title: "Ripple Commitment Warranty Simulator",
+    title: "Ripple Guaranteed Commitment Revenue Simulator",
     subtitle: "Cost Optimization & Revenue Analysis Tool for Ripple/Wave",
 
     // Config
