@@ -88,7 +88,7 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
 
   const options = {
     responsive: true,
-    maintainAspectRatio: true,
+    maintainAspectRatio: false,
     interaction: {
       mode: 'index' as const,
       intersect: false,
@@ -96,6 +96,7 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
     plugins: {
       legend: {
         position: 'top' as const,
+        align: 'start' as const,
         labels: {
           usePointStyle: true,
           padding: 15,
@@ -155,21 +156,33 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
           callback: function(value: any) {
             return formatCurrency(value)
           },
+          font: {
+            size: 10
+          }
         },
         title: {
           display: true,
           text: t('cumulativeCostUsd'),
           font: {
             weight: 'bold' as const,
+            size: 11
           },
         },
       },
       x: {
+        ticks: {
+          maxRotation: 45,
+          minRotation: 45,
+          font: {
+            size: 10
+          }
+        },
         title: {
           display: true,
           text: t('elapsedMonths'),
           font: {
             weight: 'bold' as const,
+            size: 11
           },
         },
       },
@@ -219,7 +232,9 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
           </div>
         </div>
       </div>
-      <Line data={data} options={options} />
+      <div className="relative h-[300px] md:h-[400px]">
+        <Line data={data} options={options} />
+      </div>
     </div>
   )
 }
