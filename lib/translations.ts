@@ -249,7 +249,7 @@ export const translations = {
     paybackPeriod: "Payback Period",
     standardRiSp: "Standard RI/SP Cost",
     savingsAmount: "Savings",
-    months: "mo",
+    months: " Months",
 
     // Revenue Highlight
     mspGrossProfitWarranty: "MSP Estimated Gross Profit (Guaranteed Commitment)",
