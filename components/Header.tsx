@@ -7,7 +7,7 @@ export default function Header() {
 
   return (
     <header className="bg-white rounded-xl shadow-lg p-6 mb-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col-reverse md:flex-row md:items-center justify-between gap-4 md:gap-0">
         <div>
           <h1 className="text-2xl font-bold text-primary-600">
             {t('title')}
@@ -16,7 +16,7 @@ export default function Header() {
             {t('subtitle')}
           </p>
         </div>
-        <div className="flex items-center bg-gray-100 rounded-lg p-1" role="group" aria-label="Language selection">
+        <div className="self-start md:self-auto flex items-center bg-gray-100 rounded-lg p-1" role="group" aria-label="Language selection">
           <button
             onClick={() => setLanguage('ja')}
             aria-pressed={language === 'ja'}

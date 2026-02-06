@@ -53,14 +53,14 @@ export default function ResourceSelector({ resources, onChange }: ResourceSelect
 
   return (
     <section className="bg-white rounded-xl shadow-lg p-6 border border-secondary-200">
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-0 mb-4">
         <h3 className="text-xl font-bold text-secondary-900 flex items-center gap-2">
           <PackageIcon size={24} className="text-primary-600" />
           {t('resourceTitle')}
         </h3>
         <button
           onClick={addResource}
-          className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2 shadow-sm"
+          className="self-start md:self-auto px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2 shadow-sm"
         >
           <PlusIcon size={18} />
           <span>{t('addResourceBtn')}</span>
