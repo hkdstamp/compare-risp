@@ -79,9 +79,9 @@ export const translations = {
     months: "ヶ月",
 
     // Revenue Highlight
-    mspGrossProfitWarranty: "MSP想定粗利 (コミットメント保証)",
-    mspGrossProfitStandard: "MSP想定粗利 (標準RI/SP)",
-    profitDiff: "収益差額 (保証 vs 標準)",
+    mspGrossProfitWarranty: "想定削減額 (コミットメント保証)",
+    mspGrossProfitStandard: "想定削減額 (標準RI/SP)",
+    profitDiff: "削減額の差 (保証 vs 標準)",
     warrantyBetter: "(保証が有利)",
     standardBetter: "(標準が有利)",
     noDifference: "(差額なし)",
@@ -252,13 +252,13 @@ export const translations = {
     months: " Months",
 
     // Revenue Highlight
-    mspGrossProfitWarranty: "MSP Estimated Gross Profit (Guaranteed Commitment)",
-    mspGrossProfitStandard: "MSP Estimated Gross Profit (Standard Commitment)",
-    profitDiff: "Revenue Difference (Guaranteed vs Standard)",
+    mspGrossProfitWarranty: "Estimated Savings (Guaranteed Commitment)",
+    mspGrossProfitStandard: "Estimated Savings (Standard Commitment)",
+    profitDiff: "Savings Difference (Guaranteed vs Standard)",
     warrantyBetter: "(Guaranteed Commitment is better)",
     standardBetter: "(Standard is better)",
     noDifference: "(No Difference)",
-    monthly: " month",
+    monthly: " /month",
 
     // Charts
     monthlyCostComparison: "Monthly Cost Comparison",
