@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { formatPercentage } from '@/lib/utils'
+import { useLanguage } from '@/components/LanguageProvider'
 import DiscountRateInfo from '@/components/ui/DiscountRateInfo'
 import { ShieldIcon, CalendarIcon, DollarIcon, ChartBarIcon, ActivityIcon, RocketIcon, RefreshIcon, InfoIcon } from '@/components/icons'
 
@@ -11,6 +12,7 @@ interface SimulationConfigProps {
 }
 
 export default function SimulationConfig({ onSimulate, isLoading }: SimulationConfigProps) {
+  const { t } = useLanguage()
   const [insurance, setInsurance] = useState('1y')
   const [standardTerm, setStandardTerm] = useState('1yr')
   const [standardOption, setStandardOption] = useState('SavingsPlan')
@@ -39,10 +41,10 @@ export default function SimulationConfig({ onSimulate, isLoading }: SimulationCo
     <section className="bg-white rounded-xl shadow-lg p-6 border border-secondary-200">
       <div className="flex items-center justify-between mb-6 pb-3 border-b-2 border-primary-500">
         <h2 className="text-2xl font-bold text-secondary-900">
-          シミュレーション設定
+          {t('settings')}
         </h2>
         <div className="flex items-center gap-2">
-          <span className="text-sm text-secondary-600">割引率の詳細</span>
+          <span className="text-sm text-secondary-600">{t('discountDetails')}</span>
           <DiscountRateInfo />
         </div>
       </div>
@@ -52,32 +54,32 @@ export default function SimulationConfig({ onSimulate, isLoading }: SimulationCo
         <div className="flex flex-col">
           <label className="flex items-center gap-2 font-semibold text-secondary-700 mb-2">
             <ShieldIcon size={20} className="text-accent-600" />
-            コミットメント保証プラン
+            {t('planLabel')}
           </label>
           <select
             value={insurance}
             onChange={(e) => setInsurance(e.target.value)}
             className="px-4 py-2 border border-secondary-300 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition bg-white text-secondary-900"
           >
-            <option value="30d">30日保証 (40%割引 / 50%リスクプレミアム料)</option>
-            <option value="1y">1年保証 (40%割引 / 33%リスクプレミアム料)</option>
+            <option value="30d">{t('warranty30d')}</option>
+            <option value="1y">{t('warranty1y')}</option>
           </select>
-          <small className="text-secondary-500 mt-1">保証期間終了後、Savingsの損失分は返金</small>
+          <small className="text-secondary-500 mt-1">{t('warrantyHint')}</small>
         </div>
 
         {/* Standard Term */}
         <div className="flex flex-col">
           <label className="flex items-center gap-2 font-semibold text-secondary-700 mb-2">
             <CalendarIcon size={20} className="text-primary-600" />
-            標準RI/SP 契約期間
+            {t('termLabel')}
           </label>
           <select
             value={standardTerm}
             onChange={(e) => setStandardTerm(e.target.value)}
             className="px-4 py-2 border border-secondary-300 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition bg-white text-secondary-900"
           >
-            <option value="1yr">1年予約</option>
-            <option value="3yr">3年予約</option>
+            <option value="1yr">{t('term1yr')}</option>
+            <option value="3yr">{t('term3yr')}</option>
           </select>
         </div>
 
@@ -85,21 +87,21 @@ export default function SimulationConfig({ onSimulate, isLoading }: SimulationCo
         <div className="flex flex-col">
           <label className="flex items-center gap-2 font-semibold text-secondary-700 mb-2">
             <DollarIcon size={20} className="text-success-600" />
-            標準RI/SP タイプ
+            {t('typeLabel')}
           </label>
           <select
             value={standardOption}
             onChange={(e) => setStandardOption(e.target.value)}
             className="px-4 py-2 border border-secondary-300 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition bg-white text-secondary-900"
           >
-            <optgroup label="Reserved Instance (RI)">
-              <option value="NoUpfront">RI - NoUpfront (全額後払い)</option>
-              <option value="PartialUpfront">RI - PartialUpfront (50%前払い)</option>
-              <option value="AllUpfront">RI - AllUpfront (100%前払い)</option>
+            <optgroup label={t('ri')}>
+              <option value="NoUpfront">{t('optionNoUpfront')}</option>
+              <option value="PartialUpfront">{t('optionPartialUpfront')}</option>
+              <option value="AllUpfront">{t('optionAllUpfront')}</option>
             </optgroup>
-            <optgroup label="Savings Plans (SP)">
-              <option value="SavingsPlan">SP - Compute Savings Plan</option>
-              <option value="EC2-SavingsPlan">SP - EC2 Savings Plan</option>
+            <optgroup label={t('sp')}>
+              <option value="SavingsPlan">{t('optionComputeSP')}</option>
+              <option value="EC2-SavingsPlan">{t('optionEC2SP')}</option>
             </optgroup>
           </select>
         </div>
@@ -108,7 +110,7 @@ export default function SimulationConfig({ onSimulate, isLoading }: SimulationCo
         <div className="flex flex-col">
           <label className="flex items-center gap-2 font-semibold text-secondary-700 mb-2">
             <ChartBarIcon size={20} className="text-primary-600" />
-            想定カバレッジ: <span className="text-primary-600">{formatPercentage(coverage / 100)}</span>
+            {t('coverageLabel')}: <span className="text-primary-600">{formatPercentage(coverage / 100)}</span>
           </label>
           <input
             type="range"
@@ -119,14 +121,14 @@ export default function SimulationConfig({ onSimulate, isLoading }: SimulationCo
             onChange={(e) => setCoverage(Number(e.target.value))}
             className="w-full h-2 bg-secondary-200 rounded-lg appearance-none cursor-pointer accent-primary-600"
           />
-          <small className="text-secondary-500 mt-1">リソース全体の何%をRI/SPでカバーするか</small>
+          <small className="text-secondary-500 mt-1">{t('coverageHint')}</small>
         </div>
 
         {/* Usage */}
         <div className="flex flex-col">
           <label className="flex items-center gap-2 font-semibold text-secondary-700 mb-2">
             <ActivityIcon size={20} className="text-accent-600" />
-            想定利用率: <span className="text-primary-600">{formatPercentage(usage / 100)}</span>
+            {t('uptimeLabel')}: <span className="text-primary-600">{formatPercentage(usage / 100)}</span>
           </label>
           <input
             type="range"
@@ -137,7 +139,7 @@ export default function SimulationConfig({ onSimulate, isLoading }: SimulationCo
             onChange={(e) => setUsage(Number(e.target.value))}
             className="w-full h-2 bg-secondary-200 rounded-lg appearance-none cursor-pointer accent-primary-600"
           />
-          <small className="text-secondary-500 mt-1">リソースの実稼働率</small>
+          <small className="text-secondary-500 mt-1">{t('uptimeHint')}</small>
         </div>
       </div>
 
@@ -146,9 +148,9 @@ export default function SimulationConfig({ onSimulate, isLoading }: SimulationCo
         <div className="flex items-start gap-3">
           <InfoIcon size={20} className="text-amber-600 flex-shrink-0 mt-0.5" />
           <div>
-            <p className="text-sm text-secondary-700 font-medium mb-1">重要な注意事項</p>
+            <p className="text-sm text-secondary-700 font-medium mb-1">{t('importantNote')}</p>
             <p className="text-sm text-secondary-600">
-              対象リソースのサービスに対応する標準RI/SPが１年契約のみの場合、１年保証のコミットメント保証は提供されません。本シミュレーションでは考慮していないため、ご留意ください。
+              {t('noteContent')}
             </p>
           </div>
         </div>
@@ -162,7 +164,7 @@ export default function SimulationConfig({ onSimulate, isLoading }: SimulationCo
           className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary-600 to-accent-600 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <RocketIcon size={20} />
-          シミュレーション実行
+          {isLoading ? t('calculating') : t('simulate')}
         </button>
         <button
           onClick={handleReset}
@@ -170,7 +172,7 @@ export default function SimulationConfig({ onSimulate, isLoading }: SimulationCo
           className="flex items-center gap-2 px-6 py-3 bg-secondary-200 text-secondary-700 font-semibold rounded-lg hover:bg-secondary-300 transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <RefreshIcon size={20} />
-          リセット
+          {t('reset')}
         </button>
       </div>
     </section>

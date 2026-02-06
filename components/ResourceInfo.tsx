@@ -1,4 +1,9 @@
+'use client';
+
+import { useLanguage } from './LanguageProvider'
+
 export default function ResourceInfo() {
+  const { t } = useLanguage()
   const resources = [
     { icon: '🖥️', name: 'EC2 t3.large', quantity: 3 },
     { icon: '🖥️', name: 'EC2 t3.xlarge', quantity: 2 },
@@ -8,7 +13,7 @@ export default function ResourceInfo() {
   return (
     <section className="bg-white rounded-xl shadow-lg p-6">
       <h3 className="text-xl font-bold text-gray-900 mb-4">
-        📦 シミュレーション対象リソース (東京リージョン)
+        📦 {t('resourceTitle')}
       </h3>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

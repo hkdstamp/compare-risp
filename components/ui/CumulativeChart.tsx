@@ -1,10 +1,10 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js'
 import { Line } from 'react-chartjs-2'
 import { CumulativeData, PlanResult } from '@/lib/types'
 import { formatCurrency } from '@/lib/utils'
+import { useLanguage } from '@/components/LanguageProvider'
 import { LineChartIcon, InfoIcon, TargetIcon } from '@/components/icons'
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler)
@@ -17,6 +17,8 @@ interface CumulativeChartProps {
 }
 
 export default function CumulativeChart({ cumulative, standardPlan, insurancePlan, isMSPMode = true }: CumulativeChartProps) {
+  const { t } = useLanguage()
+
   // Calculate total contract expenditure (constant for all months)
   // Total = Initial cost + (Monthly cost × Contract term)
   const termMonths = cumulative.months.length
@@ -30,10 +32,10 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
   const insuranceTotalExpenditure = cumulative.months.map(() => insuranceTotalCost)
 
   const data = {
-    labels: cumulative.months.map(m => `${m}ヶ月`),
+    labels: cumulative.months.map(m => `${m}${t('months')}`),
     datasets: [
       {
-        label: '通常価格',
+        label: t('onDemandCost'),
         data: cumulative.on_demand,
         borderColor: 'rgba(100, 116, 139, 1)', // secondary-500
         backgroundColor: 'rgba(100, 116, 139, 0.1)',
@@ -42,7 +44,7 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
         fill: true,
       },
       {
-        label: 'コミットメント保証（累積）',
+        label: t('commitmentWarranty') + t('cumulativeLabel'),
         data: cumulative.insurance,
         borderColor: 'rgba(34, 197, 94, 1)', // success-500
         backgroundColor: 'rgba(34, 197, 94, 0.1)',
@@ -51,7 +53,7 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
         fill: true,
       },
       {
-        label: 'コミットメント保証（総支出）',
+        label: t('commitmentWarranty') + t('totalExpenditureLabel'),
         data: insuranceTotalExpenditure,
         borderColor: 'rgba(34, 197, 94, 0.6)', // success-500 with opacity
         backgroundColor: 'rgba(34, 197, 94, 0.05)',
@@ -62,7 +64,7 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
         pointRadius: 0,
       },
       {
-        label: '標準RI/SP（累積）',
+        label: t('standardRiSp') + t('cumulativeLabel'),
         data: cumulative.standard,
         borderColor: 'rgba(14, 165, 233, 1)', // primary-500
         backgroundColor: 'rgba(14, 165, 233, 0.1)',
@@ -71,7 +73,7 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
         fill: true,
       },
       {
-        label: '標準RI/SP（総支出）',
+        label: t('standardRiSp') + t('totalExpenditureLabel'),
         data: standardTotalExpenditure,
         borderColor: 'rgba(14, 165, 233, 0.6)', // primary-500 with opacity
         backgroundColor: 'rgba(14, 165, 233, 0.05)',
@@ -103,9 +105,10 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
           },
           generateLabels: (chart: any) => {
             const original = ChartJS.defaults.plugins.legend.labels.generateLabels(chart)
+            const totalLabel = t('totalExpenditureLabel')
             return original.map((label: any) => {
               // Add dash pattern visual to legend for dashed lines
-              if (label.text.includes('総支出')) {
+              if (label.text.includes(totalLabel)) {
                 label.lineDash = [5, 5]
               }
               return label
@@ -131,12 +134,12 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
             
             // Check if insurance break-even month
             if (insurancePlan.break_even_months !== null && month === insurancePlan.break_even_months) {
-              footer.push('◆ コミットメント保証 損益分岐点')
+              footer.push('◆ ' + t('commitmentWarranty') + t('breakEvenPointLabel'))
             }
             
             // Check if standard break-even month
             if (standardPlan.break_even_months !== null && month === standardPlan.break_even_months) {
-              footer.push('◆ 標準RI/SP 損益分岐点')
+              footer.push('◆ ' + t('standardRiSp') + t('breakEvenPointLabel'))
             }
             
             return footer
@@ -154,7 +157,7 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
         },
         title: {
           display: true,
-          text: '累積コスト (USD)',
+          text: t('cumulativeCostUsd'),
           font: {
             weight: '600' as const,
           },
@@ -163,7 +166,7 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
       x: {
         title: {
           display: true,
-          text: '経過月数',
+          text: t('elapsedMonths'),
           font: {
             weight: '600' as const,
           },
@@ -173,21 +176,21 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
   }
 
   // Determine term duration from the number of months
-  const termDisplay = termMonths === 12 ? '1年' : termMonths === 36 ? '3年' : `${termMonths}ヶ月`
+  const termDisplay = termMonths === 12 ? t('contract1Year') : termMonths === 36 ? t('contract3Year') : `${termMonths}${t('months')}`
 
   return (
     <div className="bg-white rounded-xl shadow-lg p-6 border border-secondary-200">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-xl font-bold text-secondary-900 flex items-center gap-2">
           <LineChartIcon size={24} className="text-primary-600" />
-          累積コスト推移（契約期間: {termDisplay}）
+          {t('cumulativeCostTrend')}（{t('contractTerm')}: {termDisplay}）
         </h3>
         <div className="flex gap-4 text-sm">
           {standardPlan.break_even_months !== null && (
             <div className="flex items-center gap-2">
               <TargetIcon size={16} className="text-primary-600" />
               <span className="text-secondary-600">
-                標準RI/SP 損益分岐: <span className="font-semibold text-primary-600">{standardPlan.break_even_months}ヶ月</span>
+                {t('standardRiSp')} {t('breakEven')}: <span className="font-semibold text-primary-600">{standardPlan.break_even_months}{t('months')}</span>
               </span>
             </div>
           )}
@@ -195,7 +198,7 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
             <div className="flex items-center gap-2">
               <TargetIcon size={16} className="text-success-600" />
               <span className="text-secondary-600">
-                コミットメント保証 損益分岐: <span className="font-semibold text-success-600">{insurancePlan.break_even_months}ヶ月</span>
+                {t('commitmentWarranty')} {t('breakEven')}: <span className="font-semibold text-success-600">{insurancePlan.break_even_months}{t('months')}</span>
               </span>
             </div>
           )}
@@ -205,12 +208,12 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
         <div className="flex items-start gap-3">
           <InfoIcon size={20} className="text-primary-600 flex-shrink-0 mt-0.5" />
           <div className="text-sm text-secondary-800">
-            <p className="font-semibold mb-1">グラフの見方：</p>
+            <p className="font-semibold mb-1">{t('graphLegend')}：</p>
             <ul className="list-disc list-inside space-y-1">
-              <li><strong>実線</strong>: 累積ランニングコスト（月々の利用料金の合計）</li>
-              <li><strong>破線（総支出）</strong>: 契約期間全体の総支出額（初期費用 + 全期間の月額料金合計）を各月で表示</li>
-              <li>標準RI/SPの破線が通常価格の実線と交差する点が<strong>損益分岐点</strong>です</li>
-              <li>横軸は標準RI/SPの契約期間（{termDisplay}）に合わせて表示されます</li>
+              <li><strong>{t('legendSolid')}</strong>{t('legendSolidDesc')}</li>
+              <li><strong>{t('legendDashed')}</strong>{t('legendDashedDesc')}</li>
+              <li dangerouslySetInnerHTML={{ __html: t('legendBreakEven') }} />
+              <li>{t('legendXAxis')} ({termDisplay})</li>
             </ul>
           </div>
         </div>

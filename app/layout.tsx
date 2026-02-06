@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
-import './globals.css'
+import '@/app/globals.css'
 import IframeResizer from '@/components/IframeResizer'
+import { LanguageProvider } from '@/components/LanguageProvider'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -30,10 +31,12 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="ja">
+    <html lang={process.env.NEXT_PUBLIC_DEFAULT_LANG || 'ja'}>
       <body className={inter.className}>
-        <IframeResizer />
-        {children}
+        <LanguageProvider>
+          <IframeResizer />
+          {children}
+        </LanguageProvider>
       </body>
     </html>
   )

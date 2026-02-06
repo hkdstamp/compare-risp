@@ -2,6 +2,7 @@
 
 import { serviceMetadata } from '@/lib/pricing-catalog'
 import { ResourceConfig } from '@/lib/types'
+import { useLanguage } from '@/components/LanguageProvider'
 import { ServerIcon, DatabaseIcon, ZapIcon, PackageIcon, PlusIcon, TrashIcon, InfoIcon } from '@/components/icons'
 
 interface ResourceSelectorProps {
@@ -24,6 +25,7 @@ const ServiceIcon = ({ service, size = 24 }: { service: string; size?: number })
 }
 
 export default function ResourceSelector({ resources, onChange }: ResourceSelectorProps) {
+  const { t } = useLanguage()
   const addResource = () => {
     const newResource: ResourceConfig = {
       service: 'ec2',
@@ -54,14 +56,14 @@ export default function ResourceSelector({ resources, onChange }: ResourceSelect
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-xl font-bold text-secondary-900 flex items-center gap-2">
           <PackageIcon size={24} className="text-primary-600" />
-          シミュレーション対象リソース (東京リージョン)
+          {t('resourceTitle')}
         </h3>
         <button
           onClick={addResource}
           className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2 shadow-sm"
         >
           <PlusIcon size={18} />
-          <span>リソース追加</span>
+          <span>{t('addResourceBtn')}</span>
         </button>
       </div>
 
@@ -75,7 +77,7 @@ export default function ResourceSelector({ resources, onChange }: ResourceSelect
               {/* Service Selection */}
               <div className="md:col-span-3">
                 <label className="block text-sm font-medium text-secondary-700 mb-2">
-                  サービス
+                  {t('service')}
                 </label>
                 <select
                   value={resource.service}
@@ -103,7 +105,7 @@ export default function ResourceSelector({ resources, onChange }: ResourceSelect
               {/* Instance Type Selection */}
               <div className="md:col-span-4">
                 <label className="block text-sm font-medium text-secondary-700 mb-2">
-                  インスタンスタイプ
+                  {t('instanceType')}
                 </label>
                 <select
                   value={resource.instance}
@@ -121,7 +123,7 @@ export default function ResourceSelector({ resources, onChange }: ResourceSelect
               {/* Quantity Input */}
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-secondary-700 mb-2">
-                  台数
+                  {t('quantity')}
                 </label>
                 <input
                   type="number"
@@ -161,12 +163,12 @@ export default function ResourceSelector({ resources, onChange }: ResourceSelect
         <div className="flex items-start gap-3">
           <InfoIcon size={20} className="text-primary-600 flex-shrink-0 mt-0.5" />
           <div className="text-sm text-secondary-800">
-            <p className="font-semibold mb-1">リソース選択のヒント：</p>
+            <p className="font-semibold mb-1">{t('resourceHint')}：</p>
             <ul className="list-disc list-inside space-y-1">
-              <li>予約可能なAWSサービス（EC2、RDS、ElastiCache）を選択できます</li>
-              <li>複数のインスタンスタイプを組み合わせてシミュレーション可能</li>
-              <li>台数は1〜100台まで指定できます</li>
-              <li>最低1つのリソースが必要です</li>
+              <li>{t('hint1')}</li>
+              <li>{t('hint2')}</li>
+              <li>{t('hint3')}</li>
+              <li>{t('hint4')}</li>
             </ul>
           </div>
         </div>
@@ -174,15 +176,15 @@ export default function ResourceSelector({ resources, onChange }: ResourceSelect
 
       <div className="mt-4 flex items-center justify-between p-4 bg-secondary-100 rounded-lg border border-secondary-200">
         <div>
-          <span className="text-sm font-medium text-secondary-700">合計リソース数: </span>
+          <span className="text-sm font-medium text-secondary-700">{t('totalResources')}: </span>
           <span className="text-lg font-bold text-primary-600">
-            {resources.reduce((sum, r) => sum + r.quantity, 0)} 台
+            {resources.reduce((sum, r) => sum + r.quantity, 0)} {t('units')}
           </span>
         </div>
         <div>
-          <span className="text-sm font-medium text-secondary-700">サービス種類: </span>
+          <span className="text-sm font-medium text-secondary-700">{t('serviceTypes')}: </span>
           <span className="text-lg font-bold text-primary-600">
-            {resources.length} 種類
+            {resources.length} {t('types')}
           </span>
         </div>
       </div>
