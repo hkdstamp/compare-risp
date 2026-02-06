@@ -60,7 +60,7 @@ export default function CustomerCostComparison({ baselineCost, insurance, standa
             <div className="text-sm text-secondary-600">{t('monthlyCost')}</div>
             <div className="text-2xl font-bold text-secondary-900">{formatCurrency(insurance.monthly_cost)}</div>
             
-            {insurance.expected_refund && insurance.expected_refund > 0 && (
+            {(insurance.expected_refund ?? 0) > 0 && (
               <div className="bg-accent-50 px-3 py-2 rounded-lg border border-accent-200 mt-2">
                 <div className="flex items-center gap-2 text-sm text-accent-700">
                   <CoinsIcon size={16} />
