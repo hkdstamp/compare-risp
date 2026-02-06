@@ -249,7 +249,7 @@ export const translations = {
     paybackPeriod: "Payback Period",
     standardRiSp: "Standard RI/SP Cost",
     savingsAmount: "Savings",
-    months: "Months",
+    months: " Months",
 
     // Revenue Highlight
     mspGrossProfitWarranty: "MSP Estimated Gross Profit (Guaranteed Commitment)",
@@ -258,7 +258,7 @@ export const translations = {
     warrantyBetter: "(Guaranteed Commitment is better)",
     standardBetter: "(Standard is better)",
     noDifference: "(No Difference)",
-    monthly: "/ month",
+    monthly: " month",
 
     // Charts
     monthlyCostComparison: "Monthly Cost Comparison",
