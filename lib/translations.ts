@@ -84,6 +84,7 @@ export const translations = {
     profitDiff: "収益差額 (保証 vs 標準)",
     warrantyBetter: "(保証が有利)",
     standardBetter: "(標準が有利)",
+    noDifference: "(差額なし)",
     monthly: "月",
 
     // Charts
@@ -248,7 +249,7 @@ export const translations = {
     paybackPeriod: "Payback Period",
     standardRiSp: "Standard RI/SP Cost",
     savingsAmount: "Savings",
-    months: "mo",
+    months: "Months",
 
     // Revenue Highlight
     mspGrossProfitWarranty: "MSP Estimated Gross Profit (Guaranteed Commitment)",
@@ -256,6 +257,7 @@ export const translations = {
     profitDiff: "Revenue Difference (Guaranteed vs Standard)",
     warrantyBetter: "(Guaranteed Commitment is better)",
     standardBetter: "(Standard is better)",
+    noDifference: "(No Difference)",
     monthly: "/ month",
 
     // Charts

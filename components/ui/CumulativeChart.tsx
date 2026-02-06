@@ -66,8 +66,8 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
       {
         label: t('standardRiSp') + t('cumulativeLabel'),
         data: cumulative.standard,
-        borderColor: 'rgba(14, 165, 233, 1)', // primary-500
-        backgroundColor: 'rgba(14, 165, 233, 0.1)',
+        borderColor: 'rgba(28, 88, 217, 1)', // primary-600
+        backgroundColor: 'rgba(28, 88, 217, 0.1)',
         borderWidth: 2,
         tension: 0.4,
         fill: true,
@@ -75,8 +75,8 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
       {
         label: t('standardRiSp') + t('totalExpenditureLabel'),
         data: standardTotalExpenditure,
-        borderColor: 'rgba(14, 165, 233, 0.6)', // primary-500 with opacity
-        backgroundColor: 'rgba(14, 165, 233, 0.05)',
+        borderColor: 'rgba(28, 88, 217, 0.6)', // primary-600 with opacity
+        backgroundColor: 'rgba(28, 88, 217, 0.05)',
         borderWidth: 3,
         borderDash: [5, 5],
         tension: 0.4,
@@ -101,7 +101,7 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
           padding: 15,
           font: {
             size: 11,
-            weight: '600' as const,
+            weight: 'bold' as const,
           },
           generateLabels: (chart: any) => {
             const original = ChartJS.defaults.plugins.legend.labels.generateLabels(chart)
@@ -147,6 +147,7 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
         },
       },
     },
+
     scales: {
       y: {
         beginAtZero: true,
@@ -159,7 +160,7 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
           display: true,
           text: t('cumulativeCostUsd'),
           font: {
-            weight: '600' as const,
+            weight: 'bold' as const,
           },
         },
       },
@@ -168,7 +169,7 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
           display: true,
           text: t('elapsedMonths'),
           font: {
-            weight: '600' as const,
+            weight: 'bold' as const,
           },
         },
       },
@@ -180,15 +181,15 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
 
   return (
     <div className="bg-white rounded-xl shadow-lg p-6 border border-secondary-200">
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex flex-col gap-2 mb-4">
         <h3 className="text-xl font-bold text-secondary-900 flex items-center gap-2">
           <LineChartIcon size={24} className="text-primary-600" />
           {t('cumulativeCostTrend')}（{t('contractTerm')}: {termDisplay}）
         </h3>
-        <div className="flex gap-4 text-sm">
+        <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm ml-1">
           {standardPlan.break_even_months !== null && (
             <div className="flex items-center gap-2">
-              <TargetIcon size={16} className="text-primary-600" />
+              <TargetIcon size={16} className="text-primary-600 flex-shrink-0" />
               <span className="text-secondary-600">
                 {t('standardRiSp')} {t('breakEven')}: <span className="font-semibold text-primary-600">{standardPlan.break_even_months}{t('months')}</span>
               </span>
@@ -196,7 +197,7 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
           )}
           {insurancePlan.break_even_months !== null && (
             <div className="flex items-center gap-2">
-              <TargetIcon size={16} className="text-success-600" />
+              <TargetIcon size={16} className="text-success-600 flex-shrink-0" />
               <span className="text-secondary-600">
                 {t('commitmentWarranty')} {t('breakEven')}: <span className="font-semibold text-success-600">{insurancePlan.break_even_months}{t('months')}</span>
               </span>

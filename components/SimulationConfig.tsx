@@ -161,7 +161,7 @@ export default function SimulationConfig({ onSimulate, isLoading }: SimulationCo
         <button
           onClick={handleSimulate}
           disabled={isLoading}
-          className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary-600 to-accent-600 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center gap-2 px-6 py-3 bg-primary-600 text-white font-semibold rounded-lg shadow-md hover:shadow-lg hover:bg-primary-700 transform hover:-translate-y-0.5 transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <RocketIcon size={20} />
           {isLoading ? t('calculating') : t('simulate')}

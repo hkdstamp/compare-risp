@@ -39,8 +39,8 @@ export default function MonthlyChart({ baselineCost, insurance, standard, isMSPM
       {
         label: t('standardRiSp'),
         data: [standard.monthly_cost, standard.monthly_savings],
-        backgroundColor: 'rgba(14, 165, 233, 0.7)', // primary-500
-        borderColor: 'rgba(14, 165, 233, 1)',
+        backgroundColor: 'rgba(28, 88, 217, 0.7)', // primary-600
+        borderColor: 'rgba(28, 88, 217, 1)',
         borderWidth: 2,
       },
     ],
