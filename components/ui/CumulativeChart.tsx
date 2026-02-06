@@ -66,8 +66,8 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
       {
         label: t('standardRiSp') + t('cumulativeLabel'),
         data: cumulative.standard,
-        borderColor: 'rgba(14, 165, 233, 1)', // primary-500
-        backgroundColor: 'rgba(14, 165, 233, 0.1)',
+        borderColor: 'rgba(28, 88, 217, 1)', // primary-600
+        backgroundColor: 'rgba(28, 88, 217, 0.1)',
         borderWidth: 2,
         tension: 0.4,
         fill: true,
@@ -75,8 +75,8 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
       {
         label: t('standardRiSp') + t('totalExpenditureLabel'),
         data: standardTotalExpenditure,
-        borderColor: 'rgba(14, 165, 233, 0.6)', // primary-500 with opacity
-        backgroundColor: 'rgba(14, 165, 233, 0.05)',
+        borderColor: 'rgba(28, 88, 217, 0.6)', // primary-600 with opacity
+        backgroundColor: 'rgba(28, 88, 217, 0.05)',
         borderWidth: 3,
         borderDash: [5, 5],
         tension: 0.4,
