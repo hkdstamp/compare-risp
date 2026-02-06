@@ -1,6 +1,5 @@
 'use client'
 
-import { useRef } from 'react'
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js'
 import { Line } from 'react-chartjs-2'
 import { CumulativeData, PlanResult } from '@/lib/types'
@@ -214,7 +213,7 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
               <li><strong>{t('legendSolid')}</strong>{t('legendSolidDesc')}</li>
               <li><strong>{t('legendDashed')}</strong>{t('legendDashedDesc')}</li>
               <li dangerouslySetInnerHTML={{ __html: t('legendBreakEven') }} />
-              <li>{t('legendXAxis').replace('{termDisplay}', termDisplay)}</li>
+              <li>{t('legendXAxis')} ({termDisplay})</li>
             </ul>
           </div>
         </div>

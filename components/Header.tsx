@@ -16,9 +16,11 @@ export default function Header() {
             {t('subtitle')}
           </p>
         </div>
-        <div className="flex items-center bg-gray-100 rounded-lg p-1">
+        <div className="flex items-center bg-gray-100 rounded-lg p-1" role="group" aria-label="Language selection">
           <button
             onClick={() => setLanguage('ja')}
+            aria-pressed={language === 'ja'}
+            aria-label="Switch to Japanese language"
             className={`px-3 py-1 text-sm font-medium rounded-md transition-colors ${
               language === 'ja'
                 ? 'bg-white text-primary-600 shadow-sm'
@@ -29,6 +31,8 @@ export default function Header() {
           </button>
           <button
             onClick={() => setLanguage('en')}
+            aria-pressed={language === 'en'}
+            aria-label="Switch to English language"
             className={`px-3 py-1 text-sm font-medium rounded-md transition-colors ${
               language === 'en'
                 ? 'bg-white text-primary-600 shadow-sm'

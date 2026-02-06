@@ -236,7 +236,7 @@ export const translations = {
     // Cost Cards
     onDemandCost: "On-Demand Price",
     monthlyCost: "Monthly Cost",
-    commitmentWarranty: "Guaranteed Commitment Price",
+    commitmentWarranty: "Guaranteed Commitment Cost",
     includesOnDemandNote: "* Includes uncovered on-demand costs",
     monthlySavings: "Savings",
     costSavings: "Cost Savings",
@@ -270,7 +270,7 @@ export const translations = {
     legendDashed: "Dashed Line (Total Expenditure)",
     legendDashedDesc: ": Shows total expenditure (Initial Fee + Total Monthly Fee for the entire term) for each month",
     legendBreakEven: "The <strong>break-even point</strong> is where the dashed line for standard RI/SP intersects with the solid line for regular price.",
-    legendXAxis: "The horizontal axis corresponds to the standard RI/SP contract period (1 year).",
+    legendXAxis: "The horizontal axis corresponds to the standard RI/SP contract period",
     breakEvenPoint: "Break-Even Point",
     costUsd: "Cost (USD)",
     elapsedMonths: "Months Elapsed",
