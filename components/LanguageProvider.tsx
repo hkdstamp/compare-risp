@@ -16,7 +16,20 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   // Load saved language preference (if validation allows)
   useEffect(() => {
-    // Check if we can access localStorage (might fail in iframe)
+    // 1. First priority: Referrer URL check (for Webflow embedding)
+    // Matches /jp/ or /en/ in the parent URL
+    if (typeof document !== 'undefined' && document.referrer) {
+      if (document.referrer.includes('/jp/')) {
+        setLanguage('ja');
+        return;
+      }
+      if (document.referrer.includes('/en/')) {
+        setLanguage('en');
+        return;
+      }
+    }
+
+    // 2. Second priority: localStorage
     try {
       const saved = localStorage.getItem('app_language') as Language;
       if (saved && (saved === 'ja' || saved === 'en')) {
@@ -27,9 +40,27 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       console.warn('LocalStorage access denied (iframe context?)');
     }
 
-    // Fallback to browser language if no preference is saved
+    // 3. Fallback: Browser language
     if (typeof navigator !== 'undefined' && navigator.language.startsWith('en')) {
       setLanguage('en');
+    }
+  }, []);
+
+  // Listen for language change messages (e.g., from Webflow parent)
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      // Accept messages like { type: 'SET_LANGUAGE', lang: 'en' }
+      if (event.data && event.data.type === 'SET_LANGUAGE') {
+        const newLang = event.data.lang;
+        if (newLang === 'ja' || newLang === 'en') {
+          handleSetLanguage(newLang);
+        }
+      }
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('message', handleMessage);
+      return () => window.removeEventListener('message', handleMessage);
     }
   }, []);
 
