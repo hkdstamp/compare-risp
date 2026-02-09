@@ -16,23 +16,20 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   // Load saved language preference (if validation allows)
   useEffect(() => {
-    // 1. First priority: Post-load override check from Referrer
-    // If referrer is explicitly Japanese, force Japanese.
-    // If referrer is NOT Japanese but we are in a Webflow context, default to English.
+    // 1. First priority: Referrer URL check
+    // Matches /jp/ or /en/ in the parent URL to determine language context
     if (typeof document !== 'undefined' && document.referrer) {
       if (document.referrer.includes('/jp/')) {
         setLanguage('ja');
         return;
       }
-      // If referrer exists but isn't JP, and we know it's our site, prefer EN.
-      // This handles the case where the English site is root '/' without '/en/' segment.
-      if (document.referrer.includes('alphaus') || document.referrer.includes('webflow')) {
+      if (document.referrer.includes('/en/')) {
          setLanguage('en');
          return;
       }
     }
 
-    // 2. Third priority: localStorage
+    // 2. Second priority: localStorage
     try {
       const saved = localStorage.getItem('app_language') as Language;
       if (saved && (saved === 'ja' || saved === 'en')) {
