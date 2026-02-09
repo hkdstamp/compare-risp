@@ -16,16 +16,16 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   // Load saved language preference (if validation allows)
   useEffect(() => {
-    // 1. First priority: Referrer URL check (for Webflow embedding)
-    // Matches /jp/ or /en/ in the parent URL
+    // 1. First priority: Referrer URL check
+    // Matches /jp/ or /en/ in the parent URL to determine language context
     if (typeof document !== 'undefined' && document.referrer) {
       if (document.referrer.includes('/jp/')) {
         setLanguage('ja');
         return;
       }
       if (document.referrer.includes('/en/')) {
-        setLanguage('en');
-        return;
+         setLanguage('en');
+         return;
       }
     }
 
