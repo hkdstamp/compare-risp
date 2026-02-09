@@ -16,8 +16,18 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   // Load saved language preference (if validation allows)
   useEffect(() => {
-    // 1. First priority: Referrer URL check
-    // Matches /jp/ or /en/ in the parent URL to determine language context
+    // 1. Check URL parameters (highest priority for explicit overrides)
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const urlLang = params.get('lang');
+      if (urlLang === 'ja' || urlLang === 'en') {
+        setLanguage(urlLang);
+        return;
+      }
+    }
+
+    // 2. Check Referrer URL (for Webflow embedding)
+    // Note: This may fail in cross-origin iframes if Referrer-Policy is strict
     if (typeof document !== 'undefined' && document.referrer) {
       if (document.referrer.includes('/jp/')) {
         setLanguage('ja');
@@ -29,7 +39,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       }
     }
 
-    // 2. Second priority: localStorage
+    // 3. Check localStorage
     try {
       const saved = localStorage.getItem('app_language') as Language;
       if (saved && (saved === 'ja' || saved === 'en')) {
