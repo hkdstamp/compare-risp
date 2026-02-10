@@ -7,6 +7,7 @@ import SimulationResults from "@/components/SimulationResults";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ResourceSelector from "@/components/ResourceSelector";
+import { useLanguage } from '@/components/LanguageProvider';
 import { SimulationResult, ResourceConfig } from "@/lib/types";
 import { defaultResources } from "@/lib/pricing-catalog";
 import { cn } from "@/lib/utils";
@@ -18,6 +19,7 @@ interface PostMessageData {
 }
 
 function HomeContent() {
+  const { t } = useLanguage();
   const searchParams = useSearchParams();
   const [simulationResult, setSimulationResult] =
     useState<SimulationResult | null>(null);
@@ -211,7 +213,7 @@ function HomeContent() {
             <div className="bg-white rounded-xl shadow-lg p-8 border border-secondary-200">
               <div className="flex flex-col items-center justify-center space-y-4">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-                <p className="text-secondary-600">計算中...</p>
+                <p className="text-secondary-600">{t('calculating')}</p>
               </div>
             </div>
           )}
