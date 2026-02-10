@@ -30,7 +30,7 @@ export default function RevenueForecastReport({
     const currentCoverage = result.coverage !== undefined ? result.coverage : 1.0
     const hours = pricingCatalog.metadata.hours_per_month
     
-    // 保証プランの情報を取得（保証期間の減額計算用）
+    // プランの情報を取得（プラン期間の減額計算用）
     const insurancePlan = pricingCatalog.insurance_plans[insurancePlanKey]
     const insuranceTermMonths = insurancePlan.term_months // 1 or 12
 
@@ -99,9 +99,9 @@ export default function RevenueForecastReport({
         revenue: total12months.revenue * 3
       }
 
-      // 3年間の返金見込みは保証期間分を減額
-      // 30日保証（1ヶ月）: 1ヶ月分減額
-      // 1年保証（12ヶ月）: 12ヶ月分減額
+      // 3年間のコスト還元見込はプラン期間分を減額
+      // 30日プラン（1ヶ月）: 1ヶ月分減額
+      // 1年プラン（12ヶ月）: 12ヶ月分減額
       const refundDeduction = expectedRefund * insuranceTermMonths
       const expectedRefund3Years = total36months_base.expected_refund - refundDeduction
 
@@ -170,7 +170,7 @@ export default function RevenueForecastReport({
               <li>レベニュー = リスクプレミアム料 × 20%</li>
               <li>リスクプレミアム料が0の場合、レベニューも0</li>
               <li>3年契約RI/SP付帯前提での36ヶ月計算</li>
-              <li>3年間の返金見込みは保証期間分を減額（30日保証:1ヶ月分、1年保証:12ヶ月分）</li>
+              <li>3年間のコスト還元見込はプラン期間分を減額（30日プラン:1ヶ月分、1年プラン:12ヶ月分）</li>
             </ul>
           </div>
         </div>
@@ -185,13 +185,13 @@ export default function RevenueForecastReport({
                 想定<br/>カバレッジ
               </th>
               <th className="px-4 py-3 text-right text-sm font-semibold text-secondary-900">
-                コミットメント保証<br/>月額
+                スマート予約割引<br/>月額
               </th>
               <th className="px-4 py-3 text-right text-sm font-semibold text-secondary-900">
                 リスクプレミアム料<br/>(月額)
               </th>
               <th className="px-4 py-3 text-right text-sm font-semibold text-secondary-900">
-                返金見込<br/>(月額)
+                コスト還元見込<br/>(月額)
               </th>
               <th className="px-4 py-3 text-right text-sm font-semibold text-warning-700">
                 レベニュー<br/>(月額)
@@ -200,7 +200,7 @@ export default function RevenueForecastReport({
                 レベニュー<br/>(12ヶ月)
               </th>
               <th className="px-4 py-3 text-right text-sm font-semibold text-accent-600 bg-accent-50">
-                3年間<br/>返金見込
+                3年間<br/>コスト還元見込
               </th>
               <th className="px-4 py-3 text-right text-sm font-semibold text-primary-700 bg-primary-100">
                 レベニュー<br/>(36ヶ月)
@@ -331,7 +331,7 @@ export default function RevenueForecastReport({
         <p>※ レベニュー = リスクプレミアム料 × 20%</p>
         <p>※ リスクプレミアム料が0の場合、レベニューも0として計算されます</p>
         <p>※ 12ヶ月合計は月額の12倍、36ヶ月合計は12ヶ月合計の3倍で計算</p>
-        <p>※ 3年間の返金見込みは、保証期間分を減額（30日保証: 1ヶ月分減額、1年保証: 12ヶ月分減額）</p>
+        <p>※ 3年間のコスト還元見込は、プラン期間分を減額（30日プラン: 1ヶ月分減額、1年プラン: 12ヶ月分減額）</p>
         <p>※ 背景色が強調されている行が現在の設定値です</p>
       </div>
     </section>

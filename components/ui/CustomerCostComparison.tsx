@@ -9,7 +9,7 @@ interface CustomerCostComparisonProps {
 }
 
 export default function CustomerCostComparison({ baselineCost, insurance, standard }: CustomerCostComparisonProps) {
-  // コミットメント保証の実効コスト（返金を考慮）
+  // スマート予約割引の実効コスト（コスト還元を考慮）
   const insuranceEffectiveCost = insurance.monthly_cost - (insurance.expected_refund || 0)
   const insuranceTotalSavings = baselineCost - insuranceEffectiveCost
   
@@ -51,7 +51,7 @@ export default function CustomerCostComparison({ baselineCost, insurance, standa
             <div className="p-2 bg-accent-100 rounded-lg">
               <ShieldIcon size={20} className="text-accent-600" />
             </div>
-            <h4 className="font-bold text-secondary-900">コミットメント保証</h4>
+            <h4 className="font-bold text-secondary-900">スマート予約割引</h4>
           </div>
           <div className="space-y-2">
             <div className="text-sm text-secondary-600">月額コスト</div>
@@ -61,7 +61,7 @@ export default function CustomerCostComparison({ baselineCost, insurance, standa
               <div className="bg-accent-50 px-3 py-2 rounded-lg border border-accent-200 mt-2">
                 <div className="flex items-center gap-2 text-sm text-accent-700">
                   <CoinsIcon size={16} />
-                  <span>返金見込: {formatCurrency(insurance.expected_refund)}</span>
+                  <span>コスト還元見込: {formatCurrency(insurance.expected_refund)}</span>
                 </div>
               </div>
             )}
@@ -117,7 +117,7 @@ export default function CustomerCostComparison({ baselineCost, insurance, standa
       <div className="mt-6 bg-white rounded-lg p-5 border-2 border-accent-300">
         <h4 className="font-bold text-secondary-900 mb-3 flex items-center gap-2">
           <CoinsIcon size={20} className="text-accent-600" />
-          コミットメント保証の優位性
+          スマート予約割引の優位性
         </h4>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
@@ -136,10 +136,10 @@ export default function CustomerCostComparison({ baselineCost, insurance, standa
             </div>
           </div>
           <div className="bg-accent-50 p-4 rounded-lg border border-accent-200">
-            <div className="text-sm text-accent-700 mb-2">✅ コミットメント保証の特徴</div>
+            <div className="text-sm text-accent-700 mb-2">✅ スマート予約割引の特徴</div>
             <ul className="text-xs text-secondary-700 space-y-1">
               <li>• 初期費用ゼロで導入可能</li>
-              <li>• Savingsの損失に応じて返金あり</li>
+              <li>• Savingsの損失に応じてコスト還元あり</li>
               <li>• 柔軟な契約期間（30日/1年）</li>
               <li>• 高いコスト削減効果</li>
             </ul>

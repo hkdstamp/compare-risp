@@ -11,7 +11,7 @@ export default function RevenueHighlight({ insuranceSavings, standardSavings, re
     <div className="bg-gradient-to-r from-warning-500 to-warning-600 rounded-xl shadow-lg p-8 border border-warning-400">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="space-y-2">
-          <div className="text-white/90 text-sm font-medium">MSP想定粗利 (コミットメント保証)</div>
+          <div className="text-white/90 text-sm font-medium">MSP想定粗利 (スマート予約割引)</div>
           <div className="text-white text-2xl font-bold">{formatCurrency(insuranceSavings)} / 月</div>
         </div>
 
@@ -25,7 +25,7 @@ export default function RevenueHighlight({ insuranceSavings, standardSavings, re
           <div className={`text-2xl font-bold ${revenueDiff >= 0 ? 'text-green-200' : 'text-red-200'}`}>
             {revenueDiff >= 0 ? '+' : ''}{formatCurrency(Math.abs(revenueDiff))} / 月
             <span className="text-sm ml-2">
-              {revenueDiff > 0 ? '(保証が有利)' : revenueDiff < 0 ? '(標準が有利)' : ''}
+              {revenueDiff > 0 ? '(予約割引が有利)' : revenueDiff < 0 ? '(標準が有利)' : ''}
             </span>
           </div>
         </div>

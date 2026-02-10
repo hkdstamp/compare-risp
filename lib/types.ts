@@ -44,7 +44,7 @@ export interface RevenueForecastItem {
   coverage: number        // カバレッジ (%)
   monthly_cost: number    // 月額コスト
   premium: number         // リスクプレミアム料
-  expected_refund: number // 返金見込み
+  expected_refund: number // コスト還元見込み
   revenue: number         // レベニュー (リスクプレミアム料の30%)
   total_12months: {       // 12ヶ月合計
     monthly_cost: number
@@ -55,7 +55,7 @@ export interface RevenueForecastItem {
   total_36months: {       // 36ヶ月合計（3年間）
     monthly_cost: number
     premium: number
-    expected_refund_3years: number  // 3年間の返金見込（保証期間分を減額）
+    expected_refund_3years: number  // 3年間のコスト還元見込（プラン期間分を減額）
     revenue: number
   }
 }
