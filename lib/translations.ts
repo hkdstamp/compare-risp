@@ -1,7 +1,7 @@
 export const translations = {
   ja: {
     // Header
-    title: "Ripple コミットメント保証 収益シミュレーター",
+    title: "Ripple スマート予約割引 収益シミュレーター",
     subtitle: "Ripple/Wave向けコスト最適化・収益モデル分析ツール",
 
     // Config
@@ -9,14 +9,14 @@ export const translations = {
     discountDetails: "割引率の詳細",
     
     // Labels
-    planLabel: "コミットメント保証プラン",
+    planLabel: "スマート予約割引プラン",
     termLabel: "標準RI/SP 契約期間",
     typeLabel: "標準RI/SP タイプ",
     coverageLabel: "想定カバレッジ",
     uptimeLabel: "想定利用率",
     
     // Hints
-    warrantyHint: "保証期間終了後、Savingsの損失分は返金",
+    warrantyHint: "プラン期間終了後、Savingsの損失分はコスト還元",
     coverageHint: "リソース全体の何%をRI/SPでカバーするか",
     uptimeHint: "リソースの実稼働率",
     
@@ -27,8 +27,8 @@ export const translations = {
     addResource: "リソース追加",
 
     // Options
-    warranty30d: "30日保証 (40%割引 / 50%リスクプレミアム料)",
-    warranty1y: "1年保証 (40%割引 / 33%リスクプレミアム料)",
+    warranty30d: "30日プラン (40%割引 / 50%リスクプレミアム料)",
+    warranty1y: "1年プラン (40%割引 / 33%リスクプレミアム料)",
     term1yr: "1年予約",
     term3yr: "3年予約",
     optionNoUpfront: "RI - NoUpfront (全額後払い)",
@@ -59,17 +59,17 @@ export const translations = {
 
     // Warning
     importantNote: "重要な注意事項",
-    noteContent: "対象リソースのサービスに対応する標準RI/SPが１年契約のみの場合、１年保証のコミットメント保証は提供されません。本シミュレーションでは考慮していないため、ご留意ください。",
+    noteContent: "対象リソースのサービスに対応する標準RI/SPが１年契約のみの場合、１年プランのスマート予約割引は提供されません。本シミュレーションでは考慮していないため、ご留意ください。",
 
     // Cost Cards
     onDemandCost: "通常価格 (On-Demand)",
     monthlyCost: "月額コスト",
-    commitmentWarranty: "コミットメント保証",
+    commitmentWarranty: "スマート予約割引",
     includesOnDemandNote: "※ 適用されない分のオンデマンドコストを含みます",
     monthlySavings: "月間削減額",
     costSavings: "コスト削減",
     effectiveSavings: "実質削減",
-    expectedRefund: "返金見込",
+    expectedRefund: "コスト還元見込",
     riskPremium: "リスクプレミアム料",
     initialCost: "初期コスト",
     breakEven: "損益分岐",
@@ -79,10 +79,10 @@ export const translations = {
     months: "ヶ月",
 
     // Revenue Highlight
-    mspGrossProfitWarranty: "想定削減額 (コミットメント保証)",
+    mspGrossProfitWarranty: "想定削減額 (スマート予約割引)",
     mspGrossProfitStandard: "想定削減額 (標準RI/SP)",
-    profitDiff: "削減額の差 (保証 vs 標準)",
-    warrantyBetter: "(保証が有利)",
+    profitDiff: "削減額の差 (スマート予約割引 vs 標準)",
+    warrantyBetter: "(スマート予約割引が有利)",
     standardBetter: "(標準が有利)",
     noDifference: "(差額なし)",
     monthly: "月",
@@ -111,8 +111,8 @@ export const translations = {
     // Details Table
     resourceBreakdown: "リソース別詳細内訳",
     resource: "リソース",
-    warrantyInitialCost: "保証初期コスト",
-    warrantySavings: "保証削減額",
+    warrantyInitialCost: "スマート予約割引初期コスト",
+    warrantySavings: "スマート予約割引削減額",
     standardInitialCost: "標準初期コスト",
     standardSavings: "標準削減額",
 
@@ -122,15 +122,15 @@ export const translations = {
     reductionRate: "削減率",
     recommended: "おすすめ",
     initialFee: "初期費用",
-    warrantyAdvantage: "コミットメント保証の優位性",
+    warrantyAdvantage: "スマート予約割引の優位性",
     comparedToStandard: "標準RI/SPと比較して",
     cheaper: "お得",
     moreExpensive: "高い",
     initialCostDiff: "初期費用の差",
     notRequired: "不要",
-    warrantyFeatures: "コミットメント保証の特徴",
+    warrantyFeatures: "スマート予約割引の特徴",
     featureZeroUpfront: "• 初期費用ゼロで導入可能",
-    featureRefund: "• Savingsの損失に応じて返金あり",
+    featureRefund: "• Savingsの損失に応じてコスト還元あり",
     featureFlexibleTerm: "• 柔軟な契約期間（30日/1年）",
     featureHighSavings: "• 高いコスト削減効果",
 
@@ -146,16 +146,16 @@ export const translations = {
     conditionRevenueFormula: "レベニュー = リスクプレミアム料 × 20%",
     conditionRevenueZero: "リスクプレミアム料が0の場合、レベニューも0",
     condition3Year: "3年契約RI/SP付帯前提での36ヶ月計算",
-    conditionRefundDeduction: "3年間の返金見込みは保証期間分を減額（30日保証:1ヶ月分、1年保証:12ヶ月分）",
+    conditionRefundDeduction: "3年間のコスト還元見込みはプラン期間分を減額（30日プラン:1ヶ月分、1年プラン:12ヶ月分）",
     
     // Forecast Table Headers
     headerCoverage: "想定カバレッジ",
-    headerWarrantyMonthly: "コミットメント保証\n月額",
+    headerWarrantyMonthly: "スマート予約割引\n月額",
     headerRiskPremiumMonthly: "リスクプレミアム料\n(月額)",
-    headerRefundMonthly: "返金見込\n(月額)",
+    headerRefundMonthly: "コスト還元見込\n(月額)",
     headerRevenueMonthly: "レベニュー\n(月額)",
     headerRevenue12Months: "レベニュー\n(12ヶ月)",
-    headerRefund3Years: "3年間\n返金見込",
+    headerRefund3Years: "3年間\nコスト還元見込",
     headerRevenue36Months: "レベニュー\n(36ヶ月)",
     
     // Forecast Table Body/Footer
@@ -166,7 +166,7 @@ export const translations = {
     noteRevenueFormula: "※ レベニュー = リスクプレミアム料 × 20%",
     noteRevenueZero: "※ リスクプレミアム料が0の場合、レベニューも0として計算されます",
     noteTotalCalc: "※ 12ヶ月合計は月額の12倍、36ヶ月合計は12ヶ月合計の3倍で計算",
-    noteRefundDeduction: "※ 3年間の返金見込みは、保証期間分を減額（30日保証: 1ヶ月分減額、1年保証: 12ヶ月分減額）",
+    noteRefundDeduction: "※ 3年間のコスト還元見込みは、プラン期間分を減額（30日プラン: 1ヶ月分減額、1年プラン: 12ヶ月分減額）",
     noteHighlight: "※ 背景色が強調されている行が現在の設定値です",
 
     // Footer
