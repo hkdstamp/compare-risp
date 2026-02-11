@@ -12,7 +12,7 @@ interface CustomerCostComparisonProps {
 export default function CustomerCostComparison({ baselineCost, insurance, standard }: CustomerCostComparisonProps) {
   const { t } = useLanguage()
 
-  // コミットメント保証の実効コスト（返金を考慮）
+  // スマート予約割引の実効コスト（コスト還元を考慮）
   const insuranceEffectiveCost = insurance.monthly_cost - (insurance.expected_refund ?? 0)
   const insuranceTotalSavings = baselineCost - insuranceEffectiveCost
   

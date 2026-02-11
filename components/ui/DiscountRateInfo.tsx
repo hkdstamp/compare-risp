@@ -41,13 +41,13 @@ export default function DiscountRateInfo() {
               <section>
                 <h4 className="text-lg font-bold text-secondary-900 mb-3 flex items-center gap-2">
                   <ShieldIcon size={22} className="text-accent-600" />
-                  コミットメント保証
+                  スマート予約割引
                 </h4>
                 <div className="bg-success-50 border-l-4 border-success-500 p-4 mb-4">
                   <p className="text-sm text-secondary-700 space-y-1">
                     <strong>注記：</strong>
-                    <br/>• <strong>30日保証：</strong>EC2はComputeSP 3年相当（40%割引）、その他サービスは3年 RI NoUpfront で算定
-                    <br/>• <strong>1年保証：</strong>EC2はComputeSP 3年相当（40%割引）、RDSは3年 RI PartialUpfront で算定（初期費用あり）、その他サービスは3年 RI NoUpfront で算定
+                    <br/>• <strong>30日プラン：</strong>EC2はComputeSP 3年相当（40%割引）、その他サービスは3年 RI NoUpfront で算定
+                    <br/>• <strong>1年プラン：</strong>EC2はComputeSP 3年相当（40%割引）、RDSは3年 RI PartialUpfront で算定（初期費用あり）、その他サービスは3年 RI NoUpfront で算定
                   </p>
                 </div>
                 <div className="overflow-x-auto">
@@ -63,14 +63,14 @@ export default function DiscountRateInfo() {
                     </thead>
                     <tbody>
                       <tr className="hover:bg-secondary-50">
-                        <td className="border border-secondary-300 px-4 py-2 text-secondary-900">30日保証</td>
+                        <td className="border border-secondary-300 px-4 py-2 text-secondary-900">30日プラン</td>
                         <td className="border border-secondary-300 px-4 py-2 text-center font-semibold text-success-600">40%</td>
                         <td className="border border-secondary-300 px-4 py-2 text-center text-secondary-700">50%</td>
                         <td className="border border-secondary-300 px-4 py-2 text-center font-semibold text-primary-600">20.0%</td>
                         <td className="border border-secondary-300 px-4 py-2 text-right text-secondary-900">$63.53</td>
                       </tr>
                       <tr className="hover:bg-secondary-50">
-                        <td className="border border-secondary-300 px-4 py-2 text-secondary-900">1年保証</td>
+                        <td className="border border-secondary-300 px-4 py-2 text-secondary-900">1年プラン</td>
                         <td className="border border-secondary-300 px-4 py-2 text-center font-semibold text-success-600">40%</td>
                         <td className="border border-secondary-300 px-4 py-2 text-center text-secondary-700">33%</td>
                         <td className="border border-secondary-300 px-4 py-2 text-center font-semibold text-primary-600">26.8%</td>
@@ -81,9 +81,9 @@ export default function DiscountRateInfo() {
                 </div>
                 <div className="mt-3 text-xs text-secondary-600 space-y-1">
                   <p>✅ 契約期間30日または1年（短期契約が可能）</p>
-                  <p>✅ Savingsの損失分は返金される柔軟性</p>
-                  <p>✅ <strong>30日保証：</strong>初期費用ゼロ</p>
-                  <p>⚠️ <strong>1年保証：</strong>RDSリソース使用時は初期費用が発生（RI 3年 PartialUpfront相当）</p>
+                  <p>✅ Savingsの損失分はコスト還元される柔軟性</p>
+                  <p>✅ <strong>30日プラン：</strong>初期費用ゼロ</p>
+                  <p>⚠️ <strong>1年プラン：</strong>RDSリソース使用時は初期費用が発生（RI 3年 PartialUpfront相当）</p>
                   <p>✅ EC2はComputeSP 3年相当（40%割引）を基準に算定</p>
                 </div>
               </section>
@@ -249,11 +249,11 @@ export default function DiscountRateInfo() {
                   </div>
                   <div className="flex items-start gap-2">
                     <span className="text-primary-600 font-bold">3.</span>
-                    <p className="text-secondary-700"><strong>柔軟性を重視：</strong>コミットメント保証 1年保証 (26.8%) ← 短期契約＋返金保証</p>
+                    <p className="text-secondary-700"><strong>柔軟性を重視：</strong>スマート予約割引 1年プラン (26.8%) ← 短期契約＋コスト還元</p>
                   </div>
                   <div className="flex items-start gap-2">
                     <span className="text-primary-600 font-bold">4.</span>
-                    <p className="text-secondary-700"><strong>超短期利用：</strong>コミットメント保証 30日保証 (20.0%)</p>
+                    <p className="text-secondary-700"><strong>超短期利用：</strong>スマート予約割引 30日プラン (20.0%)</p>
                   </div>
                 </div>
               </section>
