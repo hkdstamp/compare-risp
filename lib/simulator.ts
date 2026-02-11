@@ -169,7 +169,7 @@ export function calculateInsurancePlan(
 
   return {
     result: {
-      name: `コミットメント保証 ${plan.name}`,
+      name: `スマート予約割引 ${plan.name}`,
       monthly_cost: totalMonthlyCost,
       monthly_savings: effectiveMonthlySavings,
       initial_cost: totalInsuranceUpfront,  // Include upfront cost

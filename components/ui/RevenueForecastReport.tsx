@@ -32,7 +32,7 @@ export default function RevenueForecastReport({
     const currentCoverage = result.coverage !== undefined ? result.coverage : 1.0
     const hours = pricingCatalog.metadata.hours_per_month
     
-    // 保証プランの情報を取得（保証期間の減額計算用）
+    // プランの情報を取得（プラン期間の減額計算用）
     const insurancePlan = pricingCatalog.insurance_plans[insurancePlanKey]
     const insuranceTermMonths = insurancePlan.term_months // 1 or 12
 
@@ -101,9 +101,9 @@ export default function RevenueForecastReport({
         revenue: total12months.revenue * 3
       }
 
-      // 3年間の返金見込みは保証期間分を減額
-      // 30日保証（1ヶ月）: 1ヶ月分減額
-      // 1年保証（12ヶ月）: 12ヶ月分減額
+      // 3年間のコスト還元見込はプラン期間分を減額
+      // 30日プラン（1ヶ月）: 1ヶ月分減額
+      // 1年プラン（12ヶ月）: 12ヶ月分減額
       const refundDeduction = expectedRefund * insuranceTermMonths
       const expectedRefund3Years = total36months_base.expected_refund - refundDeduction
 
@@ -169,10 +169,12 @@ export default function RevenueForecastReport({
                   : t('conditionCoveragePlusMinus')
                 }
               </li>
-              <li>{t('conditionRevenueFormula')}</li>
-              <li>{t('conditionRevenueZero')}</li>
-              <li>{t('condition3Year')}</li>
-              <li>{t('conditionRefundDeduction')}</li>
+                <li>
+                  {t('conditionRevenueFormula')}
+                </li>
+                <li>{t('conditionRevenueZero')}</li>
+                <li>{t('condition3Year')}</li>
+                <li>{t('conditionRefundDeduction')}</li>
             </ul>
           </div>
         </div>

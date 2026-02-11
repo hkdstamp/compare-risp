@@ -135,7 +135,7 @@ export default function CumulativeChart({ cumulative, standardPlan, insurancePla
             
             // Check if insurance break-even month
             if (insurancePlan.break_even_months !== null && month === insurancePlan.break_even_months) {
-              footer.push('◆ ' + t('commitmentWarranty') + t('breakEvenPointLabel'))
+              footer.push('■ ' + t('commitmentWarranty') + t('breakEvenPointLabel'))
             }
             
             // Check if standard break-even month
