@@ -6,8 +6,8 @@
 2. [計算仕様](#計算仕様)
    - [割引率の詳細](#1-割引率の詳細)
    - [基本用語定義](#2-基本用語定義)
-   - [保険コミットメント計算](#3-保険risp計算)
-   - [標準RI/SP計算](#4-標準risp計算)
+  - [保険コミットメント計算](#3-保険コミットメント計算)
+  - [標準RI/SP計算](#4-標準RI/SP計算)
    - [累積コスト計算](#5-累積コスト計算)
 3. [UI設計](#ui設計)
 4. [データ構造](#データ構造)
@@ -201,7 +201,7 @@
 
 ### 3. 保険コミットメント計算
 
-#### 2.1 月額コスト計算（2026年1月最新版）
+#### 3.1 月額コスト計算（2026年1月最新版）
 
 **重要**: 保険コミットメント料金は**固定**です。カバレッジに関係なく常に同じ金額を支払います。
 
@@ -255,10 +255,10 @@ monthlyCost = insuranceCoveredCost + premium + remainingCost - expectedRefund
 **新しい計算方式のポイント**:
 - ✅ 保険コミットメント料金は**固定**（カバレッジに無関係）
 - ✅ 基準は「標準RI/SP 3年NoUpfrontの100%使用時コスト」
-- ✅ カバレッジが低い場合は返金が発生
-- ✅ 返金発生時は保険料が0になる
+- ✅ カバレッジが低いとオンデマンドカバー分 < 保険コミットメント料金となり返金が発生する
+- ✅ 返金額 = max(0, 保険コミットメント料金 − オンデマンドカバー分)。返金発生時は保険料が0になる
 
-#### 2.2 返金見込み計算（Expected Refund）- 2026年1月最新版
+#### 3.2 返金見込み計算（Expected Refund）- 2026年1月最新版
 
 保険コミットメント料金は固定のため、カバレッジが低い場合に「未使用分」として返金が発生します。
 
@@ -335,7 +335,7 @@ monthlySavings = baseSavings + expectedRefund
 
 **効果**:
 - カバレッジを下げることで、未使用分の保険料が返金見込みとして加算される
-- 実効削減額は常に一定（カバレッジに関係なく同じ削減率）
+- 実効削減額はカバレッジや返金の有無に依存する（返金がある場合は実効削減に反映される）
 - 柔軟なリソース計画が可能
 
 #### 2.4 総支出計算
@@ -367,7 +367,7 @@ if (monthlySavings > 0) {
 
 ### 4. 標準RI/SP計算
 
-#### 3.1 Reserved Instance（RI）の場合
+#### 4.1 Reserved Instance（RI）の場合
 
 ```typescript
 // 価格情報取得
@@ -378,8 +378,13 @@ upfront = RIプラン.upfront_usd
 coverageQty = リソース数量 × カバレッジ率
 remainingQty = リソース数量 - coverageQty
 
+// 月額ランニングコストの利用率適用ルール
+// - RI AllUpfront: 利用率を適用
+// - RI NoUpfront / PartialUpfront: 利用率を適用しない（常に100%稼働として課金）
+reservedUsageFactor = (option === 'AllUpfront') ? 利用率 : 1.0
+
 // 月額ランニングコスト
-reservedMonthlyRecurring = reservedRate × 稼働時間 × coverageQty × 利用率
+reservedMonthlyRecurring = reservedRate × 稼働時間 × coverageQty × reservedUsageFactor
 
 // 月額償却初期費用
 reservedMonthlyAmortized = (upfront × coverageQty) / 契約期間月数
@@ -397,30 +402,36 @@ monthlyEffective = reservedMonthlyEffective + remainingMonthlyCost
 totalInitialCost = upfront × coverageQty
 ```
 
-#### 3.2 Savings Plan（SP）の場合
+#### 4.2 Savings Plan（SP）の場合
 
 ```typescript
 // Savings Planは初期費用ゼロ
 upfront = 0
 reservedRate = SavingsPlan.hourly_usd
 
-// RI NoUpfrontと同じ計算方法
-// ただしupfront = 0のため、月額償却は発生しない
+// Savings Planは利用率を適用しない（常に100%稼働として課金）
+reservedUsageFactor = 1.0
+
+// 月額ランニングコスト
+reservedMonthlyRecurring = reservedRate × 稼働時間 × coverageQty × reservedUsageFactor
+
+// upfront = 0 のため、月額償却は発生しない
+reservedMonthlyAmortized = 0
 ```
 
-#### 3.3 月間削減額計算
+#### 4.3 月間削減額計算
 
 ```typescript
 monthlySavings = 通常価格月額 - 月額実効コスト
 ```
 
-#### 3.4 総支出計算
+#### 4.4 総支出計算
 
 ```typescript
 totalExpenditure = totalInitialCost + (monthlyEffective × 契約期間月数)
 ```
 
-#### 3.5 損益分岐月計算
+#### 4.5 損益分岐月計算
 
 ```typescript
 if (monthlySavings > 0) {
@@ -445,6 +456,62 @@ for (month = 1 to 契約期間月数) {
   cumulative.standard.push(標準RI/SP月額 × month)
 }
 ```
+
+---
+
+### 6. 実装ノート (lib/simulator.ts のロジック)
+
+この節では、`lib/simulator.ts` に実装されている主要な計算ロジックを簡潔にまとめます。
+
+- 関数: `calculateInsurancePlan(...)`
+  - 入力: 価格カタログ、リソース配列、保険プランキー、カバレッジ（0-1）、利用率（0-1）、月間稼働時間、比較対象の標準契約期間（月数）
+  - 保険コミットメントの基準（baseline）算出:
+    - EC2: オンデマンド月額 × 0.60（= 40% 割引相当）を使用
+    - RDS (保険キーが `1y` の場合): 可能なら `standard_ri['3yr']['PartialUpfront']` を使用し、なければ `NoUpfront`、最終的にはオンデマンド×0.60 をフォールバック
+    - その他: 優先的に `standard_ri['3yr']['NoUpfront']` を使用。存在しなければ `savings_plans['3yr']`、最後はオンデマンド×0.60
+    - この baseline が「保険コミットメント料金（固定）」となる（カバレッジに依存しない）
+  - カバード分のオンデマンドコスト: `onDemandRate * hours * coverageQty * usage`
+  - 削減量: `savingsAmount = onDemandCoveredCost - insuranceCoveredCost`
+  - 返金 (expectedRefund): `savingsAmount < 0 ? -savingsAmount : 0`
+  - 保険料 (premium): `expectedRefund === 0 ? savingsAmount * plan.premium_rate : 0`
+  - 月額合計: `monthlyCost = insuranceCoveredCost + premium + remainingCost - expectedRefund`
+  - 実効月間削減額: `effectiveMonthlySavings = (totalBaseline - totalMonthlyCost) + totalExpectedRefund`
+
+- 関数: `calculateStandardPlan(...)`
+  - 入力: 価格カタログ、リソース、`term` (`1yr`|`3yr`)、`option`（RI の支払方法 または SavingsPlan）、カバレッジ、利用率、hours
+  - 支払方法選択ロジック:
+    - Savings Plan 系: `savings_plans[term]` またはフォールバックで RI `NoUpfront`
+    - RI 系: `standard_ri[term][option]` を使用（`hourly_usd`, `upfront_usd`）
+  - 利用率適用ルール（新仕様）:
+    - RI `AllUpfront`: 利用率を適用
+    - RI `NoUpfront` / `PartialUpfront`: 利用率を適用しない（100%として計算）
+    - Savings Plan（Compute / EC2 Instance SP 含む）: 利用率を適用しない（100%として計算）
+  - 月額実効コスト:
+    - `reservedMonthlyRecurring = reservedRate * hours * coverageQty * reservedUsageFactor`
+    - `reservedMonthlyAmortized = (upfront * coverageQty) / termMonths`
+    - `monthlyEffective = reservedMonthlyRecurring + reservedMonthlyAmortized + remainingMonthlyCost`
+    - `remainingMonthlyCost = onDemandRate * hours * remainingQty * usage`
+  - 集計: `totalInitialCost`（前払い合算）、`totalMonthlyEffective` 等を算出
+  - 月間削減額: `monthlySavings = totalBaseline - totalMonthlyEffective`
+  - 損益分岐: `totalExpenditure = totalInitialCost + (totalMonthlyEffective * termMonths)` → `ceil(totalExpenditure / totalBaseline)`（期間超過で `null`）
+
+- 関数: `calculateCumulativeCosts(baselineCost, insuranceResult, standardResult, termMonths)`
+  - 各月 1..termMonths で累積配列を生成:
+    - `on_demand[n] = baselineCost * n`
+    - `insurance[n] = insuranceResult.monthly_cost * n`
+    - `standard[n] = standardResult.monthly_cost * n`
+
+- 関数: `mergeDetails(insuranceDetails, standardDetails)`
+  - インデックスで対応する行を結合し、表示用の詳細テーブルを作成する
+
+実装上の注意（要点）:
+- `coverage` と `usage` は割合（0〜1）で扱われる。`hours` は月あたり稼働時間（例: 730）を渡す。
+- 保険コミットメントは「固定料金」として実装されており、カバレッジを変えてもその月額は変わらない（ただし返金が発生する）。
+- 標準RI/SPのカバー分ランニングは、新仕様で「RI AllUpfront 以外 + SP」が usage 非依存（100%課金）となる。
+- 前払い（upfront）は標準プランの `initial_cost` に加算され、保険の一部ケースでは `insuranceUpfront` が設定されて総支出に影響する。
+- 損益分岐判定は「オンデマンド累積 >= 総支出」を基準にしており、総支出は初期費用 + 月額×契約月数（標準契約期間）で固定値として扱われる。
+
+この要約は `lib/simulator.ts` の現行実装（2026-02-18 時点）を基にしています。
 
 ---
 

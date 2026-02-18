@@ -234,7 +234,8 @@ AWS Managed Service Provider (MSP) 向けに、保険型Reserved Instance/Saving
    │
    ├─► simulator.ts でコア計算実行
    │   ├─ 保険RI/SP計算（割引率、保険料、返金見込み）
-   │   ├─ 標準RI/SP計算（初期費用、月額コスト）
+    │   ├─ 標準RI/SP計算（初期費用、月額コスト）
+    │   │   └─ 利用率適用: RIはAllUpfrontのみ、NoUpfront/PartialUpfrontとSPは100%稼働として課金
    │   ├─ 累積コスト計算（12ヶ月分）
    │   └─ 損益分岐点算出
    │

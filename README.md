@@ -13,6 +13,7 @@ Ripple連携と保険RI/SPを活用したMSP収益モデルのシミュレーシ
 ### 📊 コスト最適化シミュレーション
 - **保険RI/SP**: 30日保証 / 1年保証
 - **標準RI/SP**: 1年・3年予約 × NoUpfront/PartialUpfront/AllUpfront
+- **利用率適用ルール（標準RI/SP）**: RIはAllUpfrontのみ利用率を適用、NoUpfront/PartialUpfrontとSPは100%稼働として課金
 - **リアルタイム計算**: 月次コスト、削減額、損益分岐点
 - **累積コスト推移**: 12ヶ月のグラフ可視化
 - **🆕 動的リソース選択**: 複数のAWSサービスとインスタンスタイプを自由に組み合わせ
@@ -229,6 +230,8 @@ npm run start
   "usage": 1.0
 }
 ```
+
+注: `usage` は入力パラメータとして送信されますが、標準RI/SPのカバー分ランニングコストでは `RI AllUpfront` のみ適用されます。`RI NoUpfront/PartialUpfront` と `SP` は `usage=100%` 相当で課金されます。
 
 **Response:**
 ```json

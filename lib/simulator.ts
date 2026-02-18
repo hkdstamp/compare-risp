@@ -208,8 +208,11 @@ export function calculateStandardPlan(
 
     let reservedRate: number
     let upfront: number
+    let isUsageIndependentPricing = false
 
     if (isSavingsPlan) {
+      isUsageIndependentPricing = true
+
       // Use Savings Plans pricing
       if (isEC2SavingsPlan) {
         // EC2 Instance Savings Plans
@@ -222,6 +225,7 @@ export function calculateStandardPlan(
           const plan = resourcePricing.standard_ri['3yr']['NoUpfront']
           reservedRate = plan.hourly_usd
           upfront = 0
+          isUsageIndependentPricing = true
         }
       } else {
         // Compute Savings Plans
@@ -241,13 +245,15 @@ export function calculateStandardPlan(
       const plan = resourcePricing.standard_ri[term][option]
       reservedRate = plan.hourly_usd
       upfront = plan.upfront_usd
+      isUsageIndependentPricing = option !== 'AllUpfront'
     }
 
     const coverageQty = res.quantity * coverage
     const remainingQty = Math.max(res.quantity - coverageQty, 0)
+    const reservedUsageFactor = isUsageIndependentPricing ? 1 : usage
 
     const baseline = onDemandRate * hours * res.quantity * usage
-    const reservedMonthlyRecurring = reservedRate * hours * coverageQty * usage
+    const reservedMonthlyRecurring = reservedRate * hours * coverageQty * reservedUsageFactor
     const reservedMonthlyAmortized = (upfront * coverageQty) / termMonths
     const reservedMonthlyEffective = reservedMonthlyRecurring + reservedMonthlyAmortized
     const remainingMonthlyCost = onDemandRate * hours * remainingQty * usage
@@ -261,6 +267,7 @@ export function calculateStandardPlan(
       insurance_premium: 0,
       insurance_savings: 0,
       insurance_expected_refund: 0,
+      insurance_upfront: 0,
       standard_cost: monthlyEffective,
       standard_upfront: upfront * coverageQty,
       standard_savings: baseline - monthlyEffective
