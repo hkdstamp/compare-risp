@@ -5,7 +5,7 @@ export function initMixpanel() {
     return
   }
 
-  const token = process.env.NEXT_PUBLIC_MIXPANEL_TOKEN ?? '090356d730eb3f9cfbe474d039f13716';
+  const token = process.env.NEXT_PUBLIC_MIXPANEL_TOKEN;
   if (!token) {
     console.warn('NEXT_PUBLIC_MIXPANEL_TOKEN is not set')
     return
