@@ -516,12 +516,12 @@ for (month = 1 to 契約期間月数) {
     - Savings Plan（Compute / EC2 Instance SP 含む）: 利用率を適用しない（100%として計算）
   - 月額実効コスト:
     - `reservedMonthlyRecurring = reservedRate * hours * coverageQty * reservedUsageFactor`
-    - `reservedMonthlyAmortized = (upfront * coverageQty) / termMonths`
+    - `reservedMonthlyAmortized = (upfront * coverageQty) / termMonths` ← 初期費用を契約期間で月額償却
     - `monthlyEffective = reservedMonthlyRecurring + reservedMonthlyAmortized + remainingMonthlyCost`
     - `remainingMonthlyCost = onDemandRate * hours * remainingQty * usage`
   - 集計: `totalInitialCost`（前払い合算）、`totalMonthlyEffective` 等を算出
   - 月間削減額: `monthlySavings = totalBaseline - totalMonthlyEffective`
-  - 損益分岐: `totalExpenditure = totalInitialCost + (totalMonthlyEffective * termMonths)` → `ceil(totalExpenditure / totalBaseline)`（期間超過で `null`）
+  - 損益分岐: `totalExpenditure = totalMonthlyEffective * termMonths` → `ceil(totalExpenditure / totalBaseline)`（初期費用は月額実効コストに含まれるため、期間超過で `null`）
 
 - 関数: `calculateCumulativeCosts(baselineCost, insuranceResult, standardResult, termMonths)`
   - 各月 1..termMonths で累積配列を生成:

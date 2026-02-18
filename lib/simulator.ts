@@ -320,7 +320,8 @@ export function calculateStandardPlan(
   let breakEven = null
   if (monthlySavings > 0) {
     // Calculate total expenditure for the entire contract term
-    const totalExpenditure = totalInitialCost + (totalMonthlyEffective * termMonths)
+    // totalMonthlyEffective already includes amortized upfront cost per month, so no need to add initialCost separately
+    const totalExpenditure = totalMonthlyEffective * termMonths
     
     // Break-even = when on-demand cumulative exceeds this fixed total
     breakEven = Math.ceil(totalExpenditure / totalBaseline)
