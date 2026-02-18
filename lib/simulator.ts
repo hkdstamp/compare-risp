@@ -121,8 +121,9 @@ export function calculateInsurancePlan(
       premium = savingsAmount * plan.premium_rate
     }
     
-    // Monthly cost = insurance commitment cost + premium + remaining on-demand cost - refund
-    const monthlyCost = insuranceCoveredCost + premium + remainingCost - expectedRefund
+    // Monthly cost = insurance commitment cost + premium + remaining on-demand cost - refund + amortized upfront
+    const insuranceMonthlAmortized = insuranceUpfrontCost / standardTermMonths
+    const monthlyCost = insuranceCoveredCost + premium + remainingCost - expectedRefund + insuranceMonthlAmortized
 
     details.push({
       resource: `${res.service}:${res.instance}`,
@@ -152,11 +153,12 @@ export function calculateInsurancePlan(
   // Insurance Commitment break-even calculation
   // IMPORTANT: Use the STANDARD RI/SP contract term (not insurance plan's term)
   // because we compare insurance costs over the same period as standard RI/SP
-  // Total Expenditure = initial_cost + (monthly_cost × standard_term_months)
+  // Total Expenditure = monthly_cost (includes amortized upfront) × standard_term_months
   // Break-even: when on-demand cumulative >= total expenditure
   let breakEven = null
   if (monthlySavings > 0) {
-    const totalExpenditure = totalInsuranceUpfront + (totalMonthlyCost * standardTermMonths)
+    // totalMonthlyCost already includes amortized upfront cost per month
+    const totalExpenditure = totalMonthlyCost * standardTermMonths
     
     // Break-even = when on-demand cumulative exceeds this fixed total
     breakEven = Math.ceil(totalExpenditure / totalBaseline)
