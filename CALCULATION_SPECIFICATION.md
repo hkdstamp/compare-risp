@@ -179,8 +179,10 @@
 
 #### 総支出（Total Expenditure）
 ```
-総支出 = 初期費用 + (月額料金 × 契約期間月数)
+総支出 = 月額実効コスト × 契約期間月数
 ```
+- **内訳**: 月額実効コスト = 初期費用の月額償却 + 月額ランニングコスト
+  - 初期費用の月額償却 = 初期費用 ÷ 契約期間月数
 - **特徴**: 契約期間全体の固定値（グラフ上の横線）
 - **用途**: 損益分岐点の算出に使用
 
@@ -205,6 +207,11 @@
 
 **重要**: 保険コミットメント料金は**固定**です。カバレッジに関係なく常に同じ金額を支払います。
 
+**利用基準価格の選択ロジック**:
+- EC2: ComputeSP 3年（40%割引）
+- RDS + 1年保証: RI 3年PartialUpfront（初期費用あり、月額償却を含む）
+- その他のサービス: RI 3年NoUpfront
+
 ```typescript
 // カバレッジ対象リソース
 coverageQty = リソース数量 × カバレッジ率
@@ -213,16 +220,25 @@ coverageQty = リソース数量 × カバレッジ率
 remainingQty = リソース数量 - coverageQty
 
 // 【重要】保険コミットメント固定料金の算出
-// 標準RI/SP 3年NoUpfrontの100%使用時コストを基準として固定
-if (標準RI 3年NoUpfrontが存在) {
+// 標準RI/SP 3年の価格を基準として固定
+// （RDS + 1年保証では初期費用が発生する場合あり）
+if (EC2) {
+  // EC2: ComputeSP 3年（初期費用なし）
+  baseline3yrNoUpfront = ComputeSP 3年時間単価 × 稼働時間 × リソース数量
+  insuranceUpfrontCost = 0
+} else if (RDS && 1年保証 && RI 3年PartialUpfront存在) {
+  // RDS 1年保証: RI 3年PartialUpfront（初期費用あり）
+  baseline3yrNoUpfront = RI 3年PartialUpfront時間単価 × 稼働時間 × リソース数量
+  insuranceUpfrontCost = RI 3年PartialUpfront初期費用 × リソース数量
+} else if (標準RI 3年NoUpfrontが存在) {
   baseline3yrNoUpfront = 3年NoUpfront時間単価 × 稼働時間 × リソース数量
-} else if (Savings Plans 3年が存在) {
-  baseline3yrNoUpfront = SP 3年時間単価 × 稼働時間 × リソース数量
+  insuranceUpfrontCost = 0
 } else {
   baseline3yrNoUpfront = オンデマンド時間単価 × 稼働時間 × リソース数量 × 0.40
+  insuranceUpfrontCost = 0
 }
 
-// 保険コミットメント料金（固定・カバレッジに無関係）
+// 保険コミットメント固定料金（カバレッジに無関係）
 insuranceCoveredCost = baseline3yrNoUpfront
 
 // オンデマンドカバー分の算出
@@ -248,8 +264,11 @@ if (expectedRefund === 0) {
 // 残りリソースのコスト
 remainingCost = オンデマンド時間単価 × 稼働時間 × remainingQty × 利用率
 
-// 月額合計
-monthlyCost = insuranceCoveredCost + premium + remainingCost - expectedRefund
+// 初期費用の月額償却（RDS 1年保証 + PartialUpfront RI 使用時）
+insuranceMonthlAmortized = insuranceUpfrontCost / 契約期間月数
+
+// 月額実効コスト（初期費用の月額償却を含む）
+monthlyCost = insuranceCoveredCost + premium + remainingCost - expectedRefund + insuranceMonthlAmortized
 ```
 
 **新しい計算方式のポイント**:
