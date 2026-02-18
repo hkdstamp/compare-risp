@@ -221,19 +221,32 @@ export function calculateStandardPlan(
           reservedRate = resourcePricing.ec2_savings_plans[term].hourly_usd
           upfront = 0
         } else {
-          // Non-EC2 resources: use RI 3yr NoUpfront
-          const plan = resourcePricing.standard_ri['3yr']['NoUpfront']
+          // Non-EC2 resources:
+          // - RDS 1yr: use RI 1yr PartialUpfront (customer initial cost comparison)
+          // - Others: use RI 3yr NoUpfront
+          const plan =
+            res.service === 'rds' &&
+            term === '1yr' &&
+            resourcePricing.standard_ri?.['1yr']?.['PartialUpfront']
+              ? resourcePricing.standard_ri['1yr']['PartialUpfront']
+              : resourcePricing.standard_ri['3yr']['NoUpfront']
           reservedRate = plan.hourly_usd
-          upfront = 0
-          isUsageIndependentPricing = true
+          upfront = plan.upfront_usd
         }
       } else {
         // Compute Savings Plans
         if (!resourcePricing.savings_plans || !resourcePricing.savings_plans[term]) {
-          // Fallback to RI NoUpfront if Compute SP not available
-          const plan = resourcePricing.standard_ri[term]['NoUpfront']
+          // Fallback when Compute SP not available:
+          // - RDS 1yr: use RI 1yr PartialUpfront (customer initial cost comparison)
+          // - Others: use RI NoUpfront
+          const plan =
+            res.service === 'rds' &&
+            term === '1yr' &&
+            resourcePricing.standard_ri?.['1yr']?.['PartialUpfront']
+              ? resourcePricing.standard_ri['1yr']['PartialUpfront']
+              : resourcePricing.standard_ri[term]['NoUpfront']
           reservedRate = plan.hourly_usd
-          upfront = 0
+          upfront = plan.upfront_usd
         } else {
           // Use Compute SP pricing
           reservedRate = resourcePricing.savings_plans[term].hourly_usd

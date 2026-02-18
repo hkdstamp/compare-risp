@@ -18,6 +18,7 @@ export default function CustomerCostComparison({ baselineCost, insurance, standa
   
   // 標準RI/SPのコスト削減
   const standardSavings = baselineCost - standard.monthly_cost
+  const initialCostDiff = standard.initial_cost - insurance.initial_cost
 
   return (
     <div className="bg-gradient-to-br from-primary-50 to-accent-50 rounded-xl shadow-lg p-6 border-2 border-primary-200">
@@ -133,9 +134,19 @@ export default function CustomerCostComparison({ baselineCost, insurance, standa
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm text-secondary-600">{t('initialCostDiff')}</span>
-              <span className="text-lg font-bold text-success-600">
-                {formatCurrency(standard.initial_cost)} {t('notRequired')}
-              </span>
+              {initialCostDiff > 0 ? (
+                <span className="text-lg font-bold text-success-600">
+                  {formatCurrency(initialCostDiff)} {t('notRequired')}
+                </span>
+              ) : initialCostDiff < 0 ? (
+                <span className="text-lg font-bold text-amber-600">
+                  {formatCurrency(Math.abs(initialCostDiff))} {t('moreExpensive')}
+                </span>
+              ) : (
+                <span className="text-lg font-bold text-secondary-600">
+                  {formatCurrency(0)}
+                </span>
+              )}
             </div>
           </div>
           <div className="bg-accent-50 p-4 rounded-lg border border-accent-200">
