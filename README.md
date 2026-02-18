@@ -250,7 +250,47 @@ npm run start
 ### `GET /api/resources`
 デフォルトリソース設定を取得
 
-## 📦 対応リソース（動的選択可能）
+## � Mixpanel トラッキング
+
+ユーザーの操作行動を分析するために、オプションでMixpanelトラッキングを有効化できます。
+
+### セットアップ
+
+#### 1. Mixpanelをインストール
+
+```bash
+npm install mixpanel-browser
+```
+
+#### 2. プロジェクトトークンを設定
+
+`.env.local`に以下を追加：
+
+```env
+NEXT_PUBLIC_MIXPANEL_TOKEN=your_mixpanel_project_token_here
+```
+
+#### 3. ビルド - トークンが読み込まれる
+
+Mixpanelの初期化は自動的に行われます（トークンが設定されている場合）。
+
+### トラッキングイベント
+
+以下のイベントが自動的に記録されます：
+
+| イベント | 説明 | パラメータ |
+|---------|------|----------|
+| `Page_View` | ページ初回表示 | `mode` (MSP/Customer) |
+| `Insurance_Plan_Changed` | 保険プラン選択 | `new_plan`, `previous_plan` |
+| `Standard_Term_Changed` | 標準契約期間変更 | `new_term`, `previous_term` |
+| `Plan_Option_Changed` | RI/SP支払方法変更 | `new_option`, `previous_option` |
+| `Plan_Selected` | シミュレーション実行 | `insurance_plan`, `standard_term`, `standard_option`, `coverage_percentage`, `usage_percentage` |
+
+### トラッキング無効化
+
+`NEXT_PUBLIC_MIXPANEL_TOKEN`が設定されていない場合、トラッキングは自動的に無効化されます。
+
+## �📦 対応リソース（動的選択可能）
 
 ### 🆕 選択可能なAWSサービス
 

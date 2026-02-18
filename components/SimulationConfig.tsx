@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { formatPercentage } from '@/lib/utils'
 import { useLanguage } from '@/components/LanguageProvider'
+import { trackEvent } from '@/lib/mixpanel'
 import DiscountRateInfo from '@/components/ui/DiscountRateInfo'
 import { ShieldIcon, CalendarIcon, DollarIcon, ChartBarIcon, ActivityIcon, RocketIcon, RefreshIcon, InfoIcon } from '@/components/icons'
 
@@ -20,13 +21,24 @@ export default function SimulationConfig({ onSimulate, isLoading }: SimulationCo
   const [usage, setUsage] = useState(100)
 
   const handleSimulate = () => {
-    onSimulate({
+    const params = {
       insurance,
       standard_term: standardTerm,
       standard_option: standardOption,
       coverage: coverage / 100,
       usage: usage / 100
+    }
+    
+    // Track simulation event
+    trackEvent('Plan_Selected', {
+      insurance_plan: insurance,
+      standard_term: standardTerm,
+      standard_option: standardOption,
+      coverage_percentage: coverage,
+      usage_percentage: usage
     })
+    
+    onSimulate(params)
   }
 
   const handleReset = () => {
@@ -58,7 +70,13 @@ export default function SimulationConfig({ onSimulate, isLoading }: SimulationCo
           </label>
           <select
             value={insurance}
-            onChange={(e) => setInsurance(e.target.value)}
+            onChange={(e) => {
+              setInsurance(e.target.value)
+              trackEvent('Insurance_Plan_Changed', {
+                new_plan: e.target.value,
+                previous_plan: insurance
+              })
+            }}
             className="px-4 py-2 border border-secondary-300 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition bg-white text-secondary-900"
           >
             <option value="30d">{t('warranty30d')}</option>
@@ -75,7 +93,13 @@ export default function SimulationConfig({ onSimulate, isLoading }: SimulationCo
           </label>
           <select
             value={standardTerm}
-            onChange={(e) => setStandardTerm(e.target.value)}
+            onChange={(e) => {
+              setStandardTerm(e.target.value)
+              trackEvent('Standard_Term_Changed', {
+                new_term: e.target.value,
+                previous_term: standardTerm
+              })
+            }}
             className="px-4 py-2 border border-secondary-300 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition bg-white text-secondary-900"
           >
             <option value="1yr">{t('term1yr')}</option>
@@ -91,7 +115,13 @@ export default function SimulationConfig({ onSimulate, isLoading }: SimulationCo
           </label>
           <select
             value={standardOption}
-            onChange={(e) => setStandardOption(e.target.value)}
+            onChange={(e) => {
+              setStandardOption(e.target.value)
+              trackEvent('Plan_Option_Changed', {
+                new_option: e.target.value,
+                previous_option: standardOption
+              })
+            }}
             className="px-4 py-2 border border-secondary-300 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition bg-white text-secondary-900"
           >
             <optgroup label={t('ri')}>

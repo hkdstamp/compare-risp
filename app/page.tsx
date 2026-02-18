@@ -8,6 +8,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ResourceSelector from "@/components/ResourceSelector";
 import { useLanguage } from '@/components/LanguageProvider';
+import { initMixpanel, trackEvent } from "@/lib/mixpanel";
 import { SimulationResult, ResourceConfig } from "@/lib/types";
 import { defaultResources } from "@/lib/pricing-catalog";
 import { cn } from "@/lib/utils";
@@ -31,6 +32,15 @@ function HomeContent() {
 
   // モード判定: URLパラメータ mode=customer なら顧客モード、それ以外はMSPモード
   const isMSPMode = searchParams.get("mode") !== "customer";
+
+  // Mixpanelの初期化とページビュー追跡
+  useEffect(() => {
+    initMixpanel()
+    trackEvent('Page_View', {
+      mode: isMSPMode ? 'MSP' : 'Customer',
+      timestamp: new Date().toISOString()
+    })
+  }, [isMSPMode])
 
   // PostMessage APIの初期化
   useEffect(() => {
