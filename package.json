@@ -17,13 +17,15 @@
     "react-chartjs-2": "^5.2.0",
     "chart.js": "^4.4.1",
     "uuid": "^10.0.0",
-    "clsx": "^2.1.0"
+    "clsx": "^2.1.0",
+    "mixpanel-browser": "^2.50.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@types/uuid": "^10.0.0",
+    "@types/mixpanel-browser": "^2.50.0",
     "autoprefixer": "^10.4.16",
     "eslint": "^9.0.0",
     "eslint-config-next": "^15.0.3",
