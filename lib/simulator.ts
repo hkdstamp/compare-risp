@@ -122,7 +122,9 @@ export function calculateInsurancePlan(
     }
     
     // Monthly cost = insurance commitment cost + premium + remaining on-demand cost - refund + amortized upfront
-    const insuranceMonthlAmortized = insuranceUpfrontCost / standardTermMonths
+    // RDS 1年保証で初期費用がある場合は36ヶ月で償却、それ以外は契約期間で償却
+    const amortizationMonths = insuranceKey === '1y' && res.service === 'rds' && insuranceUpfrontCost > 0 ? 36 : standardTermMonths
+    const insuranceMonthlAmortized = insuranceUpfrontCost / amortizationMonths
     const monthlyCost = insuranceCoveredCost + premium + remainingCost - expectedRefund + insuranceMonthlAmortized
 
     details.push({

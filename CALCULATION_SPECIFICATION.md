@@ -264,12 +264,21 @@ if (expectedRefund === 0) {
 // 残りリソースのコスト
 remainingCost = オンデマンド時間単価 × 稼働時間 × remainingQty × 利用率
 
-// 初期費用の月額償却（RDS 1年保証 + PartialUpfront RI 使用時）
-insuranceMonthlAmortized = insuranceUpfrontCost / 契約期間月数
+// 初期費用の月額償却
+// RDS 1年保証で初期費用がある場合は36ヶ月で償却、それ以外は契約期間で償却
+insuranceMonthlAmortized = insuranceUpfrontCost / (
+  insuranceKey === '1y' && service === 'rds' && insuranceUpfrontCost > 0
+    ? 36
+    : 契約期間月数
+)
 
 // 月額実効コスト（初期費用の月額償却を含む）
 monthlyCost = insuranceCoveredCost + premium + remainingCost - expectedRefund + insuranceMonthlAmortized
 ```
+
+**初期費用の月額償却ロジック**:
+- **RDS 1年保証**: 3年PartialUpfrontの初期費用を使用 → 36ヶ月（3年）で償却
+- **その他**: 契約期間（1年=12ヶ月など）で償却
 
 **新しい計算方式のポイント**:
 - ✅ 保険コミットメント料金は**固定**（カバレッジに無関係）
