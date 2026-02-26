@@ -43,9 +43,9 @@ export interface SimulationResult {
 export interface RevenueForecastItem {
   coverage: number        // カバレッジ (%)
   monthly_cost: number    // 月額コスト
-  premium: number         // リスクプレミアム料
+  premium: number         // スマート予約利用料
   expected_refund: number // コスト還元見込み
-  revenue: number         // レベニュー (リスクプレミアム料の30%)
+  revenue: number         // レベニュー (スマート予約利用料の20%)
   total_12months: {       // 12ヶ月合計
     monthly_cost: number
     premium: number

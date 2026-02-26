@@ -74,7 +74,8 @@ export default function RevenueForecastReport({
         insurancePlanKey,
         coverage,
         usage,
-        hours
+        hours,
+        36  // 3年契約RI/SP付帯前提（収益見込みレポートの計算条件）
       )
 
       const monthlyCost = planResult.result.monthly_cost

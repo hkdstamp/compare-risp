@@ -27,8 +27,8 @@ export const translations = {
     addResource: "リソース追加",
 
     // Options
-    warranty30d: "30日プラン (40%割引 / 50%リスクプレミアム料)",
-    warranty1y: "1年プラン (40%割引 / 33%リスクプレミアム料)",
+    warranty30d: "30日プラン (40%割引 / 50%スマート予約利用料)",
+    warranty1y: "1年プラン (40%割引 / 33%スマート予約利用料)",
     term1yr: "1年予約",
     term3yr: "3年予約",
     optionNoUpfront: "RI - NoUpfront (全額後払い)",
@@ -70,7 +70,7 @@ export const translations = {
     costSavings: "コスト削減",
     effectiveSavings: "実質削減",
     expectedRefund: "コスト還元見込",
-    riskPremium: "リスクプレミアム料",
+    riskPremium: "スマート予約利用料",
     initialCost: "初期コスト",
     breakEven: "損益分岐",
     paybackPeriod: "コスト回収期間",
@@ -143,15 +143,15 @@ export const translations = {
     conditionCoverage0: "想定カバレッジ0%の場合: 0%～20%の範囲で計算",
     conditionCoverage100: "想定カバレッジ100%の場合: 80%～100%の範囲で計算",
     conditionCoveragePlusMinus: "設定した想定カバレッジから±10%の範囲で計算",
-    conditionRevenueFormula: "レベニュー = リスクプレミアム料 × 20%",
-    conditionRevenueZero: "リスクプレミアム料が0の場合、レベニューも0",
+    conditionRevenueFormula: "レベニュー = スマート予約利用料 × 20%",
+    conditionRevenueZero: "スマート予約利用料が0の場合、レベニューも0",
     condition3Year: "3年契約RI/SP付帯前提での36ヶ月計算",
     conditionRefundDeduction: "3年間のコスト還元見込みはプラン期間分を減額（30日プラン:1ヶ月分、1年プラン:12ヶ月分）",
     
     // Forecast Table Headers
     headerCoverage: "想定カバレッジ",
     headerWarrantyMonthly: "スマート予約割引\n月額",
-    headerRiskPremiumMonthly: "リスクプレミアム料\n(月額)",
+    headerRiskPremiumMonthly: "スマート予約利用料\n(月額)",
     headerRefundMonthly: "コスト還元見込\n(月額)",
     headerRevenueMonthly: "レベニュー\n(月額)",
     headerRevenue12Months: "レベニュー\n(12ヶ月)",
@@ -163,8 +163,8 @@ export const translations = {
     totalRange: "合計範囲",
     
     // Forecast Notes
-    noteRevenueFormula: "※ レベニュー = リスクプレミアム料 × 20%",
-    noteRevenueZero: "※ リスクプレミアム料が0の場合、レベニューも0として計算されます",
+    noteRevenueFormula: "※ レベニュー = スマート予約利用料 × 20%",
+    noteRevenueZero: "※ スマート予約利用料が0の場合、レベニューも0として計算されます",
     noteTotalCalc: "※ 12ヶ月合計は月額の12倍、36ヶ月合計は12ヶ月合計の3倍で計算",
     noteRefundDeduction: "※ 3年間のコスト還元見込みは、プラン期間分を減額（30日プラン: 1ヶ月分減額、1年プラン: 12ヶ月分減額）",
     noteHighlight: "※ 背景色が強調されている行が現在の設定値です",
