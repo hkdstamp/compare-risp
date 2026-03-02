@@ -1,54 +1,94 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js'
 import { Line } from 'react-chartjs-2'
-import { CumulativeData } from '@/lib/types'
+import { CumulativeData, PlanResult } from '@/lib/types'
 import { formatCurrency } from '@/lib/utils'
+import { useLanguage } from '@/components/LanguageProvider'
+import { LineChartIcon, InfoIcon, TargetIcon } from '@/components/icons'
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler)
 
 interface CumulativeChartProps {
   cumulative: CumulativeData
+  standardPlan: PlanResult
+  insurancePlan: PlanResult
+  isMSPMode?: boolean
 }
 
-export default function CumulativeChart({ cumulative }: CumulativeChartProps) {
+export default function CumulativeChart({ cumulative, standardPlan, insurancePlan, isMSPMode = true }: CumulativeChartProps) {
+  const { t } = useLanguage()
+
+  // Calculate total contract expenditure (constant for all months)
+  // Total = Initial cost + (Monthly cost × Contract term)
+  const termMonths = cumulative.months.length
+  
+  // Standard RI/SP total expenditure: initial cost + total monthly cost over contract term
+  const standardTotalCost = standardPlan.initial_cost + (standardPlan.monthly_cost * termMonths)
+  const standardTotalExpenditure = cumulative.months.map(() => standardTotalCost)
+  
+  // Insurance Commitment total expenditure: initial cost + total monthly cost over contract term
+  const insuranceTotalCost = insurancePlan.initial_cost + (insurancePlan.monthly_cost * termMonths)
+  const insuranceTotalExpenditure = cumulative.months.map(() => insuranceTotalCost)
+
   const data = {
-    labels: cumulative.months.map(m => `${m}ヶ月`),
+    labels: cumulative.months.map(m => `${m}${t('months')}`),
     datasets: [
       {
-        label: '通常価格',
+        label: t('onDemandCost'),
         data: cumulative.on_demand,
-        borderColor: 'rgba(148, 163, 184, 1)',
-        backgroundColor: 'rgba(148, 163, 184, 0.1)',
+        borderColor: 'rgba(100, 116, 139, 1)', // secondary-500
+        backgroundColor: 'rgba(100, 116, 139, 0.1)',
         borderWidth: 2,
         tension: 0.4,
         fill: true,
       },
       {
-        label: '保険RI/SP',
+        label: t('commitmentWarranty') + t('cumulativeLabel'),
         data: cumulative.insurance,
-        borderColor: 'rgba(16, 185, 129, 1)',
-        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+        borderColor: 'rgba(34, 197, 94, 1)', // success-500
+        backgroundColor: 'rgba(34, 197, 94, 0.1)',
         borderWidth: 2,
         tension: 0.4,
         fill: true,
       },
       {
-        label: '標準RI/SP',
+        label: t('commitmentWarranty') + t('totalExpenditureLabel'),
+        data: insuranceTotalExpenditure,
+        borderColor: 'rgba(34, 197, 94, 0.6)', // success-500 with opacity
+        backgroundColor: 'rgba(34, 197, 94, 0.05)',
+        borderWidth: 2,
+        borderDash: [5, 5],
+        tension: 0.4,
+        fill: false,
+        pointRadius: 0,
+      },
+      {
+        label: t('standardRiSp') + t('cumulativeLabel'),
         data: cumulative.standard,
-        borderColor: 'rgba(37, 99, 235, 1)',
-        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+        borderColor: 'rgba(28, 88, 217, 1)', // primary-600
+        backgroundColor: 'rgba(28, 88, 217, 0.1)',
         borderWidth: 2,
         tension: 0.4,
         fill: true,
+      },
+      {
+        label: t('standardRiSp') + t('totalExpenditureLabel'),
+        data: standardTotalExpenditure,
+        borderColor: 'rgba(28, 88, 217, 0.6)', // primary-600 with opacity
+        backgroundColor: 'rgba(28, 88, 217, 0.05)',
+        borderWidth: 3,
+        borderDash: [5, 5],
+        tension: 0.4,
+        fill: false,
+        pointRadius: 0,
       },
     ],
   }
 
   const options = {
     responsive: true,
-    maintainAspectRatio: true,
+    maintainAspectRatio: false,
     interaction: {
       mode: 'index' as const,
       intersect: false,
@@ -56,12 +96,24 @@ export default function CumulativeChart({ cumulative }: CumulativeChartProps) {
     plugins: {
       legend: {
         position: 'top' as const,
+        align: 'start' as const,
         labels: {
           usePointStyle: true,
           padding: 15,
           font: {
-            size: 12,
-            weight: '600' as const,
+            size: 11,
+            weight: 'bold' as const,
+          },
+          generateLabels: (chart: any) => {
+            const original = ChartJS.defaults.plugins.legend.labels.generateLabels(chart)
+            const totalLabel = t('totalExpenditureLabel')
+            return original.map((label: any) => {
+              // Add dash pattern visual to legend for dashed lines
+              if (label.text.includes(totalLabel)) {
+                label.lineDash = [5, 5]
+              }
+              return label
+            })
           },
         },
       },
@@ -75,9 +127,28 @@ export default function CumulativeChart({ cumulative }: CumulativeChartProps) {
             label += formatCurrency(context.parsed.y)
             return label
           },
+          footer: function(tooltipItems: any[]) {
+            const monthIndex = tooltipItems[0].dataIndex
+            const month = monthIndex + 1
+            
+            let footer = []
+            
+            // Check if insurance break-even month
+            if (insurancePlan.break_even_months !== null && month === insurancePlan.break_even_months) {
+              footer.push('■ ' + t('commitmentWarranty') + t('breakEvenPointLabel'))
+            }
+            
+            // Check if standard break-even month
+            if (standardPlan.break_even_months !== null && month === standardPlan.break_even_months) {
+              footer.push('◆ ' + t('standardRiSp') + t('breakEvenPointLabel'))
+            }
+            
+            return footer
+          },
         },
       },
     },
+
     scales: {
       y: {
         beginAtZero: true,
@@ -85,31 +156,85 @@ export default function CumulativeChart({ cumulative }: CumulativeChartProps) {
           callback: function(value: any) {
             return formatCurrency(value)
           },
+          font: {
+            size: 10
+          }
         },
         title: {
           display: true,
-          text: '累積コスト (USD)',
+          text: t('cumulativeCostUsd'),
           font: {
-            weight: '600' as const,
+            weight: 'bold' as const,
+            size: 11
           },
         },
       },
       x: {
+        ticks: {
+          maxRotation: 45,
+          minRotation: 45,
+          font: {
+            size: 10
+          }
+        },
         title: {
           display: true,
-          text: '経過月数',
+          text: t('elapsedMonths'),
           font: {
-            weight: '600' as const,
+            weight: 'bold' as const,
+            size: 11
           },
         },
       },
     },
   }
 
+  // Determine term duration from the number of months
+  const termDisplay = termMonths === 12 ? t('contract1Year') : termMonths === 36 ? t('contract3Year') : `${termMonths}${t('months')}`
+
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6">
-      <h3 className="text-xl font-bold text-gray-900 mb-4">💹 12ヶ月累積コスト推移</h3>
-      <Line data={data} options={options} />
+    <div className="bg-white rounded-xl shadow-lg p-6 border border-secondary-200">
+      <div className="flex flex-col gap-2 mb-4">
+        <h3 className="text-xl font-bold text-secondary-900 flex items-center gap-2">
+          <LineChartIcon size={24} className="text-primary-600" />
+          {t('cumulativeCostTrend')}（{t('contractTerm')}: {termDisplay}）
+        </h3>
+        <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm ml-1">
+          {standardPlan.break_even_months !== null && (
+            <div className="flex items-center gap-2">
+              <TargetIcon size={16} className="text-primary-600 flex-shrink-0" />
+              <span className="text-secondary-600">
+                {t('standardRiSp')} {t('breakEven')}: <span className="font-semibold text-primary-600">{standardPlan.break_even_months}{t('months')}</span>
+              </span>
+            </div>
+          )}
+          {insurancePlan.break_even_months !== null && (
+            <div className="flex items-center gap-2">
+              <TargetIcon size={16} className="text-success-600 flex-shrink-0" />
+              <span className="text-secondary-600">
+                {t('commitmentWarranty')} {t('breakEven')}: <span className="font-semibold text-success-600">{insurancePlan.break_even_months}{t('months')}</span>
+              </span>
+            </div>
+          )}
+        </div>
+      </div>
+      <div className="mb-3 p-3 bg-primary-50 border border-primary-200 rounded-lg">
+        <div className="flex items-start gap-3">
+          <InfoIcon size={20} className="text-primary-600 flex-shrink-0 mt-0.5" />
+          <div className="text-sm text-secondary-800">
+            <p className="font-semibold mb-1">{t('graphLegend')}：</p>
+            <ul className="list-disc list-inside space-y-1">
+              <li><strong>{t('legendSolid')}</strong>{t('legendSolidDesc')}</li>
+              <li><strong>{t('legendDashed')}</strong>{t('legendDashedDesc')}</li>
+              <li dangerouslySetInnerHTML={{ __html: t('legendBreakEven') }} />
+              <li>{t('legendXAxis')} ({termDisplay})</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div className="relative h-[300px] md:h-[400px]">
+        <Line data={data} options={options} />
+      </div>
     </div>
   )
 }

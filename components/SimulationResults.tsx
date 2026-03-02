@@ -1,18 +1,24 @@
 'use client'
 
-import { SimulationResult } from '@/lib/types'
+import { SimulationResult, ResourceConfig } from '@/lib/types'
 import { formatCurrency } from '@/lib/utils'
 import CostCards from './ui/CostCards'
 import RevenueHighlight from './ui/RevenueHighlight'
 import CumulativeChart from './ui/CumulativeChart'
 import MonthlyChart from './ui/MonthlyChart'
 import DetailsTable from './ui/DetailsTable'
+import RevenueForecastReport from './ui/RevenueForecastReport'
+import CustomerCostComparison from './ui/CustomerCostComparison'
 
 interface SimulationResultsProps {
   result: SimulationResult
+  insurancePlanKey: string
+  usage: number
+  resources: ResourceConfig[]
+  isMSPMode?: boolean
 }
 
-export default function SimulationResults({ result }: SimulationResultsProps) {
+export default function SimulationResults({ result, insurancePlanKey, usage, resources, isMSPMode = true }: SimulationResultsProps) {
   const revenueDiff = result.insurance.monthly_savings - result.standard.monthly_savings
 
   return (
@@ -21,24 +27,50 @@ export default function SimulationResults({ result }: SimulationResultsProps) {
         baselineCost={result.baseline_cost}
         insurance={result.insurance}
         standard={result.standard}
+        isMSPMode={isMSPMode}
       />
 
-      <RevenueHighlight
-        insuranceSavings={result.insurance.monthly_savings}
-        standardSavings={result.standard.monthly_savings}
-        revenueDiff={revenueDiff}
-      />
+      {isMSPMode && (
+        <RevenueHighlight
+          insuranceSavings={result.insurance.monthly_savings}
+          standardSavings={result.standard.monthly_savings}
+          revenueDiff={revenueDiff}
+        />
+      )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <CumulativeChart cumulative={result.cumulative} />
-        <MonthlyChart
+      {!isMSPMode && (
+        <CustomerCostComparison
           baselineCost={result.baseline_cost}
           insurance={result.insurance}
           standard={result.standard}
         />
+      )}
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <CumulativeChart 
+          cumulative={result.cumulative}
+          standardPlan={result.standard}
+          insurancePlan={result.insurance}
+          isMSPMode={isMSPMode}
+        />
+        <MonthlyChart
+          baselineCost={result.baseline_cost}
+          insurance={result.insurance}
+          standard={result.standard}
+          isMSPMode={isMSPMode}
+        />
       </div>
 
-      <DetailsTable details={result.details} />
+      <DetailsTable details={result.details} isMSPMode={isMSPMode} />
+
+      {isMSPMode && (
+        <RevenueForecastReport 
+          result={result}
+          insurancePlanKey={insurancePlanKey}
+          usage={usage}
+          resources={resources}
+        />
+      )}
     </section>
   )
 }

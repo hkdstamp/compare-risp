@@ -1,11 +1,13 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
-import './globals.css'
+import '@/app/globals.css'
+import IframeResizer from '@/components/IframeResizer'
+import { LanguageProvider } from '@/components/LanguageProvider'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Alphaus MSP収益モデルシミュレーター - Ripple & 保険RI/SP',
+  title: 'Alphaus MSP収益モデルシミュレーター - Ripple & スマート予約割引',
   description: 'MSP向けコスト最適化・収益モデル分析ツール - Next.js 15 Edition',
   keywords: ['AWS', 'RI', 'SP', 'MSP', 'Cost Optimization', 'Cloudflare', 'Next.js 15', 'React 19'],
   authors: [{ name: 'Alphaus Cloud Group' }],
@@ -29,9 +31,12 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="ja">
+    <html lang={process.env.NEXT_PUBLIC_DEFAULT_LANG || 'ja'}>
       <body className={inter.className}>
-        {children}
+        <LanguageProvider>
+          <IframeResizer />
+          {children}
+        </LanguageProvider>
       </body>
     </html>
   )

@@ -1,7 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { formatPercentage } from '@/lib/utils'
+import { useLanguage } from '@/components/LanguageProvider'
+import { trackEvent } from '@/lib/mixpanel'
+import DiscountRateInfo from '@/components/ui/DiscountRateInfo'
+import { ShieldIcon, CalendarIcon, DollarIcon, ChartBarIcon, ActivityIcon, RocketIcon, RefreshIcon, InfoIcon } from '@/components/icons'
 
 interface SimulationConfigProps {
   onSimulate: (params: any) => void
@@ -9,92 +13,134 @@ interface SimulationConfigProps {
 }
 
 export default function SimulationConfig({ onSimulate, isLoading }: SimulationConfigProps) {
+  const { t } = useLanguage()
   const [insurance, setInsurance] = useState('1y')
   const [standardTerm, setStandardTerm] = useState('1yr')
-  const [standardOption, setStandardOption] = useState('NoUpfront')
+  const [standardOption, setStandardOption] = useState('SavingsPlan')
   const [coverage, setCoverage] = useState(100)
   const [usage, setUsage] = useState(100)
 
   const handleSimulate = () => {
-    onSimulate({
+    const params = {
       insurance,
       standard_term: standardTerm,
       standard_option: standardOption,
       coverage: coverage / 100,
       usage: usage / 100
+    }
+    
+    // Track simulation event
+    trackEvent('Plan_Selected', {
+      insurance_plan: insurance,
+      standard_term: standardTerm,
+      standard_option: standardOption,
+      coverage_percentage: coverage,
+      usage_percentage: usage
     })
+    
+    onSimulate(params)
   }
 
   const handleReset = () => {
     setInsurance('1y')
     setStandardTerm('1yr')
-    setStandardOption('NoUpfront')
+    setStandardOption('SavingsPlan')
     setCoverage(100)
     setUsage(100)
   }
 
   return (
-    <section className="bg-white rounded-xl shadow-lg p-6">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6 pb-3 border-b-4 border-primary-600">
-        シミュレーション設定
-      </h2>
+    <section className="bg-white rounded-xl shadow-lg p-6 border border-secondary-200">
+      <div className="flex items-center justify-between mb-6 pb-3 border-b-2 border-primary-500">
+        <h2 className="text-2xl font-bold text-secondary-900">
+          {t('settings')}
+        </h2>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-secondary-600">{t('discountDetails')}</span>
+          <DiscountRateInfo />
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
         {/* Insurance Plan */}
         <div className="flex flex-col">
-          <label className="flex items-center gap-2 font-semibold text-gray-700 mb-2">
-            <span className="text-xl">🛡️</span>
-            保険RI/SPプラン
+          <label className="flex items-center gap-2 font-semibold text-secondary-700 mb-2">
+            <ShieldIcon size={20} className="text-accent-600" />
+            {t('planLabel')}
           </label>
           <select
             value={insurance}
-            onChange={(e) => setInsurance(e.target.value)}
-            className="px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition"
+            onChange={(e) => {
+              setInsurance(e.target.value)
+              trackEvent('Insurance_Plan_Changed', {
+                new_plan: e.target.value,
+                previous_plan: insurance
+              })
+            }}
+            className="px-4 py-2 border border-secondary-300 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition bg-white text-secondary-900"
           >
-            <option value="30d">30日保証 (30%割引 / 50%保険料)</option>
-            <option value="1y">1年保証 (45%割引 / 33%保険料)</option>
+            <option value="30d">{t('warranty30d')}</option>
+            <option value="1y">{t('warranty1y')}</option>
           </select>
-          <small className="text-gray-500 mt-1">保証期間終了後、未使用分は返金</small>
+          <small className="text-secondary-500 mt-1">{t('warrantyHint')}</small>
         </div>
 
         {/* Standard Term */}
         <div className="flex flex-col">
-          <label className="flex items-center gap-2 font-semibold text-gray-700 mb-2">
-            <span className="text-xl">📅</span>
-            標準RI/SP 契約期間
+          <label className="flex items-center gap-2 font-semibold text-secondary-700 mb-2">
+            <CalendarIcon size={20} className="text-primary-600" />
+            {t('termLabel')}
           </label>
           <select
             value={standardTerm}
-            onChange={(e) => setStandardTerm(e.target.value)}
-            className="px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition"
+            onChange={(e) => {
+              setStandardTerm(e.target.value)
+              trackEvent('Standard_Term_Changed', {
+                new_term: e.target.value,
+                previous_term: standardTerm
+              })
+            }}
+            className="px-4 py-2 border border-secondary-300 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition bg-white text-secondary-900"
           >
-            <option value="1yr">1年予約</option>
-            <option value="3yr">3年予約</option>
+            <option value="1yr">{t('term1yr')}</option>
+            <option value="3yr">{t('term3yr')}</option>
           </select>
         </div>
 
         {/* Standard Option */}
         <div className="flex flex-col">
-          <label className="flex items-center gap-2 font-semibold text-gray-700 mb-2">
-            <span className="text-xl">💰</span>
-            標準RI/SP 支払い方法
+          <label className="flex items-center gap-2 font-semibold text-secondary-700 mb-2">
+            <DollarIcon size={20} className="text-success-600" />
+            {t('typeLabel')}
           </label>
           <select
             value={standardOption}
-            onChange={(e) => setStandardOption(e.target.value)}
-            className="px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition"
+            onChange={(e) => {
+              setStandardOption(e.target.value)
+              trackEvent('Plan_Option_Changed', {
+                new_option: e.target.value,
+                previous_option: standardOption
+              })
+            }}
+            className="px-4 py-2 border border-secondary-300 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition bg-white text-secondary-900"
           >
-            <option value="NoUpfront">NoUpfront (全額後払い)</option>
-            <option value="PartialUpfront">PartialUpfront (50%前払い)</option>
-            <option value="AllUpfront">AllUpfront (100%前払い)</option>
+            <optgroup label={t('ri')}>
+              <option value="NoUpfront">{t('optionNoUpfront')}</option>
+              <option value="PartialUpfront">{t('optionPartialUpfront')}</option>
+              <option value="AllUpfront">{t('optionAllUpfront')}</option>
+            </optgroup>
+            <optgroup label={t('sp')}>
+              <option value="SavingsPlan">{t('optionComputeSP')}</option>
+              <option value="EC2-SavingsPlan">{t('optionEC2SP')}</option>
+            </optgroup>
           </select>
         </div>
 
         {/* Coverage */}
         <div className="flex flex-col">
-          <label className="flex items-center gap-2 font-semibold text-gray-700 mb-2">
-            <span className="text-xl">📊</span>
-            想定カバレッジ: <span className="text-primary-600">{formatPercentage(coverage / 100)}</span>
+          <label className="flex items-center gap-2 font-semibold text-secondary-700 mb-2">
+            <ChartBarIcon size={20} className="text-primary-600" />
+            {t('coverageLabel')}: <span className="text-primary-600">{formatPercentage(coverage / 100)}</span>
           </label>
           <input
             type="range"
@@ -103,16 +149,16 @@ export default function SimulationConfig({ onSimulate, isLoading }: SimulationCo
             step="5"
             value={coverage}
             onChange={(e) => setCoverage(Number(e.target.value))}
-            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary-600"
+            className="w-full h-2 bg-secondary-200 rounded-lg appearance-none cursor-pointer accent-primary-600"
           />
-          <small className="text-gray-500 mt-1">リソース全体の何%をRI/SPでカバーするか</small>
+          <small className="text-secondary-500 mt-1">{t('coverageHint')}</small>
         </div>
 
         {/* Usage */}
         <div className="flex flex-col">
-          <label className="flex items-center gap-2 font-semibold text-gray-700 mb-2">
-            <span className="text-xl">⚡</span>
-            想定利用率: <span className="text-primary-600">{formatPercentage(usage / 100)}</span>
+          <label className="flex items-center gap-2 font-semibold text-secondary-700 mb-2">
+            <ActivityIcon size={20} className="text-accent-600" />
+            {t('uptimeLabel')}: <span className="text-primary-600">{formatPercentage(usage / 100)}</span>
           </label>
           <input
             type="range"
@@ -121,9 +167,22 @@ export default function SimulationConfig({ onSimulate, isLoading }: SimulationCo
             step="5"
             value={usage}
             onChange={(e) => setUsage(Number(e.target.value))}
-            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary-600"
+            className="w-full h-2 bg-secondary-200 rounded-lg appearance-none cursor-pointer accent-primary-600"
           />
-          <small className="text-gray-500 mt-1">リソースの実稼働率</small>
+          <small className="text-secondary-500 mt-1">{t('uptimeHint')}</small>
+        </div>
+      </div>
+
+      {/* Important Note */}
+      <div className="mb-6 bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-lg">
+        <div className="flex items-start gap-3">
+          <InfoIcon size={20} className="text-amber-600 flex-shrink-0 mt-0.5" />
+          <div>
+            <p className="text-sm text-secondary-700 font-medium mb-1">{t('importantNote')}</p>
+            <p className="text-sm text-secondary-600">
+              {t('noteContent')}
+            </p>
+          </div>
         </div>
       </div>
 
@@ -132,18 +191,18 @@ export default function SimulationConfig({ onSimulate, isLoading }: SimulationCo
         <button
           onClick={handleSimulate}
           disabled={isLoading}
-          className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center gap-2 px-6 py-3 bg-primary-600 text-white font-semibold rounded-lg shadow-md hover:shadow-lg hover:bg-primary-700 transform hover:-translate-y-0.5 transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <span className="text-xl">🚀</span>
-          シミュレーション実行
+          <RocketIcon size={20} />
+          {isLoading ? t('calculating') : t('simulate')}
         </button>
         <button
           onClick={handleReset}
           disabled={isLoading}
-          className="flex items-center gap-2 px-6 py-3 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center gap-2 px-6 py-3 bg-secondary-200 text-secondary-700 font-semibold rounded-lg hover:bg-secondary-300 transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <span className="text-xl">🔄</span>
-          リセット
+          <RefreshIcon size={20} />
+          {t('reset')}
         </button>
       </div>
     </section>

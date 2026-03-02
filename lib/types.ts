@@ -14,6 +14,7 @@ export interface PlanResult {
   monthly_cash_savings?: number
   initial_cost: number
   premium: number
+  expected_refund?: number
   break_even_months: number | null
 }
 
@@ -25,6 +26,7 @@ export interface SimulationParams {
   usage: number
   user_id?: string
   save_history?: boolean
+  resources?: ResourceConfig[]
 }
 
 export interface SimulationResult {
@@ -34,6 +36,28 @@ export interface SimulationResult {
   cumulative: CumulativeData
   details: DetailItem[]
   simulation_id?: string
+  coverage?: number  // 想定カバレッジ (0-1)
+}
+
+// Revenue Forecast types
+export interface RevenueForecastItem {
+  coverage: number        // カバレッジ (%)
+  monthly_cost: number    // 月額コスト
+  premium: number         // スマート予約利用料
+  expected_refund: number // コスト還元見込み
+  revenue: number         // レベニュー (スマート予約利用料の20%)
+  total_12months: {       // 12ヶ月合計
+    monthly_cost: number
+    premium: number
+    expected_refund: number
+    revenue: number
+  }
+  total_36months: {       // 36ヶ月合計（3年間）
+    monthly_cost: number
+    premium: number
+    expected_refund_3years: number  // 3年間のコスト還元見込（プラン期間分を減額）
+    revenue: number
+  }
 }
 
 export interface CumulativeData {
@@ -49,6 +73,8 @@ export interface DetailItem {
   insurance_cost: number
   insurance_premium: number
   insurance_savings: number
+  insurance_expected_refund: number
+  insurance_upfront: number  // Add insurance upfront cost
   standard_cost: number
   standard_upfront: number
   standard_savings: number
@@ -70,6 +96,16 @@ export interface PricingCatalog {
               hourly_usd: number
               upfront_usd: number
             }
+          }
+        }
+        savings_plans?: {
+          [term: string]: {
+            hourly_usd: number
+          }
+        }
+        ec2_savings_plans?: {
+          [term: string]: {
+            hourly_usd: number
           }
         }
       }

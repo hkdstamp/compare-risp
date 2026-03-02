@@ -4,15 +4,19 @@
 
 ## 🚀 概要
 
-Ripple連携と保険RI/SPを活用したMSP収益モデルのシミュレーションツールです。**Next.js 15 (App Router) + React 19 + TailwindCSS + Cloudflare Pages** の最新モダンスタック構成で、高速・スケーラブルなアプリケーションを実現しています。
+Ripple連携と保険RI/SPを活用したMSP収益モデルのシミュレーションツールです。**Next.js 15 (App Router) + React 19 + TailwindCSS + AWS Amplify** の最新モダンスタック構成で、高速・スケーラブルなアプリケーションを実現しています。
+
+**🆕 マイクロフロントエンド対応**: 会社ホームページ、他のWebアプリ、single-spaアプリなど、様々な環境から利用可能です。
 
 ## ✨ 主要機能
 
 ### 📊 コスト最適化シミュレーション
 - **保険RI/SP**: 30日保証 / 1年保証
 - **標準RI/SP**: 1年・3年予約 × NoUpfront/PartialUpfront/AllUpfront
+- **利用率適用ルール（標準RI/SP）**: RIはAllUpfrontのみ利用率を適用、NoUpfront/PartialUpfrontとSPは100%稼働として課金
 - **リアルタイム計算**: 月次コスト、削減額、損益分岐点
 - **累積コスト推移**: 12ヶ月のグラフ可視化
+- **🆕 動的リソース選択**: 複数のAWSサービスとインスタンスタイプを自由に組み合わせ
 
 ### 🎨 モダンUI/UX
 - **Next.js 15** App Router (最新版)
@@ -21,12 +25,19 @@ Ripple連携と保険RI/SPを活用したMSP収益モデルのシミュレーシ
 - React Chart.js 2 可視化
 - レスポンシブデザイン
 - スムーズアニメーション
+- **🆕 インタラクティブなリソースセレクター**: ドラッグ&ドロップ不要の直感的な選択UI
 
 ### ⚡ 高パフォーマンス
 - サーバーサイドレンダリング (SSR)
 - 静的サイト生成 (SSG)
-- Cloudflare Pages グローバル配信
+- AWS Amplify グローバルCDN配信
 - 最適化されたバンドルサイズ
+
+### 🔗 複数環境からの統合
+- **スタンドアロン**: 直接URLアクセス
+- **iframe埋め込み**: 他のWebアプリ内に埋め込み
+- **single-spa統合**: マイクロフロントエンドとして統合
+- **PostMessage API**: 双方向通信をサポート
 
 ## 🏗️ 技術スタック
 
@@ -42,16 +53,19 @@ Ripple連携と保険RI/SPを活用したMSP収益モデルのシミュレーシ
 - **TypeScript 5.6**: 型安全なロジック
 
 ### デプロイメント
-- **Cloudflare Pages**: エッジ配信
-- **@cloudflare/next-on-pages 1.13+**: Next.js 15 → Cloudflare 変換
+- **AWS Amplify Hosting**: マネージドホスティング & CI/CD
+- **CloudFront CDN**: グローバル配信
+- **Lambda@Edge**: サーバーレスAPI実行
 
 ## 📦 インストール
 
 ```bash
-cd nextjs
-
 # 依存関係のインストール
 npm install
+
+# 環境変数を設定
+cp .env.example .env.local
+# .env.local を編集して環境に合わせて設定
 ```
 
 ## 🚀 開発
@@ -75,28 +89,99 @@ npm run build
 npm run start
 ```
 
-## 🌐 Cloudflare Pages デプロイ
+## 🔗 統合方法
 
-### ビルド & デプロイ
+compare-rispは以下の3つの方法で他のアプリケーションに統合できます：
 
-```bash
-# Cloudflare Pages 用にビルド
-npm run cf:build
+### 1. 直接URL統合（最もシンプル）
 
-# デプロイ
-npm run cf:deploy
+```html
+<a href="https://compare-risp.your-domain.com" target="_blank">
+  コスト比較シミュレーターを開く
+</a>
 ```
 
-### ローカルでCloudflare環境をプレビュー
+詳細: [docs/STANDALONE.md](./docs/STANDALONE.md)
+
+### 2. iframe埋め込み統合（推奨）
+
+```html
+<iframe 
+  id="compare-risp-frame"
+  src="https://compare-risp.your-domain.com"
+  style="width: 100%; min-height: 900px; border: none;"
+  title="Cost Comparison Simulator"
+  allow="clipboard-write"
+></iframe>
+```
+
+**特徴**:
+- ✅ シンプルな実装（複雑なビルド・デプロイ不要）
+- ✅ PostMessage APIで双方向通信可能（オプション）
+- ✅ 完全な分離（CSS・JSの競合なし）
+- ✅ single-spa環境でも使用可能
+
+詳細: [docs/IFRAME_INTEGRATION.md](./docs/IFRAME_INTEGRATION.md)
+
+### 3. single-spa統合（iframe版）
+
+```vue
+<!-- Vue 3 例 -->
+<template>
+  <iframe
+    :src="iframeUrl"
+    class="simulator-iframe"
+    title="Cost Comparison Simulator"
+  />
+</template>
+
+<script setup>
+const iframeUrl = process.env.NODE_ENV === 'development'
+  ? 'http://localhost:3000'
+  : 'https://compare-risp.your-domain.com';
+</script>
+```
+
+**シンプルな構成**:
+- ✅ デプロイは1つ（Next.jsアプリのみ）
+- ✅ ラッパーモジュール不要
+- ✅ single-spaのルーティングと統合可能
+
+詳細: [docs/SINGLE_SPA_INTEGRATION.md](./docs/SINGLE_SPA_INTEGRATION.md)
+
+統合ガイドの概要: [docs/INTEGRATION.md](./docs/INTEGRATION.md)
+
+## 🌐 デプロイ
+
+### AWS Amplify デプロイ（推奨）
+
+**シンプルな1ステップデプロイ** - Next.jsアプリのみをデプロイ
+
+1. [AWS Amplify Console](https://console.aws.amazon.com/amplify/) にアクセス
+2. **New app** → **Host web app** をクリック
+3. GitHubリポジトリを接続: `compare-risp`
+4. ブランチを選択: `main` または `genspark_ai_developer`
+5. ビルド設定を確認（`amplify.yml`が自動検出されます）
+6. **Save and deploy** をクリック
+
+**完了！** - 追加のデプロイやビルドは不要です。
+
+詳細は [AMPLIFY_DEPLOYMENT.md](./AMPLIFY_DEPLOYMENT.md) を参照してください。
+
+### ローカルビルド確認
 
 ```bash
-npm run cf:preview
+# プロダクションビルド
+npm run build
+
+# ビルドを確認
+npm run start
 ```
 
 ## 📁 プロジェクト構造
 
 ```
-nextjs/
+/
 ├── app/                      # Next.js App Router
 │   ├── api/                  # API Routes
 │   │   ├── simulate/         # シミュレーションAPI
@@ -123,6 +208,7 @@ nextjs/
 │   ├── pricing-catalog.ts    # 価格カタログ
 │   └── utils.ts              # ユーティリティ関数
 ├── public/                   # 静的ファイル
+├── amplify.yml               # AWS Amplify ビルド設定
 ├── next.config.js            # Next.js設定
 ├── tailwind.config.js        # TailwindCSS設定
 ├── tsconfig.json             # TypeScript設定
@@ -145,6 +231,8 @@ nextjs/
 }
 ```
 
+注: `usage` は入力パラメータとして送信されますが、標準RI/SPのカバー分ランニングコストでは `RI AllUpfront` のみ適用されます。`RI NoUpfront/PartialUpfront` と `SP` は `usage=100%` 相当で課金されます。
+
 **Response:**
 ```json
 {
@@ -162,15 +250,78 @@ nextjs/
 ### `GET /api/resources`
 デフォルトリソース設定を取得
 
-## 📦 対象リソース
+## � Mixpanel トラッキング
 
-- **EC2 t3.large** × 3台
-- **EC2 t3.xlarge** × 2台
-- **RDS db.t4g.large** × 2台
+ユーザーの操作行動を分析するために、オプションでMixpanelトラッキングを有効化できます。
+
+### セットアップ
+
+#### 1. Mixpanelをインストール
+
+```bash
+npm install mixpanel-browser
+```
+
+#### 2. プロジェクトトークンを設定
+
+`.env.local`に以下を追加：
+
+```env
+NEXT_PUBLIC_MIXPANEL_TOKEN=your_mixpanel_project_token_here
+```
+
+#### 3. ビルド - トークンが読み込まれる
+
+Mixpanelの初期化は自動的に行われます（トークンが設定されている場合）。
+
+### トラッキングイベント
+
+以下のイベントが自動的に記録されます：
+
+| イベント | 説明 | パラメータ |
+|---------|------|----------|
+| `Page_View` | ページ初回表示 | `mode` (MSP/Customer) |
+| `Insurance_Plan_Changed` | 保険プラン選択 | `new_plan`, `previous_plan` |
+| `Standard_Term_Changed` | 標準契約期間変更 | `new_term`, `previous_term` |
+| `Plan_Option_Changed` | RI/SP支払方法変更 | `new_option`, `previous_option` |
+| `Plan_Selected` | シミュレーション実行 | `insurance_plan`, `standard_term`, `standard_option`, `coverage_percentage`, `usage_percentage` |
+
+### トラッキング無効化
+
+`NEXT_PUBLIC_MIXPANEL_TOKEN`が設定されていない場合、トラッキングは自動的に無効化されます。
+
+## �📦 対応リソース（動的選択可能）
+
+### 🆕 選択可能なAWSサービス
+
+#### Amazon EC2（Elastic Compute Cloud）
+- **t3ファミリー**: t3.micro, t3.small, t3.medium, t3.large, t3.xlarge, t3.2xlarge
+- **m5ファミリー**: m5.large, m5.xlarge
+- **c5ファミリー**: c5.large
+
+#### Amazon RDS（Relational Database Service）
+- **t4gファミリー**: db.t4g.micro, db.t4g.small, db.t4g.medium, db.t4g.large
+- **m5ファミリー**: db.m5.large
+- **r5ファミリー**: db.r5.large
+
+#### Amazon ElastiCache（In-Memory Data Store）
+- **t4gファミリー**: cache.t4g.micro, cache.t4g.small
+- **m5ファミリー**: cache.m5.large
+
+### 🎛️ 柔軟な構成
+- **複数サービス**: EC2、RDS、ElastiCacheを自由に組み合わせ
+- **台数指定**: 各リソース1〜100台まで指定可能
+- **リアルタイム追加/削除**: UIから簡単にリソースを追加・削除
+
+### 📊 デフォルト構成（例）
+- EC2 t3.large × 3台
+- EC2 t3.xlarge × 2台
+- RDS db.t4g.large × 2台
 
 ## 💰 価格データ
 
-AWS 東京リージョン (ap-northeast-1) の公式価格を使用
+AWS 東京リージョン (ap-northeast-1) の公式価格を使用  
+全20種類以上のインスタンスタイプをサポート
 
 ## 🆕 Next.js 15 & React 19 新機能
 
@@ -234,12 +385,13 @@ npm install
 npx tsc --noEmit
 ```
 
-### Cloudflareデプロイエラー
+### AWS Amplifyデプロイエラー
 
-```bash
-# Wranglerを再インストール
-npm install -g wrangler@latest
-```
+Amplify Consoleのビルドログを確認してください。一般的な問題：
+
+- **Node.js バージョン**: Amplifyは Node.js 18.x を使用
+- **環境変数**: 必要な環境変数が設定されているか確認
+- **ビルドメモリ**: 大規模プロジェクトの場合、サポートに連絡してメモリを増やす
 
 ## 📝 ライセンス
 
@@ -255,7 +407,7 @@ MIT License - © 2025 Alphaus Cloud Group
 
 ---
 
-**⚡ Built with Next.js 15 + React 19 + TailwindCSS + Cloudflare Pages**
+**⚡ Built with Next.js 15 + React 19 + TailwindCSS + AWS Amplify**
 
 ### 📋 バージョン情報
 - Next.js: 15.0.3
